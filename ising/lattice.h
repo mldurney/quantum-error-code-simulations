@@ -20,7 +20,7 @@ private:
     int rows;
     int cols;
     float temp;
-    static const int MAX_DISTANCE = 12;
+    static const int MAX_DISTANCE = 1;
     void findProbabilities();
     double distance(int x, int y) {return sqrt(pow(x, 2) + pow(y, 2));}
 };

@@ -32,6 +32,7 @@ void Lattice::updateLattice() {
         for (int j = 0; j < cols; j++) {
             if (probabilities[i][j] > (float) rand() / (float) RAND_MAX) {
                 board[i][j] *= -1;
+                //printf("%f", probabilities[i][j]);
             }
         }
     }
@@ -45,7 +46,7 @@ void Lattice::findProbabilities() {
             float energy2 = findTotalEnergy();
             board[i][j] *= -1;
 
-            probabilities[i][j] = pow(M_E, (-1 / temp) * (energy1 - energy2));
+            probabilities[i][j] = pow(M_E, (-1 / temp) * (energy2 - energy1));
         }
     }
 }
