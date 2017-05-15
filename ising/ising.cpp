@@ -20,6 +20,9 @@
  *      Include option to compare changes
  *      Pick random points L*L times
  *
+ *      Desired behavior:
+ *          Plot of average value of absolute magnetization vs temp
+ *
  */
 
 #include <stdio.h>
