@@ -13,6 +13,16 @@
  *      Create list of boards to see progression over time
  *      Enable output of results
  *
+ *      Change probabilities:
+ *          ef > ei : e^(-1/T)(ef-ei)
+ *          ef < ei : 1
+ *      Optimize for distance 1
+ *      Include option to compare changes
+ *      Pick random points L*L times
+ *
+ *      Desired behavior:
+ *          Plot of average value of absolute magnetization vs temp
+ *
  */
 
 #include <stdio.h>
