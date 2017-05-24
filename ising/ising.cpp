@@ -1,5 +1,5 @@
 /*
- * IDEAS:
+ * TODO:
  *      Add change tracking
  *      Comment to glory
  *      Make variables more accessible (at least read after start)
@@ -8,27 +8,24 @@
  *      Add more parameters
  *          Like what?
  *      Add safety nets and what not
- *      Optimize in general... Very slow
  *      Explore possibilities of distance
  *      Create list of boards to see progression over time
  *      Enable output of results
+ *      Error checking
  *
- *      Change probabilities:
- *          ef > ei : e^(-1/T)(ef-ei)
- *          ef < ei : 1
- *      Optimize for distance 1
  *      Include option to compare changes
- *      Pick random points L*L times
  *
  *      Desired behavior:
  *          Plot of average value of absolute magnetization vs temp
+
+- Obtain a plot of the average (absolute value) of the magnetization as a function of temperature
  *
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-#include "lattice.h"
+#include "lattice_near.h"
 
 using namespace std;
 
@@ -36,6 +33,7 @@ void help();
 
 int main() {
     int cols, rows, temp;
+    char mode;
     char *input = new char[10];
 
     cout << "Enter number of rows: ";
@@ -44,8 +42,10 @@ int main() {
     cin >> cols;
     cout << "Enter temperature (K): ";
     cin >> temp;
+    cout << "Enter update mode (a - all, r - random): ";
+    cin >> mode;
 
-    Lattice* lattice = new Lattice(rows, cols, temp);
+    Lattice* lattice = new Lattice(rows, cols, temp, mode);
 
     help();
 
@@ -77,6 +77,10 @@ int main() {
             printf("\nUpdated lattice %d times.", num);
             printf("\nTotal lattice energy: %f", lattice->findTotalEnergy());
             printf("\nLattice magnetization: %f\n", lattice->findMagnetism());
+        } else if (*input == 's') {
+            printf("\nSwitching mode to update %s.\n",
+                    (mode == ALL) ? "random cells" : "all cells");
+            lattice->switchMode(mode);
         } else if (*input == 'q') {
             cout << "\nExiting program...\n\n";
             return 0;
@@ -98,6 +102,7 @@ void help() {
          << "\n\tm\t- Evaluate and return lattice magnetization"
          << "\n\ta#\t- Update lattice # times; "
                         "print lattice, energy, and magnetization"
+         << "\n\ts\t- Switch modes (update all cells <-> update random cells)"
          << "\n\tq\t- Quit program"
          << "\n\th\t- Access list of commands"
          << "\nEnter a command: ";
