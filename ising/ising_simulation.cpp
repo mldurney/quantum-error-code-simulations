@@ -67,10 +67,10 @@ int main() {
 
         for (int i = 1; i < trials; i++) {
             (*itL)->updateLattice();
-            (*itM)[0] += abs((*itL)->findMagnetism());
+            (*itM)[0] += (*itL)->findMagnetism();
         }
 
-        (*itM)[0] /= trials;
+        (*itM)[0] = abs((*itM)[0]) / trials;
     }
 
     char filename[] = {"average_magnetisms.csv"};
