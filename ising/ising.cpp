@@ -19,6 +19,16 @@
  *          Plot of average value of absolute magnetization vs temp
 
 - Obtain a plot of the average (absolute value) of the magnetization as a function of temperature
+- Establish baseline of results
+- Run different lattice sizes
+- Input in text file
+    Each row: lattice size, temperatures specified, num updates per temperature
+    Automate generation of text files by Mathematica
+- Four vectors
+    Spins (1-n), couplings (1-2n), Hamiltonian (1-2n), local update (1-n)
+        Hamiltonian consists of small vectors (coupling, spin numbers)
+        Local update lists where spin is involved 
+-
  *
  */
 
@@ -32,7 +42,8 @@ using namespace std;
 void help();
 
 int main() {
-    int cols, rows, temp;
+    int cols, rows;
+    double temp;
     char mode;
     char *input = new char[10];
 

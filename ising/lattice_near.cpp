@@ -83,7 +83,7 @@ double Lattice::findTotalEnergy() {
 }
 
 double Lattice::findIndexEnergy(int x, int y) {
-    return (board[x][y] *
+    return -(board[x][y] *
             ( board[x][(y + 1) % cols]
             + board[x][(((y - 1) % cols) + cols) % cols]
             + board[(x + 1) % rows][y]

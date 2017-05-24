@@ -1,5 +1,5 @@
-#ifndef LATTICE_H_
-#define LATTICE_H_
+#ifndef LATTICE_NEAR_H_
+#define LATTICE_NEAR_H_
 
 #include <cmath>
 
@@ -30,4 +30,4 @@ private:
     double findProbability(int x, int y);
 };
 
-#endif /* LATTICE_H_ */
+#endif /* LATTICE_NEAR_H_ */
