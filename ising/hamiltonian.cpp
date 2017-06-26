@@ -1,6 +1,8 @@
+#include <iostream>
 #include "hamiltonian.h"
 
-Hamiltonian::Hamiltonian(vector<vector<int>> h) : hamiltonian(h)
+Hamiltonian::Hamiltonian(vector<vector<int>> h, char s='\0') :
+    hamiltonian(h), shape(s)
 {
     generateIndices();
     generateLocalTerms();
@@ -8,7 +10,7 @@ Hamiltonian::Hamiltonian(vector<vector<int>> h) : hamiltonian(h)
 
 void Hamiltonian::generateIndices()
 {
-    vector<vector<int>>::iterator it1;
+    vector< vector<int> >::iterator it1;
     vector<int>::iterator it2;
     vector<int>::iterator it3;
 
@@ -25,11 +27,12 @@ void Hamiltonian::generateIndices()
     }
 
     sort(indices.begin(), indices.end());
+    numIndices = indices.size();
 }
 
 void Hamiltonian::generateLocalTerms()
 {
-    vector<vector<int>>::iterator it1;
+    vector< vector<int> >::iterator it1;
     vector<int>::iterator it2;
     vector<int>::iterator it3;
 
@@ -44,6 +47,7 @@ void Hamiltonian::generateLocalTerms()
         {
             for (it3 = it2 + 1; it3 != it1->end(); ++it3)
             {
+                cout << "hi\n";
                 localTerms[*it2].push_back(*it3);
             }
         }
