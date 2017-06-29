@@ -2,7 +2,6 @@
 #define LATTICES_H_
 
 #include <stdlib.h>
-#include <iostream>
 #include <time.h>
 #include <cmath>
 #include "hamiltonian.h"
@@ -14,13 +13,19 @@ enum {RECTANGLE = 'r', SQUARE = 's', TRIANGLE = 't'};
 class Lattice
 {
 public:
-    Lattice(Hamiltonian h, double t, char m);
+    Lattice(Hamiltonian h, double t, char m = 'r');
+    virtual ~Lattice() = default;
+
+    char getShape() const { return shape; }
+    double getTemp() const { return temp; }
+    char getMode() const { return mode; }
+    char getCoupling() const { return coupling; }
+
     void updateLattice();
-    void switchMode(char m);
-    double findTotalEnergy();
-    double findMagnetism();
-    void printLattice(int cols);
-    ~Lattice() {}
+    void switchMode();
+    int getTotalEnergy() { return (this->*findTotalEnergyPtr)(); }
+    double getMagnetism() { return (this->*findMagnetismPtr)(); }
+    virtual void printLattice(int cols = -1);
 
 protected:
     Hamiltonian hamiltonian;
@@ -28,32 +33,52 @@ protected:
     vector<int> indices;
     int numIndices;
     vector< vector<int> > localTerms;
-    char shape;
-    double temp;
-    char mode;
     vector<int> spins;
 
     void shapeError() const;
-    void updateAll();
-    void updateRandom();
-    double findProbability(int index);
-    double findIndexEnergy(int index);
+    void setMode(char m) { mode = m; };
+    void setCoupling(char c) { coupling = c; }
+    void chooseSpeed();
+    void setSpeedNormal();
+    void setSpeedFast();
 
-    double (Lattice::*findIndexEnergyPtr)(int);
+    void updateAll();
+    void updateAllFast();
+    void updateRandom();
+    void updateRandomFast();
+    double findProbability(int index);
+    int findTotalEnergy();
+    int findTotalEnergyFast();
+    int findIndexEnergy(int index);
+    int findIndexEnergyFast(int index);
+    double findMagnetism();
+    double findMagnetismFast();
+
+    void (Lattice::*updateAllPtr)();
+    void (Lattice::*updateRandomPtr)();
+    int (Lattice::*findTotalEnergyPtr)();
+    int (Lattice::*findIndexEnergyPtr)(int);
+    double (Lattice::*findMagnetismPtr)();
 
 private:
+    char shape;
+    double temp;
+    char mode;
+    char coupling = '\0';
+
     void initSpins();
-    virtual void checkShape() const = 0;
+    virtual void checkShape() const {}
 };
 
 
 class RectangularLattice : public Lattice
 {
 public:
-    RectangularLattice(Hamiltonian h, double t, char m, int r, int c);
+    RectangularLattice(Hamiltonian h, double t, char m = 'r',
+            int r = -1, int c = -1);
     int getRows() const { return rows; }
     int getCols() const { return cols; }
-    void printLattice() { Lattice::printLattice(getCols()); }
+    void printLattice( int empty = -1 ) { Lattice::printLattice(getCols()); }
 
 protected:
     void setRows(int r) { rows = r; }
@@ -71,8 +96,9 @@ private:
 class SquareLattice : public RectangularLattice
 {
 public:
-    SquareLattice(Hamiltonian h, double t, char m, int s);
+    SquareLattice(Hamiltonian h, double t, char m = 'r', int s = -1);
     int getSide() const { return side; }
+    void printLattice( int empty = -1 ) { Lattice::printLattice(getSide()); }
 
 protected:
     void setSide(int s) { side = s; }
@@ -88,10 +114,11 @@ private:
 class TriangularLattice : public Lattice
 {
 public:
-    TriangularLattice(Hamiltonian h, double t, char m, int r, int c);
+    TriangularLattice(Hamiltonian h, double t, char m = 'r',
+            int r = -1, int c = -1);
     int getRows() const { return rows; }
     int getCols() const { return cols; }
-    void printLattice() { Lattice::printLattice(getCols()); }
+    void printLattice( int empty = -1 ) { Lattice::printLattice(getCols()); }
 
 protected:
     void setRows(int r) { rows = r; }

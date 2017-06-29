@@ -27,7 +27,7 @@
 - Four vectors
     Spins (1-n), couplings (1-2n), Hamiltonian (1-2n), local update (1-n)
         Hamiltonian consists of small vectors (coupling, spin numbers)
-        Local update lists where spin is involved 
+        Local update lists where spin is involved
 -
  *
  */
@@ -68,7 +68,7 @@ int main() {
         } else if (*input == 'u') {
             int num = atoi(&input[1]);
 
-            for (int i = 0; i <= num; i++) {
+            for (int i = 0; i < num; i++) {
                 lattice->updateLattice();
             }
 
@@ -80,7 +80,7 @@ int main() {
         } else if(*input == 'a') {
             int num = atoi(&input[1]);
 
-            for (int i = 0; i <= num; i++) {
+            for (int i = 0; i < num; i++) {
                 lattice->updateLattice();
             }
 

@@ -1,8 +1,7 @@
-#include <iostream>
 #include "hamiltonian.h"
 
-Hamiltonian::Hamiltonian(vector<vector<int>> h, char s='\0') :
-    hamiltonian(h), shape(s)
+Hamiltonian::Hamiltonian(vector<vector<int>> h, char s, int r, int c) :
+    hamiltonian(h), shape(s), rows(r), cols(c)
 {
     generateIndices();
     generateLocalTerms();
@@ -16,7 +15,7 @@ void Hamiltonian::generateIndices()
 
     for (it1 = hamiltonian.begin(); it1 != hamiltonian.end(); ++it1)
     {
-        for (it2 = it1->begin(); it2 != it1->end(); ++it2)
+        for (it2 = it1->begin() + 1; it2 != it1->end(); ++it2)
         {
             it3 = find(indices.begin(), indices.end(), *it2);
             if (it3 == indices.end())
@@ -32,24 +31,111 @@ void Hamiltonian::generateIndices()
 
 void Hamiltonian::generateLocalTerms()
 {
+    localTerms.resize(numIndices);
+
     vector< vector<int> >::iterator it1;
     vector<int>::iterator it2;
     vector<int>::iterator it3;
 
-    for (it3 = indices.begin(); it3 != indices.end(); ++it3)
-    {
-        localTerms.push_back(vector<int>());
-    }
-
     for (it1 = hamiltonian.begin(); it1 != hamiltonian.end(); ++it1)
     {
-        for (it2 = ++(it1->begin()); it2 != it1->end(); ++it2)
+        for (it2 = it1->begin() + 1; it2 != it1->end(); ++it2)
         {
-            for (it3 = it2 + 1; it3 != it1->end(); ++it3)
+            for (it3 = it1->begin() + 1; it3 != it1->end(); ++it3)
             {
-                cout << "hi\n";
+                if (it2 == it3)
+                {
+                    continue;
+                }
+
                 localTerms[*it2].push_back(*it3);
             }
         }
     }
+}
+
+void Hamiltonian::printHamiltonian()
+{
+    vector< vector<int> >::iterator it1;
+    vector<int>::iterator it2;
+
+    cout << "Printing Hamiltonian:" << endl;
+
+    for (it1 = hamiltonian.begin(); it1 != hamiltonian.end(); ++it1)
+    {
+        for (it2 = it1->begin(); it2 != it1->end(); ++it2)
+        {
+            cout << *it2 << " ";
+        }
+
+        cout << endl;
+    }
+
+    cout << endl;
+}
+
+void Hamiltonian::printIndices()
+{
+    vector<int>::iterator it;
+
+    cout << "Printing indices:" << endl;
+
+    for (it = indices.begin(); it != indices.end(); ++it)
+    {
+        cout << *it << " ";
+    }
+
+    cout << endl << endl;
+}
+
+void Hamiltonian::printLocalTerms()
+{
+    vector< vector<int> >::iterator it1;
+    vector<int>::iterator it2;
+
+    cout << "Printing local terms:" << endl;
+
+    for (it1 = localTerms.begin(); it1 != localTerms.end(); ++it1)
+    {
+        for (it2 = it1->begin(); it2 != it1->end(); ++it2)
+        {
+            cout << *it2 << " ";
+        }
+
+        cout << endl;
+    }
+
+    cout << endl;
+}
+
+vector< vector<int> > Hamiltonian::importHamiltonian(ifstream& file)
+{
+    vector< vector<int> > hamiltonianVector;
+    string line;
+    int num;
+
+    while (isalpha(file.peek()))
+    {
+        file.ignore(256, '\n');
+    }
+
+    while (getline(file, line))
+    {
+        vector<int> interaction;
+        istringstream lineStream(line);
+
+        while (lineStream >> num)
+        {
+            interaction.push_back(num);
+
+            if (lineStream.peek() == ',')
+            {
+                lineStream.ignore();
+            }
+        }
+
+        hamiltonianVector.push_back(interaction);
+    }
+
+    return hamiltonianVector;
 }
