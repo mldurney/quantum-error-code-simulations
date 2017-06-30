@@ -5,6 +5,24 @@ from multiprocessing import Process
 from run_simulation import run_trial
 
 
+def run_trials_parallel(filename, updates):
+
+    processes = [Process(target=run_trial, args=(filename,))
+                 for x in range(updates)]
+
+    call('make')
+
+    for process in processes:
+        process.start()
+
+    for process in processes:
+        process.join()
+
+    call(['make', 'clean'])
+
+# end run_trials_parallel
+
+
 def main():
 
     if len(sys.argv) != 3:
@@ -19,18 +37,7 @@ def main():
     filename = str(sys.argv[1])
     updates = int(sys.argv[2])
 
-    processes = [Process(target=run_trial, args=(filename,))
-                 for x in range(updates)]
-
-    call('make')
-
-    for process in processes:
-        process.start()
-
-    for process in processes:
-        process.join()
-
-    call(['make', 'clean'])
+    run_trials_parallel(filename, updates)
 
 # end main
 

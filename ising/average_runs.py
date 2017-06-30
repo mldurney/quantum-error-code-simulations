@@ -3,6 +3,9 @@ import sys
 import pandas as pd
 import numpy as np
 
+MIN_PERCENTILE = 25
+MAX_PERCENTILE = 75
+
 
 def average_no_outliers(data, percentile1, percentile2):
 
@@ -24,6 +27,21 @@ def average_no_outliers(data, percentile1, percentile2):
 # end average_no_outliers
 
 
+def rw_averages(in_filename):
+
+    data = pd.read_csv(in_filename)
+    averages = average_no_outliers(data, MIN_PERCENTILE, MAX_PERCENTILE)
+
+    slash_index = in_filename.rfind('/')
+    out_filename = ('avg_' + in_filename if slash_index == -1 else
+                    in_filename[:slash_index + 1] + 'avg_' +
+                    in_filename[slash_index + 1:])
+
+    averages.to_csv(out_filename, index=False)
+
+# end rw_averages
+
+
 def main():
 
     if len(sys.argv) != 2:
@@ -35,17 +53,7 @@ def main():
         print('Usage: ' + sys.argv[0] + ' input_file\n')
         sys.exit(1)
 
-    in_filename = sys.argv[1]
-
-    data = pd.read_csv(in_filename)
-    averages = average_no_outliers(data, 25, 75)
-
-    slash_index = in_filename.rfind('\\')
-    out_filename = ('avg_' + in_filename if slash_index == -1 else
-                    in_filename[:slash_index + 1] + 'avg_' +
-                    in_filename[slash_index + 1:])
-
-    averages.to_csv(out_filename)
+    rw_averages(sys.argv[1])
 
 # end main
 
