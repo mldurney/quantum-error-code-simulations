@@ -2,18 +2,7 @@ import os.path
 import sys
 from subprocess import call
 from multiprocessing import Process
-
-def run_trial(filename):
-
-    sim_name = './ising_simulation'
-    tests = open(filename, 'r')
-
-    for line in tests:
-        command = [sim_name] + [setting.strip()
-                                for setting in line.split(',')]
-        call(command)
-
-# end run_trial
+from run_simulation import run_trial
 
 
 def main():

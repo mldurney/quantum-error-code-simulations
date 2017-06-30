@@ -42,13 +42,18 @@ def main():
         min_rows = int(input('Min rows: '))
         max_rows = int(input('Max rows: '))
         row_skip = int(input('Rows to skip between simulations: '))
-        min_cols = int(input('Min columns: '))
-        max_cols = int(input('Max columns: '))
-        col_skip = int(input('Columns to skip between simulations: '))
+
+        if shape == gh.SQUARE:
+            (min_cols, max_cols, col_skip) = (min_rows, max_rows, row_skip)
+        else:
+            min_cols = int(input('Min columns: '))
+            max_cols = int(input('Max columns: '))
+            col_skip = int(input('Columns to skip between simulations: '))
+            
         min_temp = float(input('Starting temperature: '))
         max_temp = float(input('Ending temperature: '))
         change_temp = float(input('Change in temperature between tests: '))
-        updates = int(input('Number of updates per temperature per test '))
+        updates = int(input('Number of updates per temperature per test: '))
         coup = input('List (delimited by space) of couplings between pairs: ')
         mode = str(input('Update mode ("a" all, "r" random): '))
 
@@ -60,7 +65,7 @@ def main():
     else:
         shape = gh.SQUARE
         (min_rows, max_rows) = (10, 30)
-        (min_cols, max_cols) = (10, 30)
+        (min_cols, max_cols) = (min_rows, max_rows)
         range_rows = range(min_rows, max_rows + 1)
         range_cols = range(min_cols, max_cols + 1)
 
@@ -77,6 +82,8 @@ def main():
 
     tests = list(itertools.product(range_rows, range_cols, couplings))
 
+    if shape == gh.SQUARE:
+        tests = [test for test in tests if test[0] == test[1]]
 
     (main_dir, hamiltonian_dir, *_) = make_directories(folder)
 

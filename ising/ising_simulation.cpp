@@ -187,15 +187,26 @@ void writeOutput(string filename, vector<array<double, 2>> magnetizations)
     {
         for (itM = magnetizations.begin(); itM != magnetizations.end(); itM++)
         {
-            file << (*itM)[0] << ",";
+            file << (*itM)[0];
+
+            if (itM + 1 != magnetizations.end())
+            {
+                file << ",";
+            }
         }
+
     }
 
     file << endl;
 
     for (itM = magnetizations.begin(); itM != magnetizations.end(); itM++)
     {
-        file << (*itM)[1] << ",";
+        file << (*itM)[1];
+
+        if (itM + 1 != magnetizations.end())
+        {
+            file << ",";
+        }
     }
 
     file.close();

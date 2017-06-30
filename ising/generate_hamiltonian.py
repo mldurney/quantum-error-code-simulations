@@ -167,5 +167,5 @@ def receive_input():
 
 
 if __name__ == '__main__':
-    FILENAME = (sys.argv[1] if len(sys.argv) == 2 else 'hamiltonian') + '.csv'
+    FILENAME = sys.argv[1] if len(sys.argv) == 2 else 'hamiltonian'
     write_hamiltonian(FILENAME, *receive_input())
