@@ -7,7 +7,7 @@
 #include "hamiltonian.h"
 
 #define E 2.71828182845904523536
-enum {ALL = 'a', RANDOM = 'r'};
+enum {ALL = 'a', PSEUDO = 'p', RANDOM = 'r'};
 enum {RECTANGLE = 'r', SQUARE = 's', TRIANGLE = 't'};
 
 class Lattice
@@ -22,7 +22,7 @@ public:
     char getCoupling() const { return coupling; }
 
     void updateLattice();
-    void switchMode();
+    void switchMode(char m);
     int getTotalEnergy() { return (this->*findTotalEnergyPtr)(); }
     double getMagnetism() { return (this->*findMagnetismPtr)(); }
     virtual void printLattice(int cols = -1);
@@ -33,6 +33,7 @@ protected:
     vector<int> indices;
     int numIndices;
     vector< vector<int> > localTerms;
+    vector< vector< vector<int> > > indInteractions;
     vector<int> spins;
 
     void shapeError() const;
@@ -44,6 +45,7 @@ protected:
 
     void updateAll();
     void updateAllFast();
+    void updatePseudo();
     void updateRandom();
     void updateRandomFast();
     double findProbability(int index);
@@ -55,6 +57,7 @@ protected:
     double findMagnetismFast();
 
     void (Lattice::*updateAllPtr)();
+    void (Lattice::*updatePseudoPtr)();
     void (Lattice::*updateRandomPtr)();
     int (Lattice::*findTotalEnergyPtr)();
     int (Lattice::*findIndexEnergyPtr)(int);

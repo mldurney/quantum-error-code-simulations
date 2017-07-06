@@ -1,28 +1,34 @@
 CXX		 = g++
-CXXFLAGS = -std=c++14 -Wall -ggdb
+CXXFLAGS = -std=c++14 -Wall -ggdb -pthread -Ofast
 
-all : ising ising_simulation test_hamiltonian
+all : isingsimulation ising testhamiltonian
 
-ising : ising.o lattices.o hamiltonian.o
-	$(CXX) $(CXXFLAGS) ising.o lattices.o hamiltonian.o -o ising
+isingsimulation : isingsimulation.o isinghelpers.o simulatedlattice.o lattices.o hamiltonian.o
+	$(CXX) $(CXXFLAGS) isingsimulation.o isinghelpers.o simulatedlattice.o lattices.o hamiltonian.o -o isingsimulation
 
-ising.o : ising.cpp lattices.h
+isingsimulation.o : isingsimulation.cpp isingsimulation.h isinghelpers.h simulatedlattice.h
+	$(CXX) $(CXXFLAGS) -c isingsimulation.cpp
+
+ising : ising.o isinghelpers.o lattices.o hamiltonian.o
+	$(CXX) $(CXXFLAGS) ising.o isinghelpers.o lattices.o hamiltonian.o -o ising
+
+ising.o : ising.cpp ising.h isinghelpers.h
 	$(CXX) $(CXXFLAGS) -c ising.cpp
 
-ising_simulation : ising_simulation.o lattices.o hamiltonian.o
-	$(CXX) $(CXXFLAGS) ising_simulation.o lattices.o hamiltonian.o -o ising_simulation
+isinghelpers.o : isinghelpers.cpp isinghelpers.h lattices.h
+	$(CXX) $(CXXFLAGS) -c isinghelpers.cpp
 
-ising_simulation.o : ising_simulation.cpp lattices.h
-	$(CXX) $(CXXFLAGS) -c ising_simulation.cpp
+simulatedlattice.o : simulatedlattice.cpp simulatedlattice.h lattices.h
+	$(CXX) $(CXXFLAGS) -c simulatedlattice.cpp
 
 lattices.o : lattices.cpp lattices.h hamiltonian.h
 	$(CXX) $(CXXFLAGS) -c lattices.cpp
 
-test_hamiltonian : test_hamiltonian.o hamiltonian.o
-	$(CXX) $(CXXFLAGS) test_hamiltonian.o hamiltonian.o -o test_hamiltonian
+testhamiltonian : testhamiltonian.o hamiltonian.o
+	$(CXX) $(CXXFLAGS) testhamiltonian.o hamiltonian.o -o testhamiltonian
 
-test_hamiltonian.o : test_hamiltonian.cpp hamiltonian.h
-	$(CXX) $(CXXFLAGS) -c test_hamiltonian.cpp
+testhamiltonian.o : testhamiltonian.cpp hamiltonian.h
+	$(CXX) $(CXXFLAGS) -c testhamiltonian.cpp
 
 hamiltonian.o : hamiltonian.cpp hamiltonian.h
 	$(CXX) $(CXXFLAGS) -c hamiltonian.cpp
@@ -31,6 +37,6 @@ memcheck.o: memcheck.cpp memcheck.h
 	$(CXX) $(CXXFLAGS) -c memcheck.cpp
 
 clean :
-	rm -f ising ising_simulation lattices tests test_hamiltonian *.o *.gch
+	rm -f ising isingsimulation testhamiltonian *.o *.gch
 
 .PHONY : all clean

@@ -112,8 +112,8 @@ def receive_input():
     Return shape and Hamiltonian function based on input
     '''
 
-    shape = input('Enter lattice shape ("s" - square, "r" - rectangle, ' +
-                  '"t" - triangle): ')
+    shape = str(input('Enter lattice shape ("s" - square, "r" - rectangle, ' +
+                      '"t" - triangle): '))
 
     while (shape not in [SQUARE, RECTANGLE, TRIANGLE]):
         shape = str(input('Invalid input. Please enter "s", "r", or "t": '))

@@ -12,6 +12,7 @@ Lattice::Lattice(Hamiltonian h, double t, char m) :
     indices = hamiltonian.getIndices();
     numIndices = hamiltonian.getNumIndices();
     localTerms = hamiltonian.getLocalTerms();
+    indInteractions = hamiltonian.getIndInteractions();
     shape = hamiltonian.getShape();
 
     initSpins();
@@ -70,6 +71,7 @@ void Lattice::chooseSpeed()
 void Lattice::setSpeedNormal()
 {
     updateAllPtr = &Lattice::updateAll;
+    updatePseudoPtr = &Lattice::updatePseudo;
     updateRandomPtr = &Lattice::updateRandom;
     findTotalEnergyPtr = &Lattice::findTotalEnergy;
     findIndexEnergyPtr = &Lattice::findIndexEnergy;
@@ -79,6 +81,7 @@ void Lattice::setSpeedNormal()
 void Lattice::setSpeedFast()
 {
     updateAllPtr = &Lattice::updateAllFast;
+    updatePseudoPtr = &Lattice::updatePseudo;
     updateRandomPtr = &Lattice::updateRandomFast;
     findTotalEnergyPtr = &Lattice::findTotalEnergyFast;
     findIndexEnergyPtr = &Lattice::findIndexEnergyFast;
@@ -89,6 +92,7 @@ void Lattice::updateLattice() {
     switch (mode)
     {
         case ALL: (this->*updateAllPtr)(); break;
+        case PSEUDO: (this->*updatePseudoPtr)(); break;
         case RANDOM: (this->*updateRandomPtr)(); break;
     }
 }
@@ -113,6 +117,19 @@ void Lattice::updateAllFast()
         if (findProbability(i) > (double) rand() / (double) RAND_MAX)
         {
             spins[i] *= -1;
+        }
+    }
+}
+
+void Lattice::updatePseudo()
+{
+    random_shuffle(indices.begin(), indices.end());
+
+    for (int i = 0; i < numIndices; ++i)
+    {
+        if (findProbability(indices[i]) > (double) rand() / (double) RAND_MAX)
+        {
+            spins[indices[i]] *= -1;
         }
     }
 }
@@ -147,15 +164,18 @@ void Lattice::updateRandomFast()
     }
 }
 
-void Lattice::switchMode()
+void Lattice::switchMode(char m)
 {
-    switch (getMode())
+    switch (m)
     {
         case ALL:
-            setMode(RANDOM);
+            setMode(ALL);
+            break;
+        case PSEUDO:
+            setMode(PSEUDO);
             break;
         case RANDOM:
-            setMode(ALL);
+            setMode(RANDOM);
             break;
         default:
             cout << "INVALID MODE. Exiting...\n\n";
@@ -213,23 +233,17 @@ int Lattice::findIndexEnergy(int index)
     vector< vector<int> >::iterator it1;
     vector<int>::iterator it2;
 
-    for (it1 = hFunction.begin(); it1 != hFunction.end(); ++it1)
+    for (it1 = indInteractions[index].begin();
+            it1 != indInteractions[index].end(); ++it1)
     {
+        int couplingEnergy = *(it1->begin());
+
         for (it2 = it1->begin() + 1; it2 != it1->end(); ++it2)
         {
-            if (index == *it2)
-            {
-                int couplingEnergy = *(it1->begin());
-
-                for (it2 = it1->begin() + 1; it2 != it1->end(); ++it2)
-                {
-                    couplingEnergy *= spins[*it2];
-                }
-
-                energy -= couplingEnergy;
-                break;
-            }
+            couplingEnergy *= spins[*it2];
         }
+
+        energy -= couplingEnergy;
     }
 
     return energy;

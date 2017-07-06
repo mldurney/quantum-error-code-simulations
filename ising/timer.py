@@ -26,7 +26,7 @@ else:
 call('make')
 
 start_time = time.time()
-call(['./ising_simulation', filename, t, dt, n, updates, mode])
+call(['./isingsimulation', filename, t, dt, n, updates, mode])
 time_elapsed = time.time() - start_time
 
 call(['make', 'clean'])

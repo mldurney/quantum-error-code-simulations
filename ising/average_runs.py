@@ -9,7 +9,7 @@ MAX_PERCENTILE = 75
 
 def average_no_outliers(data, percentile1, percentile2):
 
-    cols = ['temperature', 'magnetization']
+    cols = ['temperature', 'results']
     averages = pd.DataFrame(columns=cols)
 
     for temp in data.columns:

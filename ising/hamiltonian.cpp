@@ -5,6 +5,7 @@ Hamiltonian::Hamiltonian(vector<vector<int>> h, char s, int r, int c) :
 {
     generateIndices();
     generateLocalTerms();
+    generateIndInteractions();
 }
 
 void Hamiltonian::generateIndices()
@@ -50,6 +51,40 @@ void Hamiltonian::generateLocalTerms()
 
                 localTerms[*it2].push_back(*it3);
             }
+        }
+    }
+}
+
+void Hamiltonian::generateIndInteractions()
+{
+    indInteractions.resize(numIndices);
+
+    for (int i = 0; i < numIndices; ++i)
+    {
+        indInteractions[i].resize(localTerms[i].size());
+    }
+
+    vector< vector<int> >::iterator it1;
+    vector<int>::iterator it2;
+    vector<int>::iterator it3;
+
+    for (it1 = hamiltonian.begin(); it1 != hamiltonian.end(); ++it1)
+    {
+        for (it2 = it1->begin() + 1; it2 != it1->end(); ++it2)
+        {
+            vector<int> interaction = {*(it1->begin())};
+
+            for (it3 = it1->begin() + 1; it3 != it1->end(); ++it3)
+            {
+                if (it2 == it3)
+                {
+                    continue;
+                }
+
+                interaction.push_back(*it3);
+            }
+
+            indInteractions[*it2].push_back(interaction);
         }
     }
 }
@@ -108,7 +143,33 @@ void Hamiltonian::printLocalTerms()
     cout << endl;
 }
 
-vector< vector<int> > Hamiltonian::importHamiltonian(ifstream& file)
+void Hamiltonian::printIndInteractions()
+{
+    vector< vector< vector<int> > >::iterator it1;
+    vector< vector<int> >::iterator it2;
+    vector<int>::iterator it3;
+
+    cout << "Printing index interactions:" << endl;
+
+    for (it1 = indInteractions.begin(); it1 != indInteractions.end(); ++it1)
+    {
+        for (it2 = it1->begin(); it2 != it1->end(); ++it2)
+        {
+            for (it3 = it2->begin(); it3 != it2->end(); ++it3)
+            {
+                cout << *it3 << " ";
+            }
+
+            cout << "\t";
+        }
+
+        cout << endl;
+    }
+
+    cout << endl;
+}
+
+vector< vector<int> > Hamiltonian::importHamiltonianVector(ifstream& file)
 {
     vector< vector<int> > hamiltonianVector;
     string line;

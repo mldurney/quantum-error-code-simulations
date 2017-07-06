@@ -1,66 +1,27 @@
-#include <stdio.h>
-#include "lattices.h"
+#include "ising.h"
 
-using namespace std;
-
-void help();
-void runSimulation(Lattice*);
-
-int main(int argc, char* argv[]) {
-    if (argc != 2)
-    {
-        printf("Usage: %s name_of_hamiltonian_file\n\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
-
-    char* filename = argv[1];
+int main(int argc, char* argv[])
+{
+    string filename = receiveFilename(argc, argv);
     ifstream file(filename);
 
     if (!file)
     {
-        printf("Invalid file name. %s does not exist!\n\n", argv[1]);
+        cout<< "Invalid file name. " << filename << " does not exist!\n\n";
         exit(EXIT_FAILURE);
     }
 
+    char shape;
+    Hamiltonian hamiltonian = readHamiltonian(file, shape);
 
-    char shape = '\0';
-    int rows = -1;
-    int cols = -1;
-
-    if (isalpha(file.peek()))
-    {
-        string line;
-        string field;
-        getline(file, line);
-
-        stringstream stream(line);
-        stringstream fields[3];
-
-        fields[0] << "\0";
-        fields[1] << "-1";
-        fields[2] << "-1";
-
-        for (int i = 0; i < 3 && getline(stream, field, ','); ++i)
-        {
-            fields[i].str(field);
-        }
-
-        fields[0] >> shape;
-        fields[1] >> rows;
-        fields[2] >> cols;
-    }
-
-
-    Hamiltonian hamiltonian =
-            Hamiltonian(Hamiltonian::importHamiltonian(file),
-                    shape, rows, cols);
+    file.close();
 
     double temp;
     char mode;
 
     cout << "Enter temperature (K): ";
     cin >> temp;
-    cout << "Enter update mode (a - all, r - random): ";
+    cout << "Enter update mode (a - all, p - pseudorandom, r - random): ";
     cin >> mode;
 
     Lattice* lattice;
@@ -80,30 +41,38 @@ int main(int argc, char* argv[]) {
             lattice = new Lattice(hamiltonian, temp, mode);
     }
 
-    runSimulation(lattice);
+    runLattice(lattice);
 
     delete lattice;
 }
 
-void help() {
-    cout << "\nCommands: "
-         << "\n\tp\t- Print lattice"
-         << "\n\tu#\t- Update lattice # times"
-         << "\n\te\t- Evaluate and return total lattice energy"
-         << "\n\tm\t- Evaluate and return lattice magnetization"
-         << "\n\ta#\t- Update lattice # times; "
-                        "print lattice, energy, and magnetization"
-         << "\n\ts\t- Switch modes (update all cells <-> update random cells)"
-         << "\n\tq\t- Quit program"
-         << "\n\th\t- Access list of commands"
-         << "\n\nEnter a command: ";
+string receiveFilename(int argc, char* argv[])
+{
+    string filename;
+
+    if (argc == 1)
+    {
+        cout << "Enter Hamiltonian input file: ";
+        cin >> filename;
+    }
+    else if (argc == 2)
+    {
+        filename = argv[1];
+    }
+    else
+    {
+        cout << "Usage: " << argv[0] << " name_of_hamiltonian_file\n\n";
+        exit(EXIT_FAILURE);
+    }
+
+    return filename;
 }
 
-void runSimulation(Lattice* lattice)
+void runLattice(Lattice* lattice)
 {
     char *input = new char[10];
 
-    help();
+    runLatticeHelp();
 
     while (true)
     {
@@ -123,17 +92,17 @@ void runSimulation(Lattice* lattice)
                     lattice->updateLattice();
                 }
 
-                printf("\nUpdated lattice %d times.\n", num);
+                cout << "\nUpdated lattice " << num << " times.\n";
                 break;
 
             case 'e':
-                printf("\nTotal lattice energy: %d\n",
-                        lattice->getTotalEnergy());
+                cout << "\nTotal lattice energy: ";
+                cout << lattice->getTotalEnergy() << endl;
                 break;
 
             case 'm':
-                printf("\nLattice magnetization: %f\n",
-                        lattice->getMagnetism());
+                cout << "\nLattice magnetization: ";
+                cout << lattice->getMagnetism() << endl;;
                 break;
 
             case 'a':
@@ -144,19 +113,17 @@ void runSimulation(Lattice* lattice)
                 }
 
                 lattice->printLattice();
-                printf("\nUpdated lattice %d times.", num);
-                printf("\nTotal lattice energy: %d",
-                        lattice->getTotalEnergy());
-                printf("\nLattice magnetization: %f\n",
-                        lattice->getMagnetism());
+                cout << "\nUpdated lattice " << num << " times.";
+                cout << "\nTotal lattice energy: ";
+                cout << lattice->getTotalEnergy();
+                cout << "\nLattice magnetization: ";
+                cout << lattice->getMagnetism() << endl;
 
                 break;
 
             case 's':
-                printf("\nSwitching mode to update %s.\n",
-                        (lattice->getMode() == ALL) ?
-                        "random cells" : "all cells");
-                lattice->switchMode();
+                cout<< "\nSwitching mode to " << input[1] << endl;
+                lattice->switchMode(input[1]);
                 break;
 
             case 'q':
@@ -164,7 +131,7 @@ void runSimulation(Lattice* lattice)
                 return;
 
             case 'h':
-                help();
+                runLatticeHelp();
                 break;
 
             default:
@@ -173,4 +140,18 @@ void runSimulation(Lattice* lattice)
 
         cout << "\nEnter command (h - help): ";
     }
+}
+
+void runLatticeHelp() {
+    cout << "\nCommands: "
+         << "\n\tp\t- Print lattice"
+         << "\n\tu#\t- Update lattice # times"
+         << "\n\te\t- Evaluate and return total lattice energy"
+         << "\n\tm\t- Evaluate and return lattice magnetization"
+         << "\n\ta#\t- Update lattice # times; "
+                        "print lattice, energy, and magnetization"
+         << "\n\ts#\t- Switch modes (a - all, p - pseudorandom, r - random)"
+         << "\n\tq\t- Quit program"
+         << "\n\th\t- Access list of commands"
+         << "\n\nEnter a command: ";
 }

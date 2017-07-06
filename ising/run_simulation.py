@@ -5,7 +5,7 @@ from subprocess import call
 
 def run_trial(filename):
 
-    sim_name = './ising_simulation'
+    sim_name = './isingsimulation'
     tests = open(filename, 'r')
 
     for line in tests:

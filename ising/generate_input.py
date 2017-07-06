@@ -70,11 +70,11 @@ def get_userinput_lattice():
     args['change_temp'] = float(input('Change in temperature between tests: '))
     args['updates'] = int(input('Number of updates per temperature per test: '))
     coup = input('List (delimited by space) of couplings between pairs: ')
-    args['mode'] = str(input('Update mode ("a" all, "r" random): '))
+    args['mode'] = str(input('Update mode ("a" all, "p" psuedo, "r" random): '))
 
     args['range_rows'] = range(args['min_rows'], args['max_rows'] + 1,
                                row_skip)
-    args['range_cols'] = range(args['min_cols'], args['max_col'] + 1,
+    args['range_cols'] = range(args['min_cols'], args['max_cols'] + 1,
                                col_skip)
     args['num_temps'] = int((max_temp - args['min_temp'])
                             / args['change_temp']) + 1
@@ -109,22 +109,18 @@ def get_default_lattice():
 # end get_default_lattice
 
 
-def make_directories(folder):
+def make_directories(main_dir):
 
-    main_dir = folder
-    hamiltonian_dir = os.path.join(main_dir, 'hamiltonians')
-    magnetization_dir = os.path.join(main_dir, 'magnetizations')
+    directories = [main_dir]
+    directories.append(os.path.join(main_dir, 'hamiltonians'))
+    directories.append(os.path.join(main_dir, 'magnetizations'))
+    directories.append(os.path.join(main_dir, 'binder_cumulants'))
 
-    if not os.path.exists(main_dir):
-        os.mkdir(main_dir)
+    for directory in directories:
+        if not os.path.exists(directory):
+            os.mkdir(directory)
 
-    if not os.path.exists(hamiltonian_dir):
-        os.mkdir(hamiltonian_dir)
-
-    if not os.path.exists(magnetization_dir):
-        os.mkdir(magnetization_dir)
-
-    return (main_dir, hamiltonian_dir, magnetization_dir)
+    return tuple(directories)
 
 # end make_directories
 

@@ -21,6 +21,8 @@ public:
     vector<int> getIndices() const { return indices; }
     int getNumIndices() const { return numIndices; }
     vector< vector<int> > getLocalTerms() const { return localTerms; }
+    vector< vector< vector <int> > > getIndInteractions() const
+            { return indInteractions; }
 
     char getShape() const { return shape; }
     int getRows() const { return rows; }
@@ -29,17 +31,20 @@ public:
     void printHamiltonian();
     void printIndices();
     void printLocalTerms();
+    void printIndInteractions();
 
-    static vector< vector<int> > importHamiltonian(ifstream& file);
+    static vector< vector<int> > importHamiltonianVector(ifstream& file);
 
 private:
     void generateIndices();
     void generateLocalTerms();
+    void generateIndInteractions();
 
     vector< vector<int> > hamiltonian;
     vector<int> indices;
     int numIndices;
     vector< vector<int> > localTerms;
+    vector< vector< vector<int> > > indInteractions;
 
     char shape;
     int rows;
