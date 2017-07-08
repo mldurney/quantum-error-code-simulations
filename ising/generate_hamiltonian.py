@@ -12,11 +12,26 @@ Output Hamiltonian as .csv file ('hamiltonian.csv')
 '''
 
 import sys
+from random import randint
 
-(SQUARE, RECTANGLE, TRIANGLE) = ('s', 'r', 't')
+(SQUARE, RECTANGLE, TRIANGLE, STRIANGLE) = ('s', 'r', 't', 'v')
+SHAPES = [SQUARE, RECTANGLE, TRIANGLE, STRIANGLE]
 
 
-def generate_square(coupling, size):
+def add_disorder(coupling, disorder):
+    '''
+    Find coupling when taking disorder into account
+    Coupling is original integer coupling of interaction
+    Disorder is integer percent chance that coupling will be flipped
+    Return opposite coupling at probability given by disorder
+    '''
+
+    return coupling if disorder <= randint(0, 99) else coupling * -1
+
+# end add_disorder
+
+
+def generate_square(coupling, disorder, size):
     '''
     Generate list of interacting indices with their couplings for square
     lattice
@@ -24,12 +39,12 @@ def generate_square(coupling, size):
     coupling between all pairs
     '''
 
-    return generate_rectangle(coupling, size, size)
+    return generate_rectangle(coupling, disorder, size, size)
 
 # end generate_square
 
 
-def generate_rectangle(coupling, rows, cols):
+def generate_rectangle(coupling, disorder, rows, cols):
     '''
     Generate list of interacting indices with their couplings for rectangular
     lattice
@@ -42,18 +57,18 @@ def generate_rectangle(coupling, rows, cols):
     for index in range(rows * cols):
         # Add interaction between index and right neighbor
         right = (index // cols) * rows + (index + 1) % cols
-        hamiltonian.append([coupling, index, right])
+        hamiltonian.append([add_disorder(coupling, disorder), index, right])
 
         # Add interaction between index and bottom neighbor
         bottom = (index + rows) % (rows * cols)
-        hamiltonian.append([coupling, index, bottom])
+        hamiltonian.append([add_disorder(coupling, disorder), index, bottom])
 
     return hamiltonian
 
 # end generate_rectangle
 
 
-def generate_triangle(coupling, rows, cols):
+def generate_triangle(coupling, disorder, rows, cols):
     '''
     Generate list of interacting indices with their couplings for triangular
     lattice
@@ -66,19 +81,32 @@ def generate_triangle(coupling, rows, cols):
     for index in range(rows * cols):
         # Add interaction between index and right neighbor
         right = (index // cols) * rows + (index + 1) % cols
-        hamiltonian.append([coupling, index, right])
+        hamiltonian.append([add_disorder(coupling, disorder), index, right])
 
         # Add interaction between index and bottom neighbor
         bottom = (index + rows) % (rows * cols)
-        hamiltonian.append([coupling, index, bottom])
+        hamiltonian.append([add_disorder(coupling, disorder), index, bottom])
 
         # Add interaction between index and bottom-right neighbor
         diagonal = (right + rows) % (rows * cols)
-        hamiltonian.append([coupling, index, diagonal])
+        hamiltonian.append([add_disorder(coupling, disorder), index, diagonal])
 
     return hamiltonian
 
 # end generate_triangle
+
+
+def generate_striangle(coupling, disorder, size):
+    '''
+    Generate list of interacting indices with their couplings for square
+    triangular lattice
+    Return Hamiltonian for square lattice of with side length 'size' with same
+    coupling between all pairs
+    '''
+
+    return generate_triangle(coupling, disorder, size, size)
+
+# end generate_striangle
 
 
 def write_hamiltonian(filename, hamiltonian, shape, rows, cols):
@@ -115,30 +143,32 @@ def receive_input():
     shape = str(input('Enter lattice shape ("s" - square, "r" - rectangle, ' +
                       '"t" - triangle): '))
 
-    while (shape not in [SQUARE, RECTANGLE, TRIANGLE]):
+    while (shape not in [SQUARE, RECTANGLE, TRIANGLE, STRIANGLE]):
         shape = str(input('Invalid input. Please enter "s", "r", or "t": '))
 
 
     while True:
         try:
             coupling = int(input('Enter integer coupling: '))
+            disorder = int(input('Enter disorder [0, 100]: '))
             break
         except ValueError:
             print('Invalid input -- not an integer!')
 
-
-    if shape == SQUARE:
+    if shape in [SQUARE, STRIANGLE]:
         while True:
             try:
-                rows = int(input('Enter square side length: '))
+                rows = int(input('Enter side length: '))
                 cols = rows
                 break
             except ValueError:
                 print('Invalid input -- not an integer!')
 
-        hamiltonian = generate_square(coupling, rows)
+        hamiltonian = (generate_square(coupling, disorder, rows)
+                       if shape == SQUARE
+                       else generate_striangle(coupling, disorder, rows))
 
-    elif shape == RECTANGLE:
+    elif shape in [RECTANGLE, TRIANGLE]:
         while True:
             try:
                 rows = int(input('Enter number of rows: '))
@@ -147,18 +177,9 @@ def receive_input():
             except ValueError:
                 print('Invalid input -- not an integer!')
 
-        hamiltonian = generate_rectangle(coupling, rows, cols)
-
-    elif shape == TRIANGLE:
-        while True:
-            try:
-                rows = int(input('Enter number of rows: '))
-                cols = int(input('Enter number of columns: '))
-                break
-            except ValueError:
-                print('Invalid input -- not an integer')
-
-        hamiltonian = generate_triangle(coupling, rows, cols)
+        hamiltonian = (generate_rectangle(coupling, disorder, rows, cols)
+                       if shape == RECTANGLE
+                       else generate_triangle(coupling, disorder, rows, cols))
 
 
     return (hamiltonian, shape, rows, cols)

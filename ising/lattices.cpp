@@ -22,7 +22,6 @@ Lattice::Lattice(Hamiltonian h, double t, char m) :
 void Lattice::initSpins()
 {
     srand(time(NULL));
-    spins.resize(indices.back() + 1);
 
     vector<int>::iterator it;
 
@@ -236,9 +235,10 @@ int Lattice::findIndexEnergy(int index)
     for (it1 = indInteractions[index].begin();
             it1 != indInteractions[index].end(); ++it1)
     {
-        int couplingEnergy = *(it1->begin());
+        it2 = it1->begin();
+        int couplingEnergy = *it2;
 
-        for (it2 = it1->begin() + 1; it2 != it1->end(); ++it2)
+        for (++it2; it2 != it1->end(); ++it2)
         {
             couplingEnergy *= spins[*it2];
         }
@@ -246,7 +246,7 @@ int Lattice::findIndexEnergy(int index)
         energy -= couplingEnergy;
     }
 
-    return energy;
+    return spins[index] * energy;
 }
 
 int Lattice::findIndexEnergyFast(int index)
@@ -422,7 +422,7 @@ TriangularLattice::TriangularLattice(Hamiltonian h, double t, char m,
 
 void TriangularLattice::checkShape() const
 {
-    if (getShape() != TRIANGLE)
+    if (getShape() != TRIANGLE && getShape() != STRIANGLE)
     {
         cout << "Invalid shape parameter -- not a triangle ('t')!\n";
         shapeError();
@@ -447,4 +447,51 @@ void TriangularLattice::guessRowsCols()
             return;
         }
     }
+}
+
+
+////////////////////////
+// STriangularLattice //
+////////////////////////
+
+
+STriangularLattice::STriangularLattice(Hamiltonian h, double t, char m,
+        int s) : TriangularLattice(h, t, m, s, s), side(s)
+{
+    checkShape();
+
+    if (getSide() == -1)
+    {
+        guessSide();
+    }
+}
+
+void STriangularLattice::checkShape() const
+{
+    if (getShape() != STRIANGLE)
+    {
+        cout << "Invalid shape parameter -- not a square triangle ('v')!\n";
+        shapeError();
+    }
+}
+
+void STriangularLattice::guessSide()
+{
+    int guess = hamiltonian.getRows();
+
+    if (guess == -1)
+    {
+        int guess = (int) sqrt(numIndices);
+
+        if (guess * guess != numIndices)
+        {
+            cout << "Lattice is not a square triangle ";
+            cout << "(invalid number of indices)!";
+            shapeError();
+        }
+    }
+
+    setSide(guess);
+    setRows(guess);
+    setCols(guess);
 }

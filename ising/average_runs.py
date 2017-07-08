@@ -13,12 +13,13 @@ def average_no_outliers(data, percentile1, percentile2):
     averages = pd.DataFrame(columns=cols)
 
     for temp in data.columns:
-        quartile1 = np.percentile(data[temp], percentile1)
-        quartile3 = np.percentile(data[temp], percentile2)
-        restricted = [x for x in data[temp] if quartile1 <= x <= quartile3]
+        data_no_nan = data[temp].dropna()
+        quartile1 = np.percentile(data_no_nan, percentile1)
+        quartile3 = np.percentile(data_no_nan, percentile2)
+        restricted = [x for x in data_no_nan if quartile1 <= x <= quartile3]
         mean = np.mean(restricted)
         std = np.std(restricted)
-        no_outliers = [x for x in data[temp] if abs(x - mean) <= std]
+        no_outliers = [x for x in data_no_nan if abs(x - mean) <= std]
         average = sum(no_outliers) / len(no_outliers)
         averages.loc[len(averages)] = [float(temp), average]
 
@@ -29,6 +30,7 @@ def average_no_outliers(data, percentile1, percentile2):
 
 def rw_averages(in_filename):
 
+    print('Entering ' + in_filename)
     data = pd.read_csv(in_filename)
     averages = average_no_outliers(data, MIN_PERCENTILE, MAX_PERCENTILE)
 

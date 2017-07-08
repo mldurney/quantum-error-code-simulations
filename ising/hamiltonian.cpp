@@ -32,11 +32,14 @@ void Hamiltonian::generateIndices()
 
 void Hamiltonian::generateLocalTerms()
 {
-    localTerms.resize(numIndices);
-
     vector< vector<int> >::iterator it1;
     vector<int>::iterator it2;
     vector<int>::iterator it3;
+
+    for (it2 = indices.begin(); it2 != indices.end(); ++it2)
+    {
+        localTerms[*it2] = vector<int>();
+    }
 
     for (it1 = hamiltonian.begin(); it1 != hamiltonian.end(); ++it1)
     {
@@ -57,16 +60,14 @@ void Hamiltonian::generateLocalTerms()
 
 void Hamiltonian::generateIndInteractions()
 {
-    indInteractions.resize(numIndices);
-
-    for (int i = 0; i < numIndices; ++i)
-    {
-        indInteractions[i].resize(localTerms[i].size());
-    }
-
     vector< vector<int> >::iterator it1;
     vector<int>::iterator it2;
     vector<int>::iterator it3;
+
+    for (it2 = indices.begin(); it2 != indices.end(); ++it2)
+    {
+        indInteractions[*it2] = vector< vector<int> >();
+    }
 
     for (it1 = hamiltonian.begin(); it1 != hamiltonian.end(); ++it1)
     {
@@ -125,14 +126,16 @@ void Hamiltonian::printIndices()
 
 void Hamiltonian::printLocalTerms()
 {
-    vector< vector<int> >::iterator it1;
+    map< int, vector<int> >::iterator it1;
     vector<int>::iterator it2;
 
     cout << "Printing local terms:" << endl;
 
     for (it1 = localTerms.begin(); it1 != localTerms.end(); ++it1)
     {
-        for (it2 = it1->begin(); it2 != it1->end(); ++it2)
+        cout << it1->first << ": ";
+
+        for (it2 = (it1->second).begin(); it2 != (it1->second).end(); ++it2)
         {
             cout << *it2 << " ";
         }
@@ -145,7 +148,7 @@ void Hamiltonian::printLocalTerms()
 
 void Hamiltonian::printIndInteractions()
 {
-    vector< vector< vector<int> > >::iterator it1;
+    map< int, vector< vector<int> > >::iterator it1;
     vector< vector<int> >::iterator it2;
     vector<int>::iterator it3;
 
@@ -153,7 +156,9 @@ void Hamiltonian::printIndInteractions()
 
     for (it1 = indInteractions.begin(); it1 != indInteractions.end(); ++it1)
     {
-        for (it2 = it1->begin(); it2 != it1->end(); ++it2)
+        cout << it1->first << ":\t";
+
+        for (it2 = (it1->second).begin(); it2 != (it1->second).begin(); ++it2)
         {
             for (it3 = it2->begin(); it3 != it2->end(); ++it3)
             {

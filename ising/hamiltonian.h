@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <map>
 #include <vector>
 #include <algorithm>
 
@@ -20,8 +21,8 @@ public:
     vector< vector<int> > getHamiltonian() const { return hamiltonian; }
     vector<int> getIndices() const { return indices; }
     int getNumIndices() const { return numIndices; }
-    vector< vector<int> > getLocalTerms() const { return localTerms; }
-    vector< vector< vector <int> > > getIndInteractions() const
+    map< int, vector<int> > getLocalTerms() const { return localTerms; }
+    map< int, vector< vector<int> > > getIndInteractions() const
             { return indInteractions; }
 
     char getShape() const { return shape; }
@@ -43,8 +44,8 @@ private:
     vector< vector<int> > hamiltonian;
     vector<int> indices;
     int numIndices;
-    vector< vector<int> > localTerms;
-    vector< vector< vector<int> > > indInteractions;
+    map< int, vector<int> > localTerms;
+    map< int, vector< vector<int> > > indInteractions;
 
     char shape;
     int rows;

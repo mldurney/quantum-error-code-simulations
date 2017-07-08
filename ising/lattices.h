@@ -8,7 +8,7 @@
 
 #define E 2.71828182845904523536
 enum {ALL = 'a', PSEUDO = 'p', RANDOM = 'r'};
-enum {RECTANGLE = 'r', SQUARE = 's', TRIANGLE = 't'};
+enum {RECTANGLE = 'r', SQUARE = 's', TRIANGLE = 't', STRIANGLE = 'v'};
 
 class Lattice
 {
@@ -32,9 +32,9 @@ protected:
     vector< vector<int> > hFunction;
     vector<int> indices;
     int numIndices;
-    vector< vector<int> > localTerms;
-    vector< vector< vector<int> > > indInteractions;
-    vector<int> spins;
+    map< int, vector<int> > localTerms;
+    map< int, vector< vector<int> > > indInteractions;
+    map<int, int> spins;
 
     void shapeError() const;
     void setMode(char m) { mode = m; };
@@ -133,6 +133,23 @@ private:
 
     void checkShape() const;
     void guessRowsCols();
+};
+
+class STriangularLattice : public TriangularLattice
+{
+public:
+    STriangularLattice(Hamiltonian h, double t, char m = 'r', int s = -1);
+    int getSide() const { return side; }
+    void printLattice( int empty = -1 ) { Lattice::printLattice(getSide()); }
+
+protected:
+    void setSide(int s) { side = s; }
+
+private:
+    int side;
+
+    void checkShape() const;
+    void guessSide();
 };
 
 #endif /* LATTICES_H_ */

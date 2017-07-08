@@ -19,40 +19,51 @@ int main(int argc, char* argv[])
 
     Hamiltonian h = readHamiltonian(inFile, shape);
 
-    vector<thread> threads;
     vector<double> temperatures;
     vector<double> magnetizations(n, 0);
     vector<double> binderCumulants(n, 0);
 
-    Lattice *lattice;
-    for (int i = 0; i < n; ++i)
-    {
-        double currT = t + i * dt;
-        temperatures.push_back(currT);
+    int remainingTrials = n;
+    int trial = 0;
 
-        switch (shape)
+    Lattice *lattice;
+    while (remainingTrials > 0)
+    {
+        vector<thread> threads;
+        int numThreads = getNumThreads(remainingTrials);
+
+        for (int i = 0; i < numThreads; ++i, ++trial, --remainingTrials)
         {
-            case RECTANGLE:
-                lattice = new RectangularLattice(h, currT, mode);
-                break;
-            case SQUARE:
-                lattice = new SquareLattice(h, currT, mode);
-                break;
-            case TRIANGLE:
-                lattice = new TriangularLattice(h, currT, mode);
-                break;
-            default:
-                lattice = new Lattice(h, currT, mode);
+            double currT = t + trial * dt;
+            temperatures.push_back(currT);
+
+            switch (shape)
+            {
+                case RECTANGLE:
+                    lattice = new RectangularLattice(h, currT, mode);
+                    break;
+                case SQUARE:
+                    lattice = new SquareLattice(h, currT, mode);
+                    break;
+                case TRIANGLE:
+                    lattice = new TriangularLattice(h, currT, mode);
+                    break;
+                case STRIANGLE:
+                    lattice = new STriangularLattice(h, currT, mode);
+                default:
+                    lattice = new Lattice(h, currT, mode);
+            }
+
+            threads.emplace_back(runLatticeSimulation, lattice, updates,
+                    &magnetizations[trial], &binderCumulants[trial]);
         }
 
-        threads.emplace_back(runLatticeSimulation, lattice, updates,
-                &magnetizations[i], &binderCumulants[i]);
+        for (auto &t : threads)
+        {
+            t.join();
+        }
     }
 
-    for (auto &t : threads)
-    {
-        t.join();
-    }
 
     string oldDir = "hamiltonians";
     string outMag = getOutFilename(inFilename, oldDir, "magnetizations");
@@ -95,6 +106,32 @@ void receiveInput(int argc, char* argv[], string& filename, double& t,
         cout << "min_temperature(float) change_temperature(float) ";
         cout << "num_lattices(int) updates(int) mode(char)\n\n";
         exit(EXIT_FAILURE);
+    }
+}
+
+int getNumThreads(int remaining)
+{
+    int numThreads = getMaxThreads();
+
+    if (remaining < numThreads)
+    {
+        numThreads = remaining;
+    }
+
+    return numThreads;
+}
+
+int getMaxThreads()
+{
+    int maxThreads = thread::hardware_concurrency();
+
+    if (maxThreads != 0)
+    {
+        return maxThreads;
+    }
+    else
+    {
+        return 4;
     }
 }
 

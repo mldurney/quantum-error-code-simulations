@@ -55,6 +55,8 @@ def plot_results(filename, directory, folder):
     basename = os.path.basename(filename).rsplit('.', 1)[0]
     fig_filename = os.path.join(directory, basename + '.png')
 
+    print('Plotting ' + folder + '/' + basename)
+
     data = pd.read_csv(filename)
     temp, results = data.columns.tolist()
 

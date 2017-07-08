@@ -5,20 +5,26 @@ from multiprocessing import Process
 from run_simulation import run_trial
 
 
+def run_trials_linear(filename, updates):
+
+    for n in range(updates):
+        print('INITIATING TRIAL #' + n)
+        run_trial(filename)
+        print()
+
+# end run_trials_parallel
+
+
 def run_trials_parallel(filename, updates):
 
     processes = [Process(target=run_trial, args=(filename,))
                  for x in range(updates)]
-
-    call('make')
 
     for process in processes:
         process.start()
 
     for process in processes:
         process.join()
-
-    call(['make', 'clean'])
 
 # end run_trials_parallel
 
@@ -37,7 +43,12 @@ def main():
     filename = str(sys.argv[1])
     updates = int(sys.argv[2])
 
-    run_trials_parallel(filename, updates)
+    call(['make', 'clean'])
+    call('make')
+
+    run_trials_linear(filename, updates)
+
+    call(['make', 'clean'])
 
 # end main
 

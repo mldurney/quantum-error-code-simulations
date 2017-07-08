@@ -6,7 +6,7 @@ import generate_hamiltonian as gh
 
 def receive_input():
 
-    if len(sys.argv) == 12:
+    if len(sys.argv) == 13:
         args = get_cmdline_lattice()
     elif len(sys.argv) == 1:
         args = get_userinput_lattice()
@@ -31,7 +31,8 @@ def get_cmdline_lattice():
         'num_temps'     : sys.argv[8],
         'updates'       : sys.argv[9],
         'couplings'     : sys.argv[10],
-        'mode'          : sys.argv[11]
+        'disorders'     : sys.argv[11],
+        'mode'          : sys.argv[12]
     }
 
     args['range_rows'] = range(args['min_rows'], args['max_rows'] + 1)
@@ -46,16 +47,16 @@ def get_userinput_lattice():
 
     args = {}
 
-    args['shape'] = str(input('Shape of lattice (s, r, t): '))
+    args['shape'] = str(input('Shape of lattice (s, r, t, or v): '))
 
-    while (args['shape'] not in [gh.SQUARE, gh.RECTANGLE, gh.TRIANGLE]):
-        args['shape'] = str(input('Invalid input. Please enter s, r, or t: '))
+    while args['shape'] not in gh.SHAPES:
+        args['shape'] = str(input('Invalid input. Enter s, r, t, or v: '))
 
     args['min_rows'] = int(input('Min rows: '))
     args['max_rows'] = int(input('Max rows: '))
     row_skip = int(input('Rows to skip between simulations: '))
 
-    if args['shape'] == gh.SQUARE:
+    if args['shape'] in [gh.SQUARE, gh.STRIANGLE]:
         args['min_cols'] = args['min_rows']
         args['max_cols'] = args['max_rows']
         col_skip = row_skip
@@ -69,7 +70,8 @@ def get_userinput_lattice():
     max_temp = float(input('Ending temperature: '))
     args['change_temp'] = float(input('Change in temperature between tests: '))
     args['updates'] = int(input('Number of updates per temperature per test: '))
-    coup = input('List (delimited by space) of couplings between pairs: ')
+    couplings = input('List (delimited by space) of couplings between pairs: ')
+    disorders = input('List of disorder percentages [0, 100]: ')
     args['mode'] = str(input('Update mode ("a" all, "p" psuedo, "r" random): '))
 
     args['range_rows'] = range(args['min_rows'], args['max_rows'] + 1,
@@ -78,7 +80,8 @@ def get_userinput_lattice():
                                col_skip)
     args['num_temps'] = int((max_temp - args['min_temp'])
                             / args['change_temp']) + 1
-    args['couplings'] = list(map(int, coup.split()))
+    args['couplings'] = list(map(int, couplings.split()))
+    args['disorders'] = list(map(int, disorders.split()))
 
     return args
 
@@ -96,6 +99,7 @@ def get_default_lattice():
         'num_temps'     : 20,
         'updates'       : 2000,
         'couplings'     : [1],
+        'disorders'     : [0],
         'mode'          : 'r'
     }
 
@@ -136,9 +140,9 @@ def write_hamiltonian_dir():
               + '-' + str(args['updates']) + 'u-' + args['mode'])
 
     tests = list(itertools.product(args['range_rows'], args['range_cols'],
-                                   args['couplings']))
+                                   args['couplings'], args['disorders']))
 
-    if args['shape'] == gh.SQUARE:
+    if args['shape'] in [gh.SQUARE, gh.STRIANGLE]:
         tests = [test for test in tests if test[0] == test[1]]
 
     (main_dir, hamiltonian_dir, *_) = make_directories(folder)
@@ -149,9 +153,10 @@ def write_hamiltonian_dir():
         str_rows = str(test[0])
         str_cols = str(test[1])
         str_coupling = str(test[2])
+        str_disorder = str(test[3])
 
-        hamiltonian_name = (args['shape'] + str_rows + 'x' + str_cols + '-'
-                            + str_coupling + '.csv')
+        hamiltonian_name = (args['shape'] + str_rows + 'x' + str_cols + '_'
+                            + str_coupling + '-' + str_disorder + '.csv')
         hamiltonian_filename = os.path.join(hamiltonian_dir, hamiltonian_name)
 
         tests_file.write('%s,%f,%f,%d,%d,%c\n' % (hamiltonian_filename,
@@ -159,11 +164,15 @@ def write_hamiltonian_dir():
                          args['num_temps'], args['updates'], args['mode']))
 
         if args['shape'] == gh.SQUARE:
-            hamiltonian = gh.generate_square(test[2], test[0])
+            hamiltonian = gh.generate_square(test[2], test[3], test[0])
         elif args['shape'] == gh.RECTANGLE:
-            hamiltonian = gh.generate_rectangle(test[2], test[0], test[1])
+            hamiltonian = gh.generate_rectangle(test[2], test[3], test[0],
+                                                test[1])
+        elif args['shape'] == gh.TRIANGLE:
+            hamiltonian = gh.generate_triangle(test[2], test[3], test[0],
+                                               test[1])
         else:
-            hamiltonian = gh.generate_triangle(test[2], test[0], test[1])
+            hamiltonian = gh.generate_striangle(test[2], test[3], test[0])
 
         gh.write_hamiltonian(hamiltonian_filename, hamiltonian, args['shape'],
                              str_rows, str_cols)

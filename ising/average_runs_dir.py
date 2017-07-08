@@ -17,8 +17,9 @@ def find_unaveraged_csv(directory, folder):
     os.chdir(directory)
     filenames = []
 
-    for filename in glob.glob('[!avg]*.csv'):
-        filenames.append(str(os.path.join(directory, filename)))
+    for filename in glob.glob('*.csv'):
+        if 'avg' not in filename:
+            filenames.append(str(os.path.join(directory, filename)))
 
     os.chdir(main_dir)
     return filenames

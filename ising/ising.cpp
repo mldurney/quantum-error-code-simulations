@@ -37,6 +37,8 @@ int main(int argc, char* argv[])
         case TRIANGLE:
             lattice = new TriangularLattice(hamiltonian, temp, mode);
             break;
+        case STRIANGLE:
+            lattice = new STriangularLattice(hamiltonian, temp, mode);
         default:
             lattice = new Lattice(hamiltonian, temp, mode);
     }
