@@ -2,8 +2,11 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "0.1.0",
-    "command": "g++",
+    "command": "make",
     "isShellCommand": true,
     "showOutput": "always",
-    "args": ["-g", "main.cpp"]
+    "args": [],
+    "options": {
+        "cwd": "${workspaceRoot}/mySubDir"
+    }
 }
