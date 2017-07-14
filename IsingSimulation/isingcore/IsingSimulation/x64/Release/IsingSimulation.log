@@ -1,0 +1,7 @@
+﻿  lattices.cpp
+  Generating code
+  16 of 1291 functions ( 1.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    23 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  IsingSimulation.vcxproj -> C:\GitHub\surf\IsingSimulation\x64\Release\IsingSimulation.exe

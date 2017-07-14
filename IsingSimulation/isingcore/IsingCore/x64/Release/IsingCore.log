@@ -1,0 +1,11 @@
+﻿  hamiltonian.cpp
+  ising.cpp
+  isinghelpers.cpp
+  lattices.cpp
+  simulatedlattice.cpp
+  Generating code
+  108 of 994 functions (10.9%) were compiled, the rest were copied from previous compilation.
+    4 functions were new in current compilation
+    60 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  IsingCore.vcxproj -> C:\GitHub\surf\IsingSimulation\x64\Release\Ising.exe

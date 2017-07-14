@@ -17,6 +17,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Visual Studio profiler files
+*.vsp
+
 # =========================
 # Operating System Files
 # =========================

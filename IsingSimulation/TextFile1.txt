@@ -1,0 +1,7 @@
+Fix Windows file name shenanigans -> Done
+No function pointers -> Reduced time >30%
+Const reference args to functions -> Reduced time ~1% (...Okay?)
+Thread pool
+0, 1 vs 1, -1
+Inline functions (findProbability, findIndexEnergy)
+Remove maps

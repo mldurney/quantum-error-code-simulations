@@ -1,0 +1,8 @@
+﻿  simulatedlattice.cpp
+  lattices.cpp
+  isingsimulation.cpp
+  isinghelpers.cpp
+  hamiltonian.cpp
+  Generating Code...
+  IsingSimulation.vcxproj -> C:\GitHub\surf\IsingSimulation\x64\Debug\IsingSimulation.exe
+  IsingSimulation.vcxproj -> C:\GitHub\surf\IsingSimulation\x64\Debug\IsingSimulation.pdb (Partial PDB)
