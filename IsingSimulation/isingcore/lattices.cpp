@@ -6,18 +6,23 @@ using namespace ising;
 // Lattice //
 /////////////
 
-Lattice::Lattice(Hamiltonian h, double t, char m) :
-    hamiltonian(h), temp(t), mode(m), hFunction(h.getHamiltonian()),
-	indices(h.getIndices()), numIndices(h.getNumIndices()), 
-	localTerms(h.getLocalTerms()), indInteractions(h.getIndInteractions()),
-	shape(h.getShape()) {
-	randomizedIndices = indices;
+Lattice::Lattice(Hamiltonian h, double t, char m)
+    : hamiltonian(h),
+      temp(t),
+      mode(m),
+      hFunction(h.getHamiltonian()),
+      indices(h.getIndices()),
+      numIndices(h.getNumIndices()),
+      localTerms(h.getLocalTerms()),
+      indInteractions(h.getIndInteractions()),
+      shape(h.getShape()) {
+    randomizedIndices = indices;
     initSpins();
 }
 
 void Lattice::initSpins() {
-    srand((unsigned int) time(NULL));
-	spins = std::vector<int>(numIndices, 0);
+    srand((unsigned int)time(NULL));
+    spins = std::vector<int>(numIndices, 0);
 
     std::vector<int>::const_iterator it;
 
@@ -44,7 +49,7 @@ void Lattice::updateAll() {
     std::vector<int>::const_iterator it;
 
     for (it = indices.begin(); it != indices.end(); ++it) {
-        if (findProbability(*it) > (float) rand() / RAND_MAX) {
+        if (findProbability(*it) > (float)rand() / RAND_MAX) {
             spins[*it] *= -1;
         }
     }
@@ -54,7 +59,7 @@ void Lattice::updatePseudo() {
     random_shuffle(randomizedIndices.begin(), randomizedIndices.end());
 
     for (int i = 0; i < numIndices; ++i) {
-        if (findProbability(randomizedIndices[i]) > (float) rand() / RAND_MAX) {
+        if (findProbability(randomizedIndices[i]) > (float)rand() / RAND_MAX) {
             spins[randomizedIndices[i]] *= -1;
         }
     }
@@ -66,7 +71,7 @@ void Lattice::updateRandom() {
     for (int i = 0; i < numIndices; ++i) {
         index = indices[rand() % numIndices];
 
-        if (findProbability(index) > (float) rand() / RAND_MAX) {
+        if (findProbability(index) > (float)rand() / RAND_MAX) {
             spins[index] *= -1;
         }
     }
@@ -92,7 +97,7 @@ void Lattice::switchMode(char m) {
 double Lattice::findProbability(int index) {
     int initEnergy = findIndexEnergy(index);
     spins[index] *= -1;
-	
+
     int finalEnergy = findIndexEnergy(index);
     spins[index] *= -1;
 
@@ -104,14 +109,14 @@ double Lattice::findProbability(int index) {
 }
 
 int Lattice::findTotalEnergy() {
-	int energy = 0;
-	std::vector<int>::const_iterator it;
+    int energy = 0;
+    std::vector<int>::const_iterator it;
 
-	for (it = indices.begin(); it != indices.end(); ++it) {
-		energy += findIndexEnergy(*it);
-	}
+    for (it = indices.begin(); it != indices.end(); ++it) {
+        energy += findIndexEnergy(*it);
+    }
 
-	return energy;
+    return energy;
 }
 
 int Lattice::findIndexEnergy(int index) {
@@ -153,7 +158,7 @@ void Lattice::shapeError() const {
 
 void Lattice::printLattice(int cols) const {
     if (cols == -1) {
-        cols = (int) sqrt(numIndices);
+        cols = (int)sqrt(numIndices);
     }
 
     std::vector<int>::const_iterator it = indices.begin();
@@ -172,53 +177,53 @@ void Lattice::printLattice(int cols) const {
 /////////////////
 
 void LatticeFast::updateAll() {
-	for (int i = 0; i < numIndices; ++i) {
-		if (findProbability(i) >(float) rand() / RAND_MAX) {
-			spins[i] *= -1;
-		}
-	}
+    for (int i = 0; i < numIndices; ++i) {
+        if (findProbability(i) > (float)rand() / RAND_MAX) {
+            spins[i] *= -1;
+        }
+    }
 }
 
 void LatticeFast::updateRandom() {
-	int index;
+    int index;
 
-	for (int i = 0; i < numIndices; ++i) {
-		index = rand() % numIndices;
+    for (int i = 0; i < numIndices; ++i) {
+        index = rand() % numIndices;
 
-		if (findProbability(index) >(float) rand() / RAND_MAX) {
-			spins[index] *= -1;
-		}
-	}
+        if (findProbability(index) > (float)rand() / RAND_MAX) {
+            spins[index] *= -1;
+        }
+    }
 }
 
 int LatticeFast::findTotalEnergy() {
-	int energy = 0;
+    int energy = 0;
 
-	for (int i = 0; i < numIndices; ++i) {
-		energy += findIndexEnergy(i);
-	}
+    for (int i = 0; i < numIndices; ++i) {
+        energy += findIndexEnergy(i);
+    }
 
-	return energy;
+    return energy;
 }
 
 int LatticeFast::findIndexEnergy(int index) {
-	int energy = 0;
+    int energy = 0;
 
-	for (int i = (int) localTerms.at(index).size() - 1; i >= 0; --i) {
-		energy -= spins[localTerms.at(index)[i]];
-	}
+    for (int i = (int)localTerms.at(index).size() - 1; i >= 0; --i) {
+        energy -= spins[localTerms.at(index)[i]];
+    }
 
-	return coupling * spins[index] * energy;
+    return coupling * spins[index] * energy;
 }
 
 double LatticeFast::findMagnetism() {
-	double magnetism = 0;
+    double magnetism = 0;
 
-	for (int i = 0; i < numIndices; ++i) {
-		magnetism += spins[i];
-	}
+    for (int i = 0; i < numIndices; ++i) {
+        magnetism += spins[i];
+    }
 
-	return magnetism / numIndices;
+    return magnetism / numIndices;
 }
 
 ////////////////////////
@@ -249,7 +254,7 @@ void RectangularLattice::guessRowsCols() {
         return;
     }
 
-    for (int guess = (int) sqrt(numIndices); guess > 0; --guess) {
+    for (int guess = (int)sqrt(numIndices); guess > 0; --guess) {
         if (numIndices % guess == 0) {
             setRows(guess);
             setCols(numIndices / guess);
@@ -282,7 +287,7 @@ void SquareLattice::guessSide() {
     int guess = hamiltonian.getRows();
 
     if (guess == -1) {
-        guess = (int) sqrt(numIndices);
+        guess = (int)sqrt(numIndices);
 
         if (guess * guess != numIndices) {
             std::cout << "Lattice is not a square (invalid number of indices)!";
@@ -323,7 +328,7 @@ void TriangularLattice::guessRowsCols() {
         return;
     }
 
-    for (int guess = (int) sqrt(numIndices); guess > 0; --guess) {
+    for (int guess = (int)sqrt(numIndices); guess > 0; --guess) {
         if (numIndices % guess == 0) {
             setRows(guess);
             setCols(numIndices / guess);

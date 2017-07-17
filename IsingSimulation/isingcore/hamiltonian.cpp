@@ -35,7 +35,7 @@ Hamiltonian::Hamiltonian(std::vector<std::vector<int>> h, char s, int r, int c)
     generateIndices();
     generateLocalTerms();
     generateIndInteractions();
-	findIsFast();
+    findIsFast();
 }
 
 void Hamiltonian::generateIndices() {
@@ -53,7 +53,7 @@ void Hamiltonian::generateIndices() {
     }
 
     sort(indices.begin(), indices.end());
-    numIndices = (int) indices.size();
+    numIndices = (int)indices.size();
 }
 
 void Hamiltonian::generateLocalTerms() {
@@ -105,22 +105,22 @@ void Hamiltonian::generateIndInteractions() {
 }
 
 void Hamiltonian::findIsFast() {
-	std::vector<std::vector<int>>::iterator it = hamiltonian.begin();
-	char c = (char)(*it)[0];
+    std::vector<std::vector<int>>::iterator it = hamiltonian.begin();
+    char c = (char)(*it)[0];
 
-	for (++it; it != hamiltonian.end(); ++it) {
-		if ((*it)[0] != c) {
-			isFast = false;
-			break;
-		}
-	}
+    for (++it; it != hamiltonian.end(); ++it) {
+        if ((*it)[0] != c) {
+            isFast = false;
+            break;
+        }
+    }
 
-	for (int i = 0; i < numIndices; ++i) {
-		if (indices[i] != i) {
-			isFast = false;
-			break;
-		}
-	}
+    for (int i = 0; i < numIndices; ++i) {
+        if (indices[i] != i) {
+            isFast = false;
+            break;
+        }
+    }
 }
 
 void Hamiltonian::printHamiltonian() const {

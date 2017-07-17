@@ -2,14 +2,45 @@
 
 using namespace ising;
 
-SimulatedLattice::SimulatedLattice(Lattice *latt, const int preupdates)
-    : lattice(latt) {
-    for (int i = 0; i < preupdates; ++i) {
-        latt->updateLattice();
-    }
+SimulatedLattice::SimulatedLattice(Lattice *latt, const int updates, const int preupdates)
+    : lattice(latt), updates(updates), preupdates(preupdates) {
+	indLattice = numLattices++;
+	temperatures.push_back(-1);
+	magnetizations.push_back(-1);
+	binderCumulants.push_back(-1);
 }
 
-SimulatedLattice::~SimulatedLattice() { delete lattice; }
+void SimulatedLattice::runLatticeSimulation() {
+	for (int i = 0; i < preupdates; ++i) {
+		lattice->updateLattice();
+	}
+
+	double runningMag = 0;
+	double runningMag2 = 0;
+	double runningMag4 = 0;
+
+	for (int i = 0; i < updates; ++i) {
+		lattice->updateLattice();
+		double magnetization = lattice->getMagnetism();
+
+		runningMag += magnetization;
+		runningMag2 += pow(magnetization, 2);
+		runningMag4 += pow(magnetization, 4);
+	}
+
+	setAveMag(fabs(runningMag) / updates);
+	setAveMag2(fabs(runningMag2) / updates);
+	setAveMag4(fabs(runningMag4) / updates);
+
+	double currT = lattice->getTemp();
+	double currM = getAveMag();
+	double currBC = getBinderCumulant();
+
+	//std::lock_guard<std::mutex> guard(data_mutex);
+	temperatures[indLattice] = currT;
+	magnetizations[indLattice] = currM;
+	binderCumulants[indLattice] = currBC;
+}
 
 void SimulatedLattice::setAveMag(double mag) {
     if (mag >= 0 && mag <= 1) {

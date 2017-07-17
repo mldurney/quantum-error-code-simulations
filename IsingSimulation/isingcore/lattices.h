@@ -32,13 +32,13 @@ class Lattice {
     const Hamiltonian hamiltonian;
     const std::vector<std::vector<int>> hFunction;
     const std::vector<int> indices;
-	std::vector<int> randomizedIndices;
+    std::vector<int> randomizedIndices;
     const int numIndices;
     const std::map<int, std::vector<int>> localTerms;
     const std::map<int, std::vector<std::vector<int>>> indInteractions;
     std::vector<int> spins;
 
-	virtual void checkShape() const {}
+    virtual void checkShape() const {}
     void shapeError() const;
     void setMode(char m) { mode = m; };
 
@@ -59,20 +59,20 @@ class Lattice {
 };
 
 class LatticeFast : public virtual Lattice {
-public:
-	LatticeFast(Hamiltonian h, double t, char m = 'p') : 
-		Lattice(h, t, m), coupling((char) h.getHamiltonian()[0][0]) {};
-	char getCoupling() const { return coupling; }
+   public:
+    LatticeFast(Hamiltonian h, double t, char m = 'p')
+        : Lattice(h, t, m), coupling((char)h.getHamiltonian()[0][0]){};
+    char getCoupling() const { return coupling; }
 
-protected:
-	void updateAll();
-	void updateRandom();
-	int findTotalEnergy();
-	int findIndexEnergy(int index);
-	double findMagnetism();
+   protected:
+    void updateAll();
+    void updateRandom();
+    int findTotalEnergy();
+    int findIndexEnergy(int index);
+    double findMagnetism();
 
-private:
-	const char coupling;
+   private:
+    const char coupling;
 };
 
 class RectangularLattice : public virtual Lattice {
@@ -86,25 +86,25 @@ class RectangularLattice : public virtual Lattice {
    protected:
     void setRows(int r) { rows = r; }
     void setCols(int c) { cols = c; }
-	void checkShape() const;
+    void checkShape() const;
 
    private:
     int rows;
     int cols;
 
-	void guessRowsCols();
+    void guessRowsCols();
 };
 
-class RectangularLatticeFast : 
-	public RectangularLattice, public LatticeFast {
-public:
-	RectangularLatticeFast(Hamiltonian h, double t, char m = 'p', int r = -1,
-		int c = -1) :
-		RectangularLattice(h, t, m, r, c), LatticeFast(h, t, m),
-		Lattice(h, t, m) {};
+class RectangularLatticeFast : public RectangularLattice, public LatticeFast {
+   public:
+    RectangularLatticeFast(Hamiltonian h, double t, char m = 'p', int r = -1,
+                           int c = -1)
+        : RectangularLattice(h, t, m, r, c),
+          LatticeFast(h, t, m),
+          Lattice(h, t, m){};
 
-protected:
-	void checkShape() const { RectangularLattice::checkShape(); }
+   protected:
+    void checkShape() const { RectangularLattice::checkShape(); }
 };
 
 class SquareLattice : public RectangularLattice {
@@ -115,7 +115,7 @@ class SquareLattice : public RectangularLattice {
 
    protected:
     void setSide(int s) { side = s; }
-	void checkShape() const;
+    void checkShape() const;
 
    private:
     int side;
@@ -123,14 +123,13 @@ class SquareLattice : public RectangularLattice {
     void guessSide();
 };
 
-class SquareLatticeFast :
-	public SquareLattice, public LatticeFast {
-public:
-	SquareLatticeFast(Hamiltonian h, double t, char m = 'p', int s = -1) :
-		SquareLattice(h, t, m, s), LatticeFast(h, t, m), Lattice(h, t, m) {};
+class SquareLatticeFast : public SquareLattice, public LatticeFast {
+   public:
+    SquareLatticeFast(Hamiltonian h, double t, char m = 'p', int s = -1)
+        : SquareLattice(h, t, m, s), LatticeFast(h, t, m), Lattice(h, t, m){};
 
-protected:
-	void checkShape() const { SquareLattice::checkShape(); }
+   protected:
+    void checkShape() const { SquareLattice::checkShape(); }
 };
 
 class TriangularLattice : public virtual Lattice {
@@ -144,7 +143,7 @@ class TriangularLattice : public virtual Lattice {
    protected:
     void setRows(int r) { rows = r; }
     void setCols(int c) { cols = c; }
-	void checkShape() const;
+    void checkShape() const;
 
    private:
     int rows;
@@ -153,16 +152,16 @@ class TriangularLattice : public virtual Lattice {
     void guessRowsCols();
 };
 
-class TriangularLatticeFast :
-	public TriangularLattice, public LatticeFast {
-public:
-	TriangularLatticeFast(Hamiltonian h, double t, char m = 'p', int r = -1,
-		int c = -1) :
-		TriangularLattice(h, t, m, r, c), LatticeFast(h, t, m),
-		Lattice(h, t, m) {};
+class TriangularLatticeFast : public TriangularLattice, public LatticeFast {
+   public:
+    TriangularLatticeFast(Hamiltonian h, double t, char m = 'p', int r = -1,
+                          int c = -1)
+        : TriangularLattice(h, t, m, r, c),
+          LatticeFast(h, t, m),
+          Lattice(h, t, m){};
 
-protected:
-	void checkShape() const { TriangularLattice::checkShape(); }
+   protected:
+    void checkShape() const { TriangularLattice::checkShape(); }
 };
 
 class STriangularLattice : public TriangularLattice {
@@ -173,7 +172,7 @@ class STriangularLattice : public TriangularLattice {
 
    protected:
     void setSide(int s) { side = s; }
-	void checkShape() const;
+    void checkShape() const;
 
    private:
     int side;
@@ -181,15 +180,15 @@ class STriangularLattice : public TriangularLattice {
     void guessSide();
 };
 
-class STriangularLatticeFast :
-	public STriangularLattice, public LatticeFast {
-public:
-	STriangularLatticeFast(Hamiltonian h, double t, char m = 'p', int s = -1) :
-		STriangularLattice(h, t, m, s), LatticeFast(h, t, m),
-		Lattice(h, t, m) {};
+class STriangularLatticeFast : public STriangularLattice, public LatticeFast {
+   public:
+    STriangularLatticeFast(Hamiltonian h, double t, char m = 'p', int s = -1)
+        : STriangularLattice(h, t, m, s),
+          LatticeFast(h, t, m),
+          Lattice(h, t, m){};
 
-protected:
-	void checkShape() const { STriangularLattice::checkShape(); }
+   protected:
+    void checkShape() const { STriangularLattice::checkShape(); }
 };
 }
 

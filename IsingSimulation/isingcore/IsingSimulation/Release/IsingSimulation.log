@@ -1,9 +1,0 @@
-﻿  hamiltonian.cpp
-  isinghelpers.cpp
-  isingsimulation.cpp
-  lattices.cpp
-  simulatedlattice.cpp
-  Generating code
-  All 1396 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-  IsingSimulation.vcxproj -> C:\GitHub\surf\IsingSimulation\Release\IsingSimulation.exe

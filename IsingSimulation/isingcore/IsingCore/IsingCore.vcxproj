@@ -116,14 +116,12 @@
     <ClCompile Include="..\ising.cpp" />
     <ClCompile Include="..\isinghelpers.cpp" />
     <ClCompile Include="..\lattices.cpp" />
-    <ClCompile Include="..\simulatedlattice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hamiltonian.h" />
     <ClInclude Include="..\ising.h" />
     <ClInclude Include="..\isinghelpers.h" />
     <ClInclude Include="..\lattices.h" />
-    <ClInclude Include="..\simulatedlattice.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />

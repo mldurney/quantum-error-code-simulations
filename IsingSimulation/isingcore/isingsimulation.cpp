@@ -2,6 +2,12 @@
 
 using namespace ising;
 
+int SimulatedLattice::numLattices = 0;
+std::vector<double> SimulatedLattice::temperatures;
+std::vector<double> SimulatedLattice::magnetizations;
+std::vector<double> SimulatedLattice::binderCumulants;
+std::mutex SimulatedLattice::data_mutex;
+
 int main(int argc, char *argv[]) {
     std::string inFilename;
     double t, dt;
@@ -20,40 +26,36 @@ void ising::manageSimulations(const std::string& inFilename, const double t, con
         std::cout << "Invalid file name. " << inFilename
                   << " does not exist!\n\n";
         exit(EXIT_FAILURE);
-    }
+    }      
 
     char shape;
     Hamiltonian h = readHamiltonian(inFile, shape);
 
-    std::vector<double> temperatures;
-    std::vector<double> magnetizations(n, 0);
-    std::vector<double> binderCumulants(n, 0);
+	std::vector<SimulatedLattice*> simulations;
+	std::vector<std::function<void(void)>> simFunctions;
 
-    int remainingTrials = n;
-    int trial = 0;
+	for (int trial = 0; trial < n; ++trial) {
+		double currT = t + trial * dt;
+		Lattice *lattice = chooseLattice(shape, h, currT, mode);
+		SimulatedLattice* sim = new SimulatedLattice(lattice, updates, PREUPDATES);
+		simulations.push_back(sim);
+	}
 
-    Lattice *lattice;
-    while (remainingTrials > 0) {
-        std::vector<std::thread> threads;
-        int numThreads = getNumThreads(remainingTrials);
-		// Thread pools, queue instead of vector
-		// Mutex to protect
-		// Use lock_guard
+	for (auto it = simulations.begin(); it != simulations.end(); ++it) {
+		(*it)->runLatticeSimulation();
+		//SimulatedLattice& latticeRef = **it;
+		//simFunctions.push_back([&] { latticeRef.runLatticeSimulation(); });
+	}
 
-        for (int i = 0; i < numThreads; ++i, ++trial, --remainingTrials) {
-            double currT = t + trial * dt;
-            temperatures.push_back(currT);
-			lattice = chooseLattice(shape, h, currT, mode);
+	//runInPool(simFunctions.begin(), simFunctions.end(), getMaxThreads());
 
-            threads.emplace_back(runLatticeSimulation, lattice, updates,
-                                 std::ref(magnetizations[trial]),
-                                 std::ref(binderCumulants[trial]));
-        }
+	for (auto it = simulations.begin(); it != simulations.end(); ++it) {
+		delete *it;
+	}
 
-        for (auto &th : threads) {
-            th.join();
-        }
-    }
+	std::vector<double> temperatures = SimulatedLattice::getTemperatures();
+	std::vector<double> magnetizations = SimulatedLattice::getMagnetizations();
+	std::vector<double> binderCumulants = SimulatedLattice::getBinderCumulants();
 
     std::string oldDir = "hamiltonians";
     std::string outMag = getOutFilename(inFilename, oldDir, "magnetizations");
@@ -96,16 +98,6 @@ void ising::receiveInputCMD(int argc, char *argv[], std::string &filename,
     }
 }
 
-int ising::getNumThreads(const int remaining) {
-    int numThreads = getMaxThreads();
-
-    if (remaining < numThreads) {
-        numThreads = remaining;
-    }
-
-    return numThreads;
-}
-
 int ising::getMaxThreads() {
     int maxThreads = std::thread::hardware_concurrency();
 
@@ -116,29 +108,19 @@ int ising::getMaxThreads() {
     }
 }
 
-void ising::runLatticeSimulation(Lattice *latt, const int updates,
-                                 double &indMagnetization,
-                                 double &indBinderCumulant) {
-    SimulatedLattice simulation = SimulatedLattice(latt, PREUPDATES);
-    Lattice *lattice = simulation.getLattice();
+int ising::getNumThreads(const int remaining) {
+	int numThreads = getMaxThreads();
 
-    double runningMag = 0;
-    double runningMag2 = 0;
-    double runningMag4 = 0;
+	if (remaining < numThreads) {
+		numThreads = remaining;
+	}
 
-    for (int i = 0; i < updates; ++i) {
-        lattice->updateLattice();
-        double magnetization = lattice->getMagnetism();
+	return numThreads;
+}
 
-        runningMag += magnetization;
-        runningMag2 += pow(magnetization, 2);
-        runningMag4 += pow(magnetization, 4);
-    }
-
-    simulation.setAveMag(fabs(runningMag) / updates);
-    simulation.setAveMag2(fabs(runningMag2) / updates);
-    simulation.setAveMag4(fabs(runningMag4) / updates);
-
-    indMagnetization = simulation.getAveMag();
-    indBinderCumulant = simulation.getBinderCumulant();
+template <typename Iter>
+void ising::runInPool(Iter begin, Iter end, int threadCount) {
+	ThreadPool pool(threadCount);
+	for (; begin != end; begin = std::next(begin))
+		pool.enqueue(*begin);
 }

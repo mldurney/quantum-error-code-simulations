@@ -24,9 +24,6 @@
     <ClCompile Include="..\lattices.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\simulatedlattice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\ising.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,9 +36,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\lattices.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\simulatedlattice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\ising.h">

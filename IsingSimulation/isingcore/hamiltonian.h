@@ -18,18 +18,23 @@ class Hamiltonian {
                 int c = -1);
     ~Hamiltonian() {}
 
-    const std::vector<std::vector<int>> getHamiltonian() const { return hamiltonian; }
+    const std::vector<std::vector<int>> getHamiltonian() const {
+        return hamiltonian;
+    }
     const std::vector<int> getIndices() const { return indices; }
     const int getNumIndices() const { return numIndices; }
-    const std::map<int, std::vector<int>> getLocalTerms() const { return localTerms; }
-    const std::map<int, std::vector<std::vector<int>>> getIndInteractions() const {
+    const std::map<int, std::vector<int>> getLocalTerms() const {
+        return localTerms;
+    }
+    const std::map<int, std::vector<std::vector<int>>> getIndInteractions()
+        const {
         return indInteractions;
     }
 
     const char getShape() const { return shape; }
     const int getRows() const { return rows; }
     const int getCols() const { return cols; }
-	const bool getIsFast() const { return isFast; }
+    const bool getIsFast() const { return isFast; }
 
     void printHamiltonian() const;
     void printIndices() const;
@@ -40,7 +45,7 @@ class Hamiltonian {
     void generateIndices();
     void generateLocalTerms();
     void generateIndInteractions();
-	void findIsFast();
+    void findIsFast();
 
     std::vector<std::vector<int>> hamiltonian;
     std::vector<int> indices;
@@ -51,7 +56,7 @@ class Hamiltonian {
     char shape;
     int rows;
     int cols;
-	bool isFast;
+    bool isFast;
 };
 }
 

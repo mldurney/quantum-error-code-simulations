@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     runLattice(lattice);
     delete lattice;
 
-	return 0;
+    return 0;
 }
 
 std::string ising::receiveHamiltonianFile(int argc, char *argv[]) {
@@ -55,7 +55,7 @@ void ising::runLattice(Lattice *lattice) {
 
     while (true) {
         std::cin >> input;
-		
+
         int num;
         switch (*input) {
             case 'p':
@@ -119,7 +119,7 @@ void ising::runLattice(Lattice *lattice) {
         std::cout << "\nEnter command (h - help): ";
     }
 
-	delete input;
+    delete input;
 }
 
 void ising::runLatticeHelp() {
