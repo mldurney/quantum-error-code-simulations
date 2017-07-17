@@ -1,8 +1,0 @@
-﻿  hamiltonian.cpp
-  ising.cpp
-  isinghelpers.cpp
-  lattices.cpp
-  Generating code
-  All 993 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-  IsingCore.vcxproj -> C:\GitHub\surf\IsingSimulation\x64\Release\Ising.exe
