@@ -119,7 +119,7 @@ void ising::runLattice(Lattice *lattice) {
         std::cout << "\nEnter command (h - help): ";
     }
 
-    delete input;
+    delete[] input;
 }
 
 void ising::runLatticeHelp() {

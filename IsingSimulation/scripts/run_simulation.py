@@ -1,7 +1,9 @@
 import os.path
 import sys
-from subprocess import call
+import subprocess
 import config as cf
+
+FNULL = open(os.devnull, 'w')
 
 
 def run_trial(filename):
@@ -21,7 +23,7 @@ def run_trial(filename):
         args.insert(0, hamiltonian_path)
 
         command = [sim_path] + args
-        call(command)
+        subprocess.call(command, stdout=FNULL, stderr=subprocess.STDOUT)
 
 # end run_trial
 
@@ -38,16 +40,10 @@ def main():
         sys.exit(1)
 
     filename = str(sys.argv[1])
-
     old_dir = os.getcwd()
     os.chdir(cf.MAKE_DIR)
-    call(['make', 'clean'])
-    call('make')
-    print()
-
+    subprocess.call('make', stdout=FNULL, stderr=subprocess.STDOUT)
     run_trial(filename)
-
-    call(['make', 'clean'])
     os.chdir(old_dir)
 
 # end main

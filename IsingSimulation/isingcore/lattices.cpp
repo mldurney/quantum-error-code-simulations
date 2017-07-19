@@ -8,26 +8,29 @@ using namespace ising;
 
 Lattice::Lattice(Hamiltonian h, double t, char m)
     : hamiltonian(h),
-      temp(t),
-      mode(m),
       hFunction(h.getHamiltonian()),
       indices(h.getIndices()),
       numIndices(h.getNumIndices()),
       localTerms(h.getLocalTerms()),
       indInteractions(h.getIndInteractions()),
-      shape(h.getShape()) {
+      shape(h.getShape()),
+      temp(t),
+      mode(m) {
+    srand((unsigned int)time(NULL));
+    zSeed = rand();
+    wSeed = rand();
+
     randomizedIndices = indices;
     initSpins();
 }
 
 void Lattice::initSpins() {
-    srand((unsigned int)time(NULL));
     spins = std::vector<int>(numIndices, 0);
 
     std::vector<int>::const_iterator it;
 
     for (it = indices.begin(); it != indices.end(); ++it) {
-        spins[*it] = (rand() % 2 == 1) ? 1 : -1;
+        spins[*it] = (MWC() % 2 == 0) ? 1 : -1;
     }
 }
 
@@ -49,17 +52,20 @@ void Lattice::updateAll() {
     std::vector<int>::const_iterator it;
 
     for (it = indices.begin(); it != indices.end(); ++it) {
-        if (findProbability(*it) > (float)rand() / RAND_MAX) {
+        if (findProbability(*it) > randFloatCO()) {
             spins[*it] *= -1;
         }
     }
 }
 
 void Lattice::updatePseudo() {
-    random_shuffle(randomizedIndices.begin(), randomizedIndices.end());
+    for (int i = 0; i < numIndices; ++i) {
+        int j = MWC() % numIndices;
+        std::swap(randomizedIndices[i], randomizedIndices[j]);
+    }
 
     for (int i = 0; i < numIndices; ++i) {
-        if (findProbability(randomizedIndices[i]) > (float)rand() / RAND_MAX) {
+        if (findProbability(randomizedIndices[i]) > randFloatCO()) {
             spins[randomizedIndices[i]] *= -1;
         }
     }
@@ -69,9 +75,9 @@ void Lattice::updateRandom() {
     int index;
 
     for (int i = 0; i < numIndices; ++i) {
-        index = indices[rand() % numIndices];
+        index = indices[MWC() % numIndices];
 
-        if (findProbability(index) > (float)rand() / RAND_MAX) {
+        if (findProbability(index) > randFloatCO()) {
             spins[index] *= -1;
         }
     }
@@ -96,13 +102,9 @@ void Lattice::switchMode(char m) {
 
 double Lattice::findProbability(int index) {
     int initEnergy = findIndexEnergy(index);
-    spins[index] *= -1;
 
-    int finalEnergy = findIndexEnergy(index);
-    spins[index] *= -1;
-
-    if (finalEnergy > initEnergy) {
-        return pow(E, (-1 / getTemp()) * (finalEnergy - initEnergy));
+    if (initEnergy < 0) {
+        return pow(E, (-1 / getTemp()) * (-2 * initEnergy));
     } else {
         return 1;
     }
@@ -120,13 +122,21 @@ int Lattice::findTotalEnergy() {
 }
 
 int Lattice::findIndexEnergy(int index) {
+    /*
+    return -spins[index] * std::accumulate(indInteractions.at(index).begin(),
+            indInteractions.at(index).end(), 0,
+            [&](int lhs, const auto& rhs) { return lhs +
+            std::accumulate(rhs.begin() + 1, rhs.end(), rhs[0],
+            [&](int a, int b) { return a * spins[b]; }); });
+    */
+
     int energy = 0;
 
     std::vector<std::vector<int>>::const_iterator it1;
     std::vector<int>::const_iterator it2;
 
-    for (it1 = indInteractions.at(index).begin();
-         it1 != indInteractions.at(index).end(); ++it1) {
+    auto end = indInteractions.at(index).end();
+    for (it1 = indInteractions.at(index).begin(); it1 != end; ++it1) {
         it2 = it1->begin();
         int couplingEnergy = *it2;
 
@@ -172,13 +182,25 @@ void Lattice::printLattice(int cols) const {
     }
 }
 
+float Lattice::asFloat(uint32_t i) {
+    union {
+        uint32_t i;
+        float f;
+    } pun = {i};
+    return pun.f;
+}
+
+float Lattice::randFloatCO() {
+    return asFloat(0x3F800000U | (MWC() >> 9)) - 1.0f;
+}
+
 /////////////////
 // LatticeFast //
 /////////////////
 
 void LatticeFast::updateAll() {
     for (int i = 0; i < numIndices; ++i) {
-        if (findProbability(i) > (float)rand() / RAND_MAX) {
+        if (findProbability(i) > randFloatCO()) {
             spins[i] *= -1;
         }
     }
@@ -188,9 +210,9 @@ void LatticeFast::updateRandom() {
     int index;
 
     for (int i = 0; i < numIndices; ++i) {
-        index = rand() % numIndices;
+        index = MWC() % numIndices;
 
-        if (findProbability(index) > (float)rand() / RAND_MAX) {
+        if (findProbability(index) > randFloatCO()) {
             spins[index] *= -1;
         }
     }
@@ -268,7 +290,7 @@ void RectangularLattice::guessRowsCols() {
 ///////////////////
 
 SquareLattice::SquareLattice(Hamiltonian h, double t, char m, int s)
-    : RectangularLattice(h, t, m, s, s), Lattice(h, t, m), side(s) {
+    : Lattice(h, t, m), RectangularLattice(h, t, m, s, s), side(s) {
     checkShape();
 
     if (getSide() == -1) {
@@ -342,7 +364,7 @@ void TriangularLattice::guessRowsCols() {
 ////////////////////////
 
 STriangularLattice::STriangularLattice(Hamiltonian h, double t, char m, int s)
-    : TriangularLattice(h, t, m, s, s), Lattice(h, t, m), side(s) {
+    : Lattice(h, t, m), TriangularLattice(h, t, m, s, s), side(s) {
     checkShape();
 
     if (getSide() == -1) {

@@ -6,7 +6,6 @@ int SimulatedLattice::numLattices = 0;
 std::vector<double> SimulatedLattice::temperatures;
 std::vector<double> SimulatedLattice::magnetizations;
 std::vector<double> SimulatedLattice::binderCumulants;
-std::mutex SimulatedLattice::data_mutex;
 
 int main(int argc, char *argv[]) {
     std::string inFilename;
@@ -18,44 +17,43 @@ int main(int argc, char *argv[]) {
     manageSimulations(inFilename, t, dt, n, updates, mode);
 }
 
-void ising::manageSimulations(const std::string& inFilename, const double t, const double dt,
-                              const int n, const int updates, const char mode) {
+void ising::manageSimulations(const std::string &inFilename, const double t,
+                              const double dt, const int n, const int updates,
+                              const char mode) {
     std::ifstream inFile(inFilename);
 
     if (!inFile) {
         std::cout << "Invalid file name. " << inFilename
                   << " does not exist!\n\n";
         exit(EXIT_FAILURE);
-    }      
+    }
 
     char shape;
     Hamiltonian h = readHamiltonian(inFile, shape);
 
-	std::vector<SimulatedLattice*> simulations;
-	std::vector<std::function<void(void)>> simFunctions;
+    std::vector<SimulatedLattice *> simulations;
+    std::vector<std::function<void(void)>> simFunctions;
 
-	for (int trial = 0; trial < n; ++trial) {
-		double currT = t + trial * dt;
-		Lattice *lattice = chooseLattice(shape, h, currT, mode);
-		SimulatedLattice* sim = new SimulatedLattice(lattice, updates, PREUPDATES);
-		simulations.push_back(sim);
-	}
+    for (int trial = 0; trial < n; ++trial) {
+        double currT = t + trial * dt;
+        Lattice *lattice = chooseLattice(shape, h, currT, mode);
+        SimulatedLattice *sim =
+            new SimulatedLattice(lattice, updates, PREUPDATES);
+        simulations.push_back(sim);
+    }
 
-	for (auto it = simulations.begin(); it != simulations.end(); ++it) {
-		(*it)->runLatticeSimulation();
-		//SimulatedLattice& latticeRef = **it;
-		//simFunctions.push_back([&] { latticeRef.runLatticeSimulation(); });
-	}
+    for (auto it = simulations.begin(); it != simulations.end(); ++it) {
+        (*it)->runLatticeSimulation();
+    }
 
-	//runInPool(simFunctions.begin(), simFunctions.end(), getMaxThreads());
+    for (auto it = simulations.begin(); it != simulations.end(); ++it) {
+        delete *it;
+    }
 
-	for (auto it = simulations.begin(); it != simulations.end(); ++it) {
-		delete *it;
-	}
-
-	std::vector<double> temperatures = SimulatedLattice::getTemperatures();
-	std::vector<double> magnetizations = SimulatedLattice::getMagnetizations();
-	std::vector<double> binderCumulants = SimulatedLattice::getBinderCumulants();
+    std::vector<double> temperatures = SimulatedLattice::getTemperatures();
+    std::vector<double> magnetizations = SimulatedLattice::getMagnetizations();
+    std::vector<double> binderCumulants =
+        SimulatedLattice::getBinderCumulants();
 
     std::string oldDir = "hamiltonians";
     std::string outMag = getOutFilename(inFilename, oldDir, "magnetizations");
@@ -109,18 +107,11 @@ int ising::getMaxThreads() {
 }
 
 int ising::getNumThreads(const int remaining) {
-	int numThreads = getMaxThreads();
+    int numThreads = getMaxThreads();
 
-	if (remaining < numThreads) {
-		numThreads = remaining;
-	}
+    if (remaining < numThreads) {
+        numThreads = remaining;
+    }
 
-	return numThreads;
-}
-
-template <typename Iter>
-void ising::runInPool(Iter begin, Iter end, int threadCount) {
-	ThreadPool pool(threadCount);
-	for (; begin != end; begin = std::next(begin))
-		pool.enqueue(*begin);
+    return numThreads;
 }

@@ -4,7 +4,6 @@
 #include <thread>
 #include "isinghelpers.h"
 #include "simulatedlattice.h"
-#include "threadpool.h"
 
 namespace ising {
 const int PREUPDATES = 500;
@@ -16,9 +15,6 @@ void receiveInputCMD(int argc, char *argv[], std::string &filename, double &t,
                      double &dt, int &n, int &updates, char &mode);
 int getMaxThreads();
 int getNumThreads(const int remaining);
-
-template <typename Iter>
-void runInPool(Iter begin, Iter end, int threadCount);
 }
 
 #endif /* ISINGSIMULATION_H_ */

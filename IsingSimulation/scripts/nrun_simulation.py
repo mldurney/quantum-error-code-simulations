@@ -1,9 +1,12 @@
 import os.path
 import sys
-from subprocess import call
-from multiprocessing import Process
+import subprocess
+from multiprocessing import Pool, cpu_count
+from multiprocessing.dummy import Pool as ThreadPool
 from run_simulation import run_trial
 import config as cf
+
+FNULL = open(os.devnull, 'w')
 
 
 def run_trials_linear(filename, updates):
@@ -16,8 +19,15 @@ def run_trials_linear(filename, updates):
 # end run_trials_parallel
 
 
-def run_trials_parallel(filename, updates):
+def run_trials_parallel(filename, updates, num_threads=0):
 
+    if num_threads == 0:
+        num_threads = cpu_count() * 2
+
+    pool = ThreadPool(num_threads)
+    pool.map(run_trial, [filename for _ in range(updates)])
+
+    '''
     processes = [Process(target=run_trial, args=(filename,))
                  for x in range(updates)]
 
@@ -26,6 +36,7 @@ def run_trials_parallel(filename, updates):
 
     for process in processes:
         process.join()
+    '''
 
 # end run_trials_parallel
 
@@ -46,13 +57,8 @@ def main():
 
     old_dir = os.getcwd()
     os.chdir(cf.MAKE_DIR)
-    call(['make', 'clean'])
-    call('make')
-    print()
-
-    run_trials_linear(filename, updates)
-
-    call(['make', 'clean'])
+    subprocess.call('make', stdout=FNULL, stderr=subprocess.STDOUT)
+    run_trials_parallel(filename, updates)
     os.chdir(old_dir)
 
 # end main

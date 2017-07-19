@@ -63,7 +63,7 @@ def find_exec_path(directory, filename):
 
 SHAPES = [RECTANGLE, SQUARE, TRIANGLE, STRIANGLE] = ['r', 's', 't', 'v']
 DIR_NAMES = ['magnetizations', 'binder_cumulants']
-ROOT_NAME = 'ising'
+ROOT_NAME = 'IsingSimulation'
 MAKE_NAME = 'Makefile'
 CSIM_NAME = 'isingsimulation'
 
@@ -71,5 +71,5 @@ try:
     ROOT_DIR = find_parent_dir(ROOT_NAME)
     MAKE_DIR = os.path.dirname(find_exec_path(ROOT_DIR, MAKE_NAME))
 except ValueError as msg:
-    print('ValueError: ' + msg)
+    print('ValueError: ' + str(msg))
     sys.exit(1)

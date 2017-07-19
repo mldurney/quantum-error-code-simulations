@@ -109,24 +109,28 @@ void ising::writeOutput(const std::string& filename,
     std::vector<double>::const_iterator it;
 
     if (isNewFile) {
+        std::ostringstream header;
         for (it = temp.begin(); it != temp.end(); ++it) {
-            file << *it;
+            header << *it;
 
             if (it + 1 != temp.end()) {
-                file << ",";
+                header << ",";
             }
         }
+        header << "\n";
+        file << header.str();
     }
 
-    file << std::endl;
-
+    std::ostringstream row;
     for (it = results.begin(); it != results.end(); ++it) {
-        file << *it;
+        row << *it;
 
         if (it + 1 != results.end()) {
-            file << ",";
+            row << ",";
         }
     }
+    row << "\n";
+    file << row.str();
 
     file.close();
 
