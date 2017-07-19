@@ -39,10 +39,13 @@ class Lattice {
     const std::map<int, std::vector<int>> localTerms;
     const std::map<int, std::vector<std::vector<int>>> indInteractions;
     std::vector<int> spins;
+	const std::map<int, std::map<int, double>> distances;
 
     virtual void checkShape() const {}
     void shapeError() const;
     void setMode(char m) { mode = m; };
+	std::map<int, std::map<int, double>> generateDistances() {}
+	virtual double findDistance(int i, int j) { return 1; }
 
     void updateAll();
     void updatePseudo();
@@ -102,6 +105,7 @@ class RectangularLattice : public virtual Lattice {
     void setRows(int r) { rows = r; }
     void setCols(int c) { cols = c; }
     void checkShape() const;
+	double findDistance(int i, int j);
 
    private:
     int rows;
@@ -159,6 +163,7 @@ class TriangularLattice : public virtual Lattice {
     void setRows(int r) { rows = r; }
     void setCols(int c) { cols = c; }
     void checkShape() const;
+	double findDistance(int i, int j);
 
    private:
     int rows;

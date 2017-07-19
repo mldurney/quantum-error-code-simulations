@@ -22,6 +22,7 @@ Lattice::Lattice(Hamiltonian h, double t, char m)
 
     randomizedIndices = indices;
     initSpins();
+	const std::map<int, std::map<int, double>> distances = generateDistances();
 }
 
 void Lattice::initSpins() {
@@ -32,6 +33,17 @@ void Lattice::initSpins() {
     for (it = indices.begin(); it != indices.end(); ++it) {
         spins[*it] = (MWC() % 2 == 0) ? 1 : -1;
     }
+}
+
+std::map<int, std::map<int, double>> Lattice::generateDistances() {
+	std::map<int, std::map<int, double>> dists;
+	for (auto i : indices) {
+		for (auto j : indices) {
+			dists[i][j] = findDistance(i, j);
+		}
+	}
+
+	return dists;
 }
 
 void Lattice::updateLattice() {
@@ -269,6 +281,17 @@ void RectangularLattice::checkShape() const {
     }
 }
 
+double RectangularLattice::findDistance(int i, int j) {
+	int iRow = i % getCols();
+	int iCol = i / getCols();
+	int jRow = j % getCols();
+	int jCol = j / getCols();
+
+	int distRow = iRow - jRow;
+	int distCol = iCol - jCol;
+	return sqrt(pow(distRow, 2) + pow(distCol, 2));
+}
+
 void RectangularLattice::guessRowsCols() {
     if (hamiltonian.getRows() != -1 && hamiltonian.getCols() != -1) {
         setRows(hamiltonian.getRows());
@@ -341,6 +364,17 @@ void TriangularLattice::checkShape() const {
         std::cout << "Invalid shape parameter -- not a triangle ('t')!\n";
         shapeError();
     }
+}
+
+double TriangularLattice::findDistance(int i, int j) {
+	int iRow = i % getCols();
+	int iCol = i / getCols();
+	int jRow = j % getCols();
+	int jCol = j / getCols();
+
+	int distRow = iRow - jRow;
+	int distCol = iCol - jCol;
+	return sqrt(pow(distRow, 2) + pow(distCol, 2));
 }
 
 void TriangularLattice::guessRowsCols() {

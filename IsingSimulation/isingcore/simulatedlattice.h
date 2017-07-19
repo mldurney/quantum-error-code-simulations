@@ -14,9 +14,9 @@ class SimulatedLattice {
     ~SimulatedLattice() {}
     void runPreupdates();
     void runLatticeSimulation();
-    int getIndLattice() const { return indLattice; }
+    unsigned int getIndLattice() const { return indLattice; }
     Lattice *getLattice() const { return lattice; }
-    int getUpdates() const { return updates; }
+    unsigned int getUpdates() const { return updates; }
     double getAveMag() const { return aveMag; }
     double getAveMag2() const { return aveMag2; }
     double getAveMag4() const { return aveMag4; }
@@ -33,10 +33,10 @@ class SimulatedLattice {
     void setAveMag4(double mag4);
 
    private:
-    int indLattice;
+    unsigned int indLattice;
     Lattice *lattice;
-    int updates;
-    int preupdates;
+    unsigned int updates;
+    unsigned int preupdates;
     double aveMag;
     double aveMag2;
     double aveMag4;
