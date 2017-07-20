@@ -26,7 +26,7 @@ void SimulatedLattice::runPreupdates() {
         bool continueUpdating = true;
         double preMagnetization = lattice->getMagnetism();
         unsigned int numUpdates = INITUPDATES * 2;
-        unsigned int maxUpdates = 100000;
+        unsigned int maxUpdates = 110000;
         double threshold = .05;
 
         while (continueUpdating) {
