@@ -6,12 +6,12 @@ import config as cf
 old_dir = os.getcwd()
 os.chdir(cf.MAKE_DIR)
 
-times = [0] * 20
+times = [0] * 14
 for _ in range(10):
     for n in range(len(times)):
         t0 = time.time()
         run_trials_parallel(
-            '../s10x10-30x30_1.0T-0.1dTx21-200u-p/tests0.csv', 100, n)
+            '../s10x10-30x30_1.0T-0.1dTx21-200u-p/tests0.csv', 30, n)
         times[n] += time.time() - t0
 
 for n in range(len(times)):
