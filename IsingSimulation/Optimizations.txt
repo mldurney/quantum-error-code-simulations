@@ -1,0 +1,9 @@
+Fix Windows file name shenanigans -> Done
+No function pointers -> Reduced time >30%
+Const reference args to functions -> Reduced time ~2% (...Okay?)
+Single thread -> Reduced time 25%
+0, 1 vs 1, -1 -> Cute in theory, sad in reality
+Inline functions (findProbability, findIndexEnergy)
+Remove maps -> 10% improvment != worthwhile exchange for flexibility
+Stored indInteractions.at(index).end() in variable -> Reduced time ~20%
+Switched to MWC and randFloatCO() for random generation -> Reduced time ~30%
