@@ -9,43 +9,71 @@
 #include <utility>
 #include "hamiltonian.h"
 
+typedef std::vector<double> dvector;
+typedef std::map<int, int> imap;
+typedef std::map<int, double> dmap;
+
 namespace ising {
 enum { PLUS = 0, MINUS = 1 };
 enum { ALL = 'a', PSEUDO = 'p', RANDOM = 'r' };
 enum { RECTANGLE = 'r', SQUARE = 's', TRIANGLE = 't', STRIANGLE = 'v' };
 const double E = 2.71828182845904523536;
+const double PI = 3.14159265358979323846;
 
 class Lattice {
    public:
-    Lattice(Hamiltonian h, double t, char m = 'p');
+    Lattice(Hamiltonian h, double t, char m = 'p', bool init = true);
     virtual ~Lattice() = default;
 
+    std::string getType() const { return type; }
     char getShape() const { return shape; }
     double getTemp() const { return temp; }
     char getMode() const { return mode; }
+    int getSize() const { return size; }
+    const Hamiltonian getHamiltonian() const { return hamiltonian; }
+    const ivector2 getHFunction() const {
+        return hFunction;
+    }
+    const ivector getIndices() const { return indices; }
+    const int getNumIndices() const { return numIndices; }
+    const ivectormap getLocalTerms() const {
+        return localTerms;
+    }
+    const std::map<int, ivector2> getIndInteractions()
+        const {
+        return indInteractions;
+    }
+    imap getSpins() const { return spins; }
+    std::map<int, dmap> getDistances() const {
+        return distances;
+    }
 
     void updateLattice();
     void switchMode(char m);
     int getTotalEnergy() { return findTotalEnergy(); }
     double getMagnetism() { return findMagnetism(); }
-    virtual void printLattice(int cols = -1) const;
+
+    virtual double findDistance(int, int) { return 1; }
+    void reinit() { initSpins(); }
+    virtual void print(int cols = -1) const;
 
    protected:
     const Hamiltonian hamiltonian;
-    const std::vector<std::vector<int>> hFunction;
-    const std::vector<int> indices;
-    std::vector<int> randomizedIndices;
+    const ivector2 hFunction;
+    const ivector indices;
+    ivector randomizedIndices;
     const int numIndices;
-    const std::map<int, std::vector<int>> localTerms;
-    const std::map<int, std::vector<std::vector<int>>> indInteractions;
-    std::vector<int> spins;
-	const std::map<int, std::map<int, double>> distances;
+    const ivectormap localTerms;
+    const std::map<int, ivector2> indInteractions;
+    imap spins;
+    std::map<int, dmap> distances;
 
     virtual void checkShape() const {}
     void shapeError() const;
-    void setMode(char m) { mode = m; };
-	std::map<int, std::map<int, double>> generateDistances() {}
-	virtual double findDistance(int i, int j) { return 1; }
+    void setType(std::string t) { type = t; }
+    void setMode(char m) { mode = m; }
+    void setSize(int s) { size = s; }
+    void generateDistances();
 
     void updateAll();
     void updatePseudo();
@@ -60,9 +88,11 @@ class Lattice {
     inline unsigned int MWC() { return (zNew() << 16) + wNew(); }
 
    private:
+    std::string type;
     const char shape;
     const double temp;
     char mode;
+    int size;
     unsigned int zSeed;
     unsigned int wSeed;
 
@@ -78,8 +108,8 @@ class Lattice {
 
 class LatticeFast : public virtual Lattice {
    public:
-    LatticeFast(Hamiltonian h, double t, char m = 'p')
-        : Lattice(h, t, m), coupling((char)h.getHamiltonian()[0][0]){};
+    LatticeFast(Hamiltonian h, double t, char m = 'p', bool init = true)
+        : Lattice(h, t, m, init), coupling((char)h.getHamiltonian()[0][0]){};
     char getCoupling() const { return coupling; }
 
    protected:
@@ -95,17 +125,17 @@ class LatticeFast : public virtual Lattice {
 
 class RectangularLattice : public virtual Lattice {
    public:
-    RectangularLattice(Hamiltonian h, double t, char m = 'p', int r = -1,
+	   RectangularLattice(Hamiltonian h, double t, char m = 'p', bool init = true, int r = -1,
                        int c = -1);
     int getRows() const { return rows; }
     int getCols() const { return cols; }
-    void printLattice() const { Lattice::printLattice(getCols()); }
+    void print() const { Lattice::print(getCols()); }
+    double findDistance(int i, int j);
 
    protected:
     void setRows(int r) { rows = r; }
     void setCols(int c) { cols = c; }
     void checkShape() const;
-	double findDistance(int i, int j);
 
    private:
     int rows;
@@ -116,11 +146,14 @@ class RectangularLattice : public virtual Lattice {
 
 class RectangularLatticeFast : public RectangularLattice, public LatticeFast {
    public:
-    RectangularLatticeFast(Hamiltonian h, double t, char m = 'p', int r = -1,
+    RectangularLatticeFast(Hamiltonian h, double t, char m = 'p', bool init = true, int r = -1,
                            int c = -1)
-        : Lattice(h, t, m),
-          RectangularLattice(h, t, m, r, c),
-          LatticeFast(h, t, m){};
+        : Lattice(h, t, m, init),
+          RectangularLattice(h, t, m, init, r, c),
+          LatticeFast(h, t, m, init){};
+    double findDistance(int i, int j) {
+        return RectangularLattice::findDistance(i, j);
+    }
 
    protected:
     void checkShape() const { RectangularLattice::checkShape(); }
@@ -128,9 +161,12 @@ class RectangularLatticeFast : public RectangularLattice, public LatticeFast {
 
 class SquareLattice : public RectangularLattice {
    public:
-    SquareLattice(Hamiltonian h, double t, char m = 'p', int s = -1);
+    SquareLattice(Hamiltonian h, double t, char m = 'p', bool init = true, int s = -1);
     int getSide() const { return side; }
-    void printLattice() const { Lattice::printLattice(getSide()); }
+    void print() const { Lattice::print(getSide()); }
+    double findDistance(int i, int j) {
+        return RectangularLattice::findDistance(i, j);
+    }
 
    protected:
     void setSide(int s) { side = s; }
@@ -144,8 +180,11 @@ class SquareLattice : public RectangularLattice {
 
 class SquareLatticeFast : public SquareLattice, public LatticeFast {
    public:
-    SquareLatticeFast(Hamiltonian h, double t, char m = 'p', int s = -1)
-        : Lattice(h, t, m), SquareLattice(h, t, m, s), LatticeFast(h, t, m){};
+    SquareLatticeFast(Hamiltonian h, double t, char m = 'p', bool init = true, int s = -1)
+        : Lattice(h, t, m, init), SquareLattice(h, t, m, init, s), LatticeFast(h, t, m, init){};
+    double findDistance(int i, int j) {
+        return SquareLattice::findDistance(i, j);
+    }
 
    protected:
     void checkShape() const { SquareLattice::checkShape(); }
@@ -153,17 +192,17 @@ class SquareLatticeFast : public SquareLattice, public LatticeFast {
 
 class TriangularLattice : public virtual Lattice {
    public:
-    TriangularLattice(Hamiltonian h, double t, char m = 'p', int r = -1,
+	   TriangularLattice(Hamiltonian h, double t, char m = 'p', bool init = true, int r = -1,
                       int c = -1);
     int getRows() const { return rows; }
     int getCols() const { return cols; }
-    void printLattice() const { Lattice::printLattice(getCols()); }
+    void print() const { Lattice::print(getCols()); }
+    double findDistance(int i, int j);
 
    protected:
     void setRows(int r) { rows = r; }
     void setCols(int c) { cols = c; }
     void checkShape() const;
-	double findDistance(int i, int j);
 
    private:
     int rows;
@@ -174,11 +213,14 @@ class TriangularLattice : public virtual Lattice {
 
 class TriangularLatticeFast : public TriangularLattice, public LatticeFast {
    public:
-    TriangularLatticeFast(Hamiltonian h, double t, char m = 'p', int r = -1,
+    TriangularLatticeFast(Hamiltonian h, double t, char m = 'p', bool init = true, int r = -1,
                           int c = -1)
-        : Lattice(h, t, m),
-          TriangularLattice(h, t, m, r, c),
-          LatticeFast(h, t, m){};
+        : Lattice(h, t, m, init),
+          TriangularLattice(h, t, m, init, r, c),
+          LatticeFast(h, t, m, init){};
+    double findDistance(int i, int j) {
+        return TriangularLattice::findDistance(i, j);
+    }
 
    protected:
     void checkShape() const { TriangularLattice::checkShape(); }
@@ -186,9 +228,12 @@ class TriangularLatticeFast : public TriangularLattice, public LatticeFast {
 
 class STriangularLattice : public TriangularLattice {
    public:
-    STriangularLattice(Hamiltonian h, double t, char m = 'p', int s = -1);
+    STriangularLattice(Hamiltonian h, double t, char m = 'p', bool init = true, int s = -1);
     int getSide() const { return side; }
-    void printLattice() const { Lattice::printLattice(getSide()); }
+    void print() const { Lattice::print(getSide()); }
+    double findDistance(int i, int j) {
+        return TriangularLattice::findDistance(i, j);
+    }
 
    protected:
     void setSide(int s) { side = s; }
@@ -202,10 +247,13 @@ class STriangularLattice : public TriangularLattice {
 
 class STriangularLatticeFast : public STriangularLattice, public LatticeFast {
    public:
-    STriangularLatticeFast(Hamiltonian h, double t, char m = 'p', int s = -1)
-        : Lattice(h, t, m),
-          STriangularLattice(h, t, m, s),
-          LatticeFast(h, t, m){};
+    STriangularLatticeFast(Hamiltonian h, double t, char m = 'p', bool init = true, int s = -1)
+        : Lattice(h, t, m, init),
+          STriangularLattice(h, t, m, init, s),
+          LatticeFast(h, t, m, init){};
+    double findDistance(int i, int j) {
+        return STriangularLattice::findDistance(i, j);
+    }
 
    protected:
     void checkShape() const { STriangularLattice::checkShape(); }

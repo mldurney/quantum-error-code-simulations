@@ -33,7 +33,8 @@ def write_hamiltonian_dir(args):
                  + str(args['min_cols']) + '-' + str(args['max_rows']) + 'x'
                  + str(args['max_cols']) + '_' + str(args['min_temp']) + 'T-'
                  + str(args['change_temp']) + 'dTx' + str(args['num_temps'])
-                 + '-' + str(args['updates']) + 'u-' + args['mode'])
+                 + '-' + str(args['updates']) + 'ux' + str(args['trials'])
+                 + '-' + args['mode'])
     main_dir = os.path.join(cf.ROOT_DIR, main_name)
 
     tests = list(itertools.product(args['range_rows'], args['range_cols'],
@@ -56,10 +57,11 @@ def write_hamiltonian_dir(args):
                             + str_coupling + '-' + str_disorder + '.csv')
         hamiltonian_filename = os.path.join(hamiltonian_dir, hamiltonian_name)
 
-        tests_file.write('%s,%s,%f,%f,%d,%d,%c\n' %
+        tests_file.write('%s,%s,%f,%f,%d,%d,%d,%c\n' %
                          (os.path.basename(hamiltonian_dir), hamiltonian_name,
                           args['min_temp'], args['change_temp'],
-                          args['num_temps'], args['updates'], args['mode']))
+                          args['num_temps'], args['updates'], args['trials'],
+                          args['mode']))
 
         hamiltonian = get_hamiltonian(args['shape'], test)
 
@@ -101,7 +103,7 @@ def receive_input():
     Intended for use when generate_input.py being ran directly
     '''
 
-    if len(sys.argv) == 13:
+    if len(sys.argv) == 14:
         args = get_cmdline_lattice()
     elif len(sys.argv) == 1:
         args = get_userinput_lattice()
@@ -129,9 +131,10 @@ def get_cmdline_lattice():
         'change_temp': sys.argv[7],
         'num_temps': sys.argv[8],
         'updates': sys.argv[9],
-        'couplings': sys.argv[10],
-        'disorders': sys.argv[11],
-        'mode': sys.argv[12]
+        'trials': sys.argv[10],
+        'couplings': sys.argv[11],
+        'disorders': sys.argv[12],
+        'mode': sys.argv[13]
     }
 
     args['range_rows'] = range(args['min_rows'], args['max_rows'] + 1)
@@ -174,6 +177,7 @@ def get_userinput_lattice():
     args['change_temp'] = float(input('Change in temperature between tests: '))
     args['updates'] = int(
         input('Number of updates per temperature per test: '))
+    args['trials'] = int(input('Number of seperate trials per lattice: '))
     couplings = input('List (delimited by space) of couplings between pairs: ')
     disorders = input('List of disorder percentages [0, 100]: ')
     args['mode'] = str(
@@ -209,7 +213,8 @@ def get_default_lattice():
         'min_temp': 1.1,
         'change_temp': .1,
         'num_temps': 20,
-        'updates': 2000,
+        'updates': 100,
+        'trials': 100,
         'couplings': [1],
         'disorders': [0],
         'mode': 'r'

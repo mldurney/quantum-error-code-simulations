@@ -10,10 +10,16 @@
 // Headers for CppUnitTest
 #include "CppUnitTest.h"
 
-// TODO: reference additional headers your program requires here
+// Headers for program files to be tested
 #include "..\hamiltonian.h"
 #include "..\lattices.h"
 #include "..\simulatedlattice.h"
 #include "..\isinghelpers.h"
 #include "..\ising.h"
 #include "..\isingsimulation.h"
+
+// Additional headers needed for execution
+#include <filesystem>
+#include <iostream>
+#include <sstream>
+#include <vector>

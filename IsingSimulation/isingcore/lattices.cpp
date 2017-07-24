@@ -6,7 +6,7 @@ using namespace ising;
 // Lattice //
 /////////////
 
-Lattice::Lattice(Hamiltonian h, double t, char m)
+Lattice::Lattice(Hamiltonian h, double t, char m, bool init)
     : hamiltonian(h),
       hFunction(h.getHamiltonian()),
       indices(h.getIndices()),
@@ -16,34 +16,34 @@ Lattice::Lattice(Hamiltonian h, double t, char m)
       shape(h.getShape()),
       temp(t),
       mode(m) {
+    setType("default");
+    setSize((int)sqrt(getNumIndices()));
     srand((unsigned int)time(NULL));
     zSeed = rand();
     wSeed = rand();
 
     randomizedIndices = indices;
-    initSpins();
-	const std::map<int, std::map<int, double>> distances = generateDistances();
+	generateDistances();
+
+	if (init) {
+		initSpins();
+	}
 }
 
 void Lattice::initSpins() {
-    spins = std::vector<int>(numIndices, 0);
-
-    std::vector<int>::const_iterator it;
+    ivector::const_iterator it;
 
     for (it = indices.begin(); it != indices.end(); ++it) {
         spins[*it] = (MWC() % 2 == 0) ? 1 : -1;
     }
 }
 
-std::map<int, std::map<int, double>> Lattice::generateDistances() {
-	std::map<int, std::map<int, double>> dists;
-	for (auto i : indices) {
-		for (auto j : indices) {
-			dists[i][j] = findDistance(i, j);
-		}
-	}
-
-	return dists;
+void Lattice::generateDistances() {
+    for (auto i : indices) {
+        for (auto j : indices) {
+            distances[i][j] = findDistance(i, j);
+        }
+    }
 }
 
 void Lattice::updateLattice() {
@@ -61,7 +61,7 @@ void Lattice::updateLattice() {
 }
 
 void Lattice::updateAll() {
-    std::vector<int>::const_iterator it;
+    ivector::const_iterator it;
 
     for (it = indices.begin(); it != indices.end(); ++it) {
         if (findProbability(*it) > randFloatCO()) {
@@ -124,7 +124,7 @@ double Lattice::findProbability(int index) {
 
 int Lattice::findTotalEnergy() {
     int energy = 0;
-    std::vector<int>::const_iterator it;
+    ivector::const_iterator it;
 
     for (it = indices.begin(); it != indices.end(); ++it) {
         energy += findIndexEnergy(*it);
@@ -134,18 +134,10 @@ int Lattice::findTotalEnergy() {
 }
 
 int Lattice::findIndexEnergy(int index) {
-    /*
-    return -spins[index] * std::accumulate(indInteractions.at(index).begin(),
-            indInteractions.at(index).end(), 0,
-            [&](int lhs, const auto& rhs) { return lhs +
-            std::accumulate(rhs.begin() + 1, rhs.end(), rhs[0],
-            [&](int a, int b) { return a * spins[b]; }); });
-    */
-
     int energy = 0;
 
-    std::vector<std::vector<int>>::const_iterator it1;
-    std::vector<int>::const_iterator it2;
+    ivector2::const_iterator it1;
+    ivector::const_iterator it2;
 
     auto end = indInteractions.at(index).end();
     for (it1 = indInteractions.at(index).begin(); it1 != end; ++it1) {
@@ -164,7 +156,7 @@ int Lattice::findIndexEnergy(int index) {
 
 double Lattice::findMagnetism() {
     double magnetism = 0;
-    std::vector<int>::const_iterator it;
+    ivector::const_iterator it;
 
     for (it = indices.begin(); it != indices.end(); ++it) {
         magnetism += spins[*it];
@@ -178,16 +170,16 @@ void Lattice::shapeError() const {
     exit(EXIT_FAILURE);
 }
 
-void Lattice::printLattice(int cols) const {
+void Lattice::print(int cols) const {
     if (cols == -1) {
         cols = (int)sqrt(numIndices);
     }
 
-    std::vector<int>::const_iterator it = indices.begin();
+    ivector::const_iterator it = indices.begin();
 
     while (it != indices.end()) {
         for (int col = 0; col < cols && it != indices.end(); ++col, ++it) {
-            (spins[*it] == 1) ? std::cout << "+ " : std::cout << "- ";
+            (spins.at(*it) == 1) ? std::cout << "+ " : std::cout << "- ";
         }
 
         std::cout << "\n";
@@ -264,14 +256,17 @@ double LatticeFast::findMagnetism() {
 // RectangularLattice //
 ////////////////////////
 
-RectangularLattice::RectangularLattice(Hamiltonian h, double t, char m, int r,
+RectangularLattice::RectangularLattice(Hamiltonian h, double t, char m, bool init, int r,
                                        int c)
-    : Lattice(h, t, m), rows(r), cols(c) {
+    : Lattice(h, t, m, init), rows(r), cols(c) {
+    setType("rectangle");
     checkShape();
 
     if (rows == -1 || cols == -1) {
         guessRowsCols();
     }
+
+    generateDistances();
 }
 
 void RectangularLattice::checkShape() const {
@@ -282,14 +277,14 @@ void RectangularLattice::checkShape() const {
 }
 
 double RectangularLattice::findDistance(int i, int j) {
-	int iRow = i % getCols();
-	int iCol = i / getCols();
-	int jRow = j % getCols();
-	int jCol = j / getCols();
+    int iRow = i % getCols();
+    int iCol = i / getCols();
+    int jRow = j % getCols();
+    int jCol = j / getCols();
 
-	int distRow = iRow - jRow;
-	int distCol = iCol - jCol;
-	return sqrt(pow(distRow, 2) + pow(distCol, 2));
+    int distRow = iRow - jRow;
+    int distCol = iCol - jCol;
+    return sqrt(pow(distRow, 2) + pow(distCol, 2));
 }
 
 void RectangularLattice::guessRowsCols() {
@@ -312,13 +307,16 @@ void RectangularLattice::guessRowsCols() {
 // SquareLattice //
 ///////////////////
 
-SquareLattice::SquareLattice(Hamiltonian h, double t, char m, int s)
-    : Lattice(h, t, m), RectangularLattice(h, t, m, s, s), side(s) {
+SquareLattice::SquareLattice(Hamiltonian h, double t, char m, bool init, int s)
+    : Lattice(h, t, m, init), RectangularLattice(h, t, m, init, s, s), side(s) {
+    setType("square");
     checkShape();
 
     if (getSide() == -1) {
         guessSide();
     }
+
+    setSize(getSide());
 }
 
 void SquareLattice::checkShape() const {
@@ -349,14 +347,17 @@ void SquareLattice::guessSide() {
 // TriangularLattice //
 ///////////////////////
 
-TriangularLattice::TriangularLattice(Hamiltonian h, double t, char m, int r,
+TriangularLattice::TriangularLattice(Hamiltonian h, double t, char m, bool init, int r,
                                      int c)
-    : Lattice(h, t, m), rows(r), cols(c) {
+    : Lattice(h, t, m, init), rows(r), cols(c) {
+    setType("triangle");
     checkShape();
 
     if (rows == -1 || cols == -1) {
         guessRowsCols();
     }
+
+    generateDistances();
 }
 
 void TriangularLattice::checkShape() const {
@@ -367,14 +368,14 @@ void TriangularLattice::checkShape() const {
 }
 
 double TriangularLattice::findDistance(int i, int j) {
-	int iRow = i % getCols();
-	int iCol = i / getCols();
-	int jRow = j % getCols();
-	int jCol = j / getCols();
+    int iRow = i % getCols();
+    int iCol = i / getCols();
+    int jRow = j % getCols();
+    int jCol = j / getCols();
 
-	int distRow = iRow - jRow;
-	int distCol = iCol - jCol;
-	return sqrt(pow(distRow, 2) + pow(distCol, 2));
+    int distRow = iRow - jRow;
+    int distCol = iCol - jCol;
+    return sqrt(pow(distRow, 2) + pow(distCol, 2));
 }
 
 void TriangularLattice::guessRowsCols() {
@@ -397,13 +398,16 @@ void TriangularLattice::guessRowsCols() {
 // STriangularLattice //
 ////////////////////////
 
-STriangularLattice::STriangularLattice(Hamiltonian h, double t, char m, int s)
-    : Lattice(h, t, m), TriangularLattice(h, t, m, s, s), side(s) {
+STriangularLattice::STriangularLattice(Hamiltonian h, double t, char m, bool init, int s)
+    : Lattice(h, t, m, init), TriangularLattice(h, t, m, init, s, s), side(s) {
+    setType("square triangle");
     checkShape();
 
     if (getSide() == -1) {
         guessSide();
     }
+
+    setSize(getSide());
 }
 
 void STriangularLattice::checkShape() const {

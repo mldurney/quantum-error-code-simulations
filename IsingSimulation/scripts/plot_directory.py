@@ -6,17 +6,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import config as cf
 from matplotlib.ticker import AutoMinorLocator
 
 plt.switch_backend('agg')
 
-FOLDERS = ['magnetizations', 'binder_cumulants']
 MODES = [SINGLE, COUPLING, DISORDER, SIZE, ALL] = ['s', 'c', 'd', 'z', 'a']
 
 
 def manage_plotting(directory, mode):
 
-    for folder in FOLDERS:
+    for folder in cf.FOLDERS:
         filenames = find_averaged_csv(directory, folder)
         plot_directory = make_plot_directory(directory, folder, mode)
         groups = find_filename_groups(filenames[:], mode)
@@ -155,6 +155,9 @@ def plot_results(filenames, directory, folder, mode):
     elif folder == 'binder_cumulants':
         title = 'U**4 v. T: ' + plotname
         ylabel = 'Binder Cumulant (U**4)'
+    elif folder == 'correlation_lengths':
+        title = 'E_m v. T: ' + plotname
+        ylabel = 'Correlation Lengths (E_m)'
     else:
         title = 'Data v. T: ' + plotname
         ylabel = 'Data'

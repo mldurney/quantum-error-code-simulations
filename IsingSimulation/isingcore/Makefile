@@ -9,7 +9,7 @@ debug: isingsimulation ising testhamiltonian
 isingsimulation : isingsimulation.o isinghelpers.o simulatedlattice.o lattices.o hamiltonian.o
 	$(CXX) $(CXXFLAGS) isingsimulation.o isinghelpers.o simulatedlattice.o lattices.o hamiltonian.o -o isingsimulation
 
-isingsimulation.o : isingsimulation.cpp isingsimulation.h isinghelpers.h simulatedlattice.h
+isingsimulation.o : isingsimulation.cpp isingsimulation.h isinghelpers.h simulatedlattice.h threadpool.h
 	$(CXX) $(CXXFLAGS) -c isingsimulation.cpp
 
 ising : ising.o isinghelpers.o lattices.o hamiltonian.o

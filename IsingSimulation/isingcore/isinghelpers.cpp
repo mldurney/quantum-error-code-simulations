@@ -38,42 +38,44 @@ Hamiltonian ising::readHamiltonian(std::ifstream& file, char& shape) {
 }
 
 Lattice* ising::chooseLattice(const char shape, const Hamiltonian& hamiltonian,
-                              const double temp, const char mode) {
+                              const double temp, const char mode, const bool init) {
     Lattice* lattice;
 
     if (hamiltonian.getIsFast()) {
         switch (shape) {
             case RECTANGLE:
-                lattice = new RectangularLatticeFast(hamiltonian, temp, mode);
+                lattice = new RectangularLatticeFast(hamiltonian, temp, mode, init);
                 break;
             case SQUARE:
-                lattice = new SquareLatticeFast(hamiltonian, temp, mode);
+                lattice = new SquareLatticeFast(hamiltonian, temp, mode, init);
                 break;
             case TRIANGLE:
-                lattice = new TriangularLatticeFast(hamiltonian, temp, mode);
+                lattice = new TriangularLatticeFast(hamiltonian, temp, mode, init);
                 break;
             case STRIANGLE:
-                lattice = new STriangularLatticeFast(hamiltonian, temp, mode);
+                lattice = new STriangularLatticeFast(hamiltonian, temp, mode, init);
+                break;
             default:
-                lattice = new LatticeFast(hamiltonian, temp, mode);
+                lattice = new LatticeFast(hamiltonian, temp, mode, init);
         }
     }
 
     else {
         switch (shape) {
             case RECTANGLE:
-                lattice = new RectangularLattice(hamiltonian, temp, mode);
+                lattice = new RectangularLattice(hamiltonian, temp, mode, init);
                 break;
             case SQUARE:
-                lattice = new SquareLattice(hamiltonian, temp, mode);
+                lattice = new SquareLattice(hamiltonian, temp, mode, init);
                 break;
             case TRIANGLE:
-                lattice = new TriangularLattice(hamiltonian, temp, mode);
+                lattice = new TriangularLattice(hamiltonian, temp, mode, init);
                 break;
             case STRIANGLE:
-                lattice = new STriangularLattice(hamiltonian, temp, mode);
+                lattice = new STriangularLattice(hamiltonian, temp, mode, init);
+                break;
             default:
-                lattice = new Lattice(hamiltonian, temp, mode);
+                lattice = new Lattice(hamiltonian, temp, mode, init);
         }
     }
 
@@ -100,13 +102,13 @@ std::string ising::getOutFilename(const std::string& inFilename,
 }
 
 void ising::writeOutput(const std::string& filename,
-                        const std::vector<double>& temp,
-                        const std::vector<double>& results) {
+                        const dvector& temp,
+                        const dvector& results) {
     bool isNewFile = (std::ifstream(filename)) ? false : true;
     std::ofstream file(filename.c_str(),
                        std::ofstream::out | std::ofstream::app);
 
-    std::vector<double>::const_iterator it;
+    dvector::const_iterator it;
 
     if (isNewFile) {
         std::ostringstream header;

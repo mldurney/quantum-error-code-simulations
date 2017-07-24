@@ -3,10 +3,9 @@
     "",
     "\\IsingSimulation",
     "\\IsingSimulation\\isingcore",
-    "\\IsingSimulation\\isingcore\\IsingCore",
-    "\\IsingSimulation\\isingcore\\IsingSimulation",
-    "\\IsingSimulation\\s10x10-30x30_1.0T-0.1dTx21-200u-p"
+    "\\IsingSimulation\\isingcore\\x64",
+    "\\IsingSimulation\\scripts"
   ],
-  "SelectedNode": "\\IsingSimulation\\isingcore\\lattices.cpp",
+  "SelectedNode": "\\IsingSimulation\\isingcore\\threadpool.h",
   "PreviewInSolutionExplorer": false
 }

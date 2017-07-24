@@ -2,9 +2,9 @@
 
 using namespace ising;
 
-std::vector<std::vector<int>> ising::importHamiltonianVector(
+ivector2 ising::importHamiltonianVector(
     std::ifstream& file) {
-    std::vector<std::vector<int>> hamiltonianVector;
+    ivector2 hamiltonianVector;
     std::string line;
     int num;
 
@@ -13,7 +13,7 @@ std::vector<std::vector<int>> ising::importHamiltonianVector(
     }
 
     while (getline(file, line)) {
-        std::vector<int> interaction;
+        ivector interaction;
         std::istringstream lineStream(line);
 
         while (lineStream >> num) {
@@ -30,7 +30,7 @@ std::vector<std::vector<int>> ising::importHamiltonianVector(
     return hamiltonianVector;
 }
 
-Hamiltonian::Hamiltonian(std::vector<std::vector<int>> h, char s, int r, int c)
+Hamiltonian::Hamiltonian(ivector2 h, char s, int r, int c)
     : hamiltonian(h), shape(s), rows(r), cols(c) {
     generateIndices();
     generateLocalTerms();
@@ -39,9 +39,9 @@ Hamiltonian::Hamiltonian(std::vector<std::vector<int>> h, char s, int r, int c)
 }
 
 void Hamiltonian::generateIndices() {
-    std::vector<std::vector<int>>::iterator it1;
-    std::vector<int>::iterator it2;
-    std::vector<int>::iterator it3;
+    ivector2::iterator it1;
+    ivector::iterator it2;
+    ivector::iterator it3;
 
     for (it1 = hamiltonian.begin(); it1 != hamiltonian.end(); ++it1) {
         for (it2 = it1->begin() + 1; it2 != it1->end(); ++it2) {
@@ -57,12 +57,12 @@ void Hamiltonian::generateIndices() {
 }
 
 void Hamiltonian::generateLocalTerms() {
-    std::vector<std::vector<int>>::iterator it1;
-    std::vector<int>::iterator it2;
-    std::vector<int>::iterator it3;
+    ivector2::iterator it1;
+    ivector::iterator it2;
+    ivector::iterator it3;
 
     for (it2 = indices.begin(); it2 != indices.end(); ++it2) {
-        localTerms[*it2] = std::vector<int>();
+        localTerms[*it2] = ivector();
     }
 
     for (it1 = hamiltonian.begin(); it1 != hamiltonian.end(); ++it1) {
@@ -79,17 +79,17 @@ void Hamiltonian::generateLocalTerms() {
 }
 
 void Hamiltonian::generateIndInteractions() {
-    std::vector<std::vector<int>>::iterator it1;
-    std::vector<int>::iterator it2;
-    std::vector<int>::iterator it3;
+    ivector2::iterator it1;
+    ivector::iterator it2;
+    ivector::iterator it3;
 
     for (it2 = indices.begin(); it2 != indices.end(); ++it2) {
-        indInteractions[*it2] = std::vector<std::vector<int>>();
+        indInteractions[*it2] = ivector2();
     }
 
     for (it1 = hamiltonian.begin(); it1 != hamiltonian.end(); ++it1) {
         for (it2 = it1->begin() + 1; it2 != it1->end(); ++it2) {
-            std::vector<int> interaction = {*(it1->begin())};
+            ivector interaction = {*(it1->begin())};
 
             for (it3 = it1->begin() + 1; it3 != it1->end(); ++it3) {
                 if (it2 == it3) {
@@ -105,7 +105,7 @@ void Hamiltonian::generateIndInteractions() {
 }
 
 void Hamiltonian::findIsFast() {
-    std::vector<std::vector<int>>::iterator it = hamiltonian.begin();
+    ivector2::iterator it = hamiltonian.begin();
     char c = (char)(*it)[0];
 
     for (++it; it != hamiltonian.end(); ++it) {
@@ -124,8 +124,8 @@ void Hamiltonian::findIsFast() {
 }
 
 void Hamiltonian::printHamiltonian() const {
-    std::vector<std::vector<int>>::const_iterator it1;
-    std::vector<int>::const_iterator it2;
+    ivector2::const_iterator it1;
+    ivector::const_iterator it2;
 
     std::cout << "Printing Hamiltonian:" << std::endl;
 
@@ -141,7 +141,7 @@ void Hamiltonian::printHamiltonian() const {
 }
 
 void Hamiltonian::printIndices() const {
-    std::vector<int>::const_iterator it;
+    ivector::const_iterator it;
 
     std::cout << "Printing indices:" << std::endl;
 
@@ -153,8 +153,8 @@ void Hamiltonian::printIndices() const {
 }
 
 void Hamiltonian::printLocalTerms() const {
-    std::map<int, std::vector<int>>::const_iterator it1;
-    std::vector<int>::const_iterator it2;
+    ivectormap::const_iterator it1;
+    ivector::const_iterator it2;
 
     std::cout << "Printing local terms:" << std::endl;
 
@@ -172,9 +172,9 @@ void Hamiltonian::printLocalTerms() const {
 }
 
 void Hamiltonian::printIndInteractions() const {
-    std::map<int, std::vector<std::vector<int>>>::const_iterator it1;
-    std::vector<std::vector<int>>::const_iterator it2;
-    std::vector<int>::const_iterator it3;
+    std::map<int, ivector2>::const_iterator it1;
+    ivector2::const_iterator it2;
+    ivector::const_iterator it3;
 
     std::cout << "Printing index interactions:" << std::endl;
 

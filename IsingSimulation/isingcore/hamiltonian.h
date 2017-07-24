@@ -9,24 +9,28 @@
 #include <string>
 #include <vector>
 
+typedef std::vector<int> ivector;
+typedef std::vector<ivector> ivector2;
+typedef std::map<int, ivector> ivectormap;
+
 namespace ising {
-std::vector<std::vector<int>> importHamiltonianVector(std::ifstream &file);
+ivector2 importHamiltonianVector(std::ifstream &file);
 
 class Hamiltonian {
    public:
-    Hamiltonian(std::vector<std::vector<int>> h, char s = '\0', int r = -1,
+    Hamiltonian(ivector2 h, char s = '\0', int r = -1,
                 int c = -1);
     ~Hamiltonian() {}
 
-    const std::vector<std::vector<int>> getHamiltonian() const {
+    const ivector2 getHamiltonian() const {
         return hamiltonian;
     }
-    const std::vector<int> getIndices() const { return indices; }
+    const ivector getIndices() const { return indices; }
     const int getNumIndices() const { return numIndices; }
-    const std::map<int, std::vector<int>> getLocalTerms() const {
+    const ivectormap getLocalTerms() const {
         return localTerms;
     }
-    const std::map<int, std::vector<std::vector<int>>> getIndInteractions()
+    const std::map<int, ivector2> getIndInteractions()
         const {
         return indInteractions;
     }
@@ -47,11 +51,11 @@ class Hamiltonian {
     void generateIndInteractions();
     void findIsFast();
 
-    std::vector<std::vector<int>> hamiltonian;
-    std::vector<int> indices;
+    ivector2 hamiltonian;
+    ivector indices;
     int numIndices;
-    std::map<int, std::vector<int>> localTerms;
-    std::map<int, std::vector<std::vector<int>>> indInteractions;
+    ivectormap localTerms;
+    std::map<int, ivector2> indInteractions;
 
     char shape;
     int rows;

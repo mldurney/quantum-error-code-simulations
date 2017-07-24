@@ -30,4 +30,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="s10x10_1-0.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="v20x20_1-10.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

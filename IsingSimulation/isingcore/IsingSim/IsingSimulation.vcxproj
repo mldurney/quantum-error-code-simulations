@@ -125,6 +125,7 @@
     <ClInclude Include="..\isingsimulation.h" />
     <ClInclude Include="..\lattices.h" />
     <ClInclude Include="..\simulatedlattice.h" />
+    <ClInclude Include="..\threadpool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

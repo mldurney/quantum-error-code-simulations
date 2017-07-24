@@ -59,7 +59,7 @@ void ising::runLattice(Lattice *lattice) {
         int num;
         switch (*input) {
             case 'p':
-                lattice->printLattice();
+                lattice->print();
                 break;
 
             case 'u':
@@ -90,7 +90,7 @@ void ising::runLattice(Lattice *lattice) {
                     lattice->updateLattice();
                 }
 
-                lattice->printLattice();
+                lattice->print();
                 std::cout << "\nUpdated lattice " << num << " times.";
                 std::cout << "\nTotal lattice energy: ";
                 std::cout << lattice->getTotalEnergy();
