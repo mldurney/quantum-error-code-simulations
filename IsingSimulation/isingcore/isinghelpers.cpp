@@ -38,22 +38,26 @@ Hamiltonian ising::readHamiltonian(std::ifstream& file, char& shape) {
 }
 
 Lattice* ising::chooseLattice(const char shape, const Hamiltonian& hamiltonian,
-                              const double temp, const char mode, const bool init) {
+                              const double temp, const char mode,
+                              const bool init) {
     Lattice* lattice;
 
     if (hamiltonian.getIsFast()) {
         switch (shape) {
             case RECTANGLE:
-                lattice = new RectangularLatticeFast(hamiltonian, temp, mode, init);
+                lattice =
+                    new RectangularLatticeFast(hamiltonian, temp, mode, init);
                 break;
             case SQUARE:
                 lattice = new SquareLatticeFast(hamiltonian, temp, mode, init);
                 break;
             case TRIANGLE:
-                lattice = new TriangularLatticeFast(hamiltonian, temp, mode, init);
+                lattice =
+                    new TriangularLatticeFast(hamiltonian, temp, mode, init);
                 break;
             case STRIANGLE:
-                lattice = new STriangularLatticeFast(hamiltonian, temp, mode, init);
+                lattice =
+                    new STriangularLatticeFast(hamiltonian, temp, mode, init);
                 break;
             default:
                 lattice = new LatticeFast(hamiltonian, temp, mode, init);
@@ -83,37 +87,36 @@ Lattice* ising::chooseLattice(const char shape, const Hamiltonian& hamiltonian,
 }
 
 std::string ising::getOutFilename(const std::string& inFilename,
-								  const std::string& newDir) {
-	fs::path outFilename(inFilename);
-	std::ostringstream latticeName;
-	latticeName << outFilename.filename();
+                                  const std::string& newDir) {
+    fs::path outFilename(inFilename);
+    std::ostringstream latticeName;
+    latticeName << outFilename.filename();
 
-	outFilename.remove_filename();
-	outFilename.replace_filename(newDir + "/");
-	outFilename /= latticeName.str();
+    outFilename.remove_filename();
+    outFilename.replace_filename(newDir + "/");
+    outFilename /= latticeName.str();
 
-	return outFilename.string();
+    return outFilename.string();
 }
 
 std::string ising::getOutFilename(const std::string& inFilename,
-								  const std::string& oldDir,
-								  const std::string& newDir) {
-	fs::path outFilename(inFilename);
-	std::ostringstream latticeName;
-	latticeName << outFilename.filename();
+                                  const std::string& oldDir,
+                                  const std::string& newDir) {
+    fs::path outFilename(inFilename);
+    std::ostringstream latticeName;
+    latticeName << outFilename.filename();
 
-	if (outFilename.string().find(oldDir) != std::string::npos) {
-		outFilename.remove_filename();
-	}
+    if (outFilename.string().find(oldDir) != std::string::npos) {
+        outFilename.remove_filename();
+    }
 
-	outFilename.replace_filename(newDir + "/");
-	outFilename /= latticeName.str();
+    outFilename.replace_filename(newDir + "/");
+    outFilename /= latticeName.str();
 
-	return outFilename.string();
+    return outFilename.string();
 }
 
-void ising::writeOutput(const std::string& filename,
-                        const dvector& temp,
+void ising::writeOutput(const std::string& filename, const dvector& temp,
                         const dvector& results) {
     bool isNewFile = (std::ifstream(filename)) ? false : true;
     std::ofstream file(filename.c_str(),

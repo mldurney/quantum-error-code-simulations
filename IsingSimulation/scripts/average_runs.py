@@ -2,6 +2,7 @@ import os.path
 import sys
 import pandas as pd
 import numpy as np
+import config as cf
 
 MIN_PERCENTILE = 25
 MAX_PERCENTILE = 75
@@ -34,7 +35,7 @@ def rw_averages(in_filename):
     data = pd.read_csv(in_filename)
     averages = average_no_outliers(data, MIN_PERCENTILE, MAX_PERCENTILE)
 
-    slash_index = in_filename.rfind('/')
+    slash_index = in_filename.rfind(cf.SLASH)
     out_filename = ('avg_' + in_filename if slash_index == -1 else
                     in_filename[:slash_index + 1] + 'avg_' +
                     in_filename[slash_index + 1:])

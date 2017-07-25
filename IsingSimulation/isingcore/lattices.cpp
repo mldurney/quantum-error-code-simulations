@@ -23,11 +23,11 @@ Lattice::Lattice(Hamiltonian h, double t, char m, bool init)
     wSeed = rand();
 
     randomizedIndices = indices;
-	generateDistances();
+    generateDistances();
 
-	if (init) {
-		initSpins();
-	}
+    if (init) {
+        initSpins();
+    }
 }
 
 void Lattice::initSpins() {
@@ -256,8 +256,8 @@ double LatticeFast::findMagnetism() {
 // RectangularLattice //
 ////////////////////////
 
-RectangularLattice::RectangularLattice(Hamiltonian h, double t, char m, bool init, int r,
-                                       int c)
+RectangularLattice::RectangularLattice(Hamiltonian h, double t, char m,
+                                       bool init, int r, int c)
     : Lattice(h, t, m, init), rows(r), cols(c) {
     setType("rectangle");
     checkShape();
@@ -347,8 +347,8 @@ void SquareLattice::guessSide() {
 // TriangularLattice //
 ///////////////////////
 
-TriangularLattice::TriangularLattice(Hamiltonian h, double t, char m, bool init, int r,
-                                     int c)
+TriangularLattice::TriangularLattice(Hamiltonian h, double t, char m, bool init,
+                                     int r, int c)
     : Lattice(h, t, m, init), rows(r), cols(c) {
     setType("triangle");
     checkShape();
@@ -398,7 +398,8 @@ void TriangularLattice::guessRowsCols() {
 // STriangularLattice //
 ////////////////////////
 
-STriangularLattice::STriangularLattice(Hamiltonian h, double t, char m, bool init, int s)
+STriangularLattice::STriangularLattice(Hamiltonian h, double t, char m,
+                                       bool init, int s)
     : Lattice(h, t, m, init), TriangularLattice(h, t, m, init, s, s), side(s) {
     setType("square triangle");
     checkShape();

@@ -3,9 +3,8 @@
     "",
     "\\IsingSimulation",
     "\\IsingSimulation\\isingcore",
-    "\\IsingSimulation\\isingcore\\x64",
     "\\IsingSimulation\\scripts"
   ],
-  "SelectedNode": "\\IsingSimulation\\isingcore\\threadpool.h",
+  "SelectedNode": "\\IsingSimulation\\isingcore\\simulatedlattice.cpp",
   "PreviewInSolutionExplorer": false
 }

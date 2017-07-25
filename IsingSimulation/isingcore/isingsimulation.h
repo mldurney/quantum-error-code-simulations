@@ -7,7 +7,6 @@
 #include "threadpool.h"
 
 namespace ising {
-const int PREUPDATES = 300;
 
 void manageSimulations(const std::string &inFilename, const double t,
                        const double dt, const int n, const int updates,

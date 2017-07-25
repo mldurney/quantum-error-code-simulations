@@ -121,7 +121,7 @@ def plot_results(filenames, directory, folder, mode):
     for i, filename in enumerate(filenames):
         basename = os.path.basename(filename).rsplit('.', 1)[0]
 
-        print('Plotting ' + folder + '/' + basename)
+        print('Plotting ' + folder + cf.SLASH + basename)
 
         data = pd.read_csv(filename)
         temp, results = data.columns.tolist()

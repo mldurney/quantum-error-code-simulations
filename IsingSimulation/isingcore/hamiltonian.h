@@ -18,20 +18,14 @@ ivector2 importHamiltonianVector(std::ifstream &file);
 
 class Hamiltonian {
    public:
-    Hamiltonian(ivector2 h, char s = '\0', int r = -1,
-                int c = -1);
+    Hamiltonian(ivector2 h, char s = '\0', int r = -1, int c = -1);
     ~Hamiltonian() {}
 
-    const ivector2 getHamiltonian() const {
-        return hamiltonian;
-    }
+    const ivector2 getHamiltonian() const { return hamiltonian; }
     const ivector getIndices() const { return indices; }
     const int getNumIndices() const { return numIndices; }
-    const ivectormap getLocalTerms() const {
-        return localTerms;
-    }
-    const std::map<int, ivector2> getIndInteractions()
-        const {
+    const ivectormap getLocalTerms() const { return localTerms; }
+    const std::map<int, ivector2> getIndInteractions() const {
         return indInteractions;
     }
 

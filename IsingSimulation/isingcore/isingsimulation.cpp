@@ -40,8 +40,8 @@ void ising::manageSimulations(const std::string &inFilename, const double t,
     for (int i = 0; i < n; ++i) {
         double currT = t + i * dt;
         Lattice *lattice = chooseLattice(shape, h, currT, mode, false);
-        SimulatedLattice *sim =
-            new SimulatedLattice(lattice, inFilename, updates, PREUPDATES, trials);
+        SimulatedLattice *sim = new SimulatedLattice(
+            lattice, inFilename, updates, PREUPDATES, trials);
         simulations.push_back(sim);
     }
 
@@ -59,10 +59,8 @@ void ising::manageSimulations(const std::string &inFilename, const double t,
 
     dvector temperatures = SimulatedLattice::getTemperatures();
     dvector magnetizations = SimulatedLattice::getMagnetizations();
-    dvector binderCumulants =
-        SimulatedLattice::getBinderCumulants();
-    dvector correlationLengths =
-        SimulatedLattice::getRealCorrelationLengths();
+    dvector binderCumulants = SimulatedLattice::getBinderCumulants();
+    dvector correlationLengths = SimulatedLattice::getRealCorrelationLengths();
 
     std::string outMag = getOutFilename(inFilename, "magnetizations");
     std::string outBC = getOutFilename(inFilename, "binder_cumulants");

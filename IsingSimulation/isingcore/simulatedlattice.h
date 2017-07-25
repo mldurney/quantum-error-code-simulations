@@ -11,7 +11,9 @@ typedef std::complex<double> cdouble;
 typedef std::vector<cdouble> cvector;
 
 namespace ising {
-const int INITUPDATES = 100;
+const unsigned int PREUPDATES = 500;
+const unsigned int BASEUPDATES = 5;
+const unsigned int SKIP = 10;
 const double MIN_PERCENTILE = .4;
 const double MAX_PERCENTILE = 1;
 
@@ -26,7 +28,7 @@ class SimulatedLattice {
    public:
     SimulatedLattice(Lattice *lattice, const std::string &filename,
                      const unsigned int updates,
-                     const unsigned int preupdates = 0,
+                     const unsigned int preupdates = PREUPDATES,
                      const unsigned int trials = 1);
     ~SimulatedLattice() {}
     void runLatticeSimulation();
@@ -86,6 +88,8 @@ class SimulatedLattice {
     void updateTempFile();
     void runPreupdates();
     void runTrials();
+    void runUpdates();
+    void runUpdatesStable();
 };
 }
 

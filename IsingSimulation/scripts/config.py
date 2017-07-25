@@ -66,6 +66,7 @@ DIR_NAMES = ['magnetizations', 'binder_cumulants', 'correlation_lengths']
 ROOT_NAME = 'IsingSimulation'
 MAKE_NAME = 'Makefile'
 CSIM_NAME = 'IsingSimulation'
+SLASH = '\\' if sys.platform in ['win32', 'cygwin'] else '/'
 
 try:
     ROOT_DIR = find_parent_dir(ROOT_NAME)

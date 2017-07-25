@@ -2,8 +2,7 @@
 
 using namespace ising;
 
-ivector2 ising::importHamiltonianVector(
-    std::ifstream& file) {
+ivector2 ising::importHamiltonianVector(std::ifstream& file) {
     ivector2 hamiltonianVector;
     std::string line;
     int num;
