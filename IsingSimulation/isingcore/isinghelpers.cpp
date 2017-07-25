@@ -83,22 +83,33 @@ Lattice* ising::chooseLattice(const char shape, const Hamiltonian& hamiltonian,
 }
 
 std::string ising::getOutFilename(const std::string& inFilename,
-                                  const std::string& oldDir,
-                                  const std::string& newDir) {
-    std::string outFilename;
+								  const std::string& newDir) {
+	fs::path outFilename(inFilename);
+	std::ostringstream latticeName;
+	latticeName << outFilename.filename();
 
-    if (inFilename.find(SLASH) == inFilename.rfind(SLASH)) {
-        std::string objectName = inFilename.substr(0, inFilename.rfind('.'));
+	outFilename.remove_filename();
+	outFilename.replace_filename(newDir + "/");
+	outFilename /= latticeName.str();
 
-        std::ostringstream outFilenameBuilder;
-        outFilenameBuilder << newDir << SLASH << objectName << ".csv";
-        outFilename = outFilenameBuilder.str();
-    } else {
-        outFilename = inFilename;
-        outFilename.replace(outFilename.find(oldDir), oldDir.length(), newDir);
-    }
+	return outFilename.string();
+}
 
-    return outFilename;
+std::string ising::getOutFilename(const std::string& inFilename,
+								  const std::string& oldDir,
+								  const std::string& newDir) {
+	fs::path outFilename(inFilename);
+	std::ostringstream latticeName;
+	latticeName << outFilename.filename();
+
+	if (outFilename.string().find(oldDir) != std::string::npos) {
+		outFilename.remove_filename();
+	}
+
+	outFilename.replace_filename(newDir + "/");
+	outFilename /= latticeName.str();
+
+	return outFilename.string();
 }
 
 void ising::writeOutput(const std::string& filename,

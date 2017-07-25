@@ -40,11 +40,11 @@ def main():
         sys.exit(1)
 
     filename = str(sys.argv[1])
-    old_dir = os.getcwd()
-    os.chdir(cf.MAKE_DIR)
-    subprocess.call('make', stdout=FNULL, stderr=subprocess.STDOUT)
+    #old_dir = os.getcwd()
+    #os.chdir(cf.MAKE_DIR)
+    #subprocess.call('make', stdout=FNULL, stderr=subprocess.STDOUT)
     run_trial(filename)
-    os.chdir(old_dir)
+    #os.chdir(old_dir)
 
 # end main
 

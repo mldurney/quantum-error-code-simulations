@@ -24,11 +24,12 @@ static const std::string SLASH = "/";
 
 class SimulatedLattice {
    public:
-    SimulatedLattice(Lattice *lattice, const std::string &filename, const unsigned int updates,
+    SimulatedLattice(Lattice *lattice, const std::string &filename,
+                     const unsigned int updates,
                      const unsigned int preupdates = 0,
                      const unsigned int trials = 1);
     ~SimulatedLattice() {}
-	void runLatticeSimulation();
+    void runLatticeSimulation();
     unsigned int getIndLattice() const { return indLattice; }
     Lattice *getLattice() const { return lattice; }
     unsigned int getUpdates() const { return updates; }
@@ -44,9 +45,7 @@ class SimulatedLattice {
     static dvector getTemperatures() { return temperatures; }
     static dvector getMagnetizations() { return magnetizations; }
     static dvector getBinderCumulants() { return binderCumulants; }
-    static cvector getCorrelationLengths() {
-        return correlationLengths;
-    }
+    static cvector getCorrelationLengths() { return correlationLengths; }
     static dvector getRealCorrelationLengths();
 
    protected:
@@ -55,14 +54,16 @@ class SimulatedLattice {
     void addAvgMag4(double mag4);
     void addChi0(cdouble chi) { chi0.push_back(chi); }
     void addChiq(cdouble chi) { chiq.push_back(chi); }
-    double findAverage(dvector &v, double percentile1 = MIN_PERCENTILE, double percentile2 = MAX_PERCENTILE);
-    cdouble findAverage(cvector &v, double percentile1 = MIN_PERCENTILE, double percentile2 = MAX_PERCENTILE);
+    double findAverage(dvector &v, double percentile1 = MIN_PERCENTILE,
+                       double percentile2 = MAX_PERCENTILE);
+    cdouble findAverage(cvector &v, double percentile1 = MIN_PERCENTILE,
+                        double percentile2 = MAX_PERCENTILE);
 
    private:
     unsigned int indLattice;
     Lattice *lattice;
-	fs::path tempDirectory;
-	fs::path tempData;
+    fs::path tempDirectory;
+    fs::path tempData;
     unsigned int updates;
     unsigned int preupdates;
     unsigned int trials;
@@ -79,12 +80,12 @@ class SimulatedLattice {
     static dvector binderCumulants;
     static cvector correlationLengths;
     static std::mutex data_mutex;
-	static std::mutex file_mutex;
+    static std::mutex file_mutex;
 
-	void initTempFiles(const std::string &filename);
-	void updateTempFile();
-	void runPreupdates();
-	void runTrials();
+    void initTempFiles(const std::string &filename);
+    void updateTempFile();
+    void runPreupdates();
+    void runTrials();
 };
 }
 

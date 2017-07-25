@@ -21,8 +21,8 @@ $RECYCLE.BIN/
 *.vsp
 */.vs/*
 */.vscode/*
-*/x64/*
-*/Debug/*
+x64/
+Debug/
 
 # =========================
 # Operating System Files

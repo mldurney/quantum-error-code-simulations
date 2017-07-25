@@ -65,7 +65,7 @@ SHAPES = [RECTANGLE, SQUARE, TRIANGLE, STRIANGLE] = ['r', 's', 't', 'v']
 DIR_NAMES = ['magnetizations', 'binder_cumulants', 'correlation_lengths']
 ROOT_NAME = 'IsingSimulation'
 MAKE_NAME = 'Makefile'
-CSIM_NAME = 'isingsimulation'
+CSIM_NAME = 'IsingSimulation'
 
 try:
     ROOT_DIR = find_parent_dir(ROOT_NAME)

@@ -1,10 +1,8 @@
 import glob
 import os
 import sys
+import config as cf
 from average_runs import rw_averages
-
-FOLDERS = ['magnetizations', 'binder_cumulants']
-
 
 def find_unaveraged_csv(directory, folder):
 
@@ -54,7 +52,7 @@ def main():
         print('Usage: ' + sys.argv[0] + ' data_dir\n')
         sys.exit(1)
 
-    for folder in FOLDERS:
+    for folder in cf.DIR_NAMES:
         rw_averages_dir(directory, folder)
 
 # end main

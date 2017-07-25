@@ -1,16 +1,16 @@
 CXX		 = g++
-CXXFLAGS = -std=c++14 -Wall -pthread -Ofast
+CXXFLAGS = -std=c++1z -Wall -pthread -Ofast
 
 all : isingsimulation ising testhamiltonian
 
-debug: CXXFLAGS = -std=c++14 -Wall -pthread -g -ggdb -O0
+debug: CXXFLAGS = -std=c++1z -Wall -pthread -g -ggdb -O0
 debug: isingsimulation ising testhamiltonian
 
 isingsimulation : isingsimulation.o isinghelpers.o simulatedlattice.o lattices.o hamiltonian.o
 	$(CXX) $(CXXFLAGS) isingsimulation.o isinghelpers.o simulatedlattice.o lattices.o hamiltonian.o -o isingsimulation
 
 isingsimulation.o : isingsimulation.cpp isingsimulation.h isinghelpers.h simulatedlattice.h threadpool.h
-	$(CXX) $(CXXFLAGS) -c isingsimulation.cpp
+	$(CXX) $(CXXFLAGS) -c isingsimulation.cpp -lstdc++fs
 
 ising : ising.o isinghelpers.o lattices.o hamiltonian.o
 	$(CXX) $(CXXFLAGS) ising.o isinghelpers.o lattices.o hamiltonian.o -o ising
@@ -22,7 +22,7 @@ isinghelpers.o : isinghelpers.cpp isinghelpers.h lattices.h
 	$(CXX) $(CXXFLAGS) -c isinghelpers.cpp
 
 simulatedlattice.o : simulatedlattice.cpp simulatedlattice.h lattices.h
-	$(CXX) $(CXXFLAGS) -c simulatedlattice.cpp
+	$(CXX) $(CXXFLAGS) -c simulatedlattice.cpp -lstdc++fs
 
 lattices.o : lattices.cpp lattices.h hamiltonian.h
 	$(CXX) $(CXXFLAGS) -c lattices.cpp
@@ -35,9 +35,6 @@ testhamiltonian.o : testhamiltonian.cpp hamiltonian.h
 
 hamiltonian.o : hamiltonian.cpp hamiltonian.h
 	$(CXX) $(CXXFLAGS) -c hamiltonian.cpp
-
-memcheck.o: memcheck.cpp memcheck.h
-	$(CXX) $(CXXFLAGS) -c memcheck.cpp
 
 clean :
 	rm -f ising isingsimulation testhamiltonian *.o *.gch *.exe

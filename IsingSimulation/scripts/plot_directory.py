@@ -16,7 +16,7 @@ MODES = [SINGLE, COUPLING, DISORDER, SIZE, ALL] = ['s', 'c', 'd', 'z', 'a']
 
 def manage_plotting(directory, mode):
 
-    for folder in cf.FOLDERS:
+    for folder in cf.DIR_NAMES:
         filenames = find_averaged_csv(directory, folder)
         plot_directory = make_plot_directory(directory, folder, mode)
         groups = find_filename_groups(filenames[:], mode)

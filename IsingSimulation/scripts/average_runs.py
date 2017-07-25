@@ -30,7 +30,7 @@ def average_no_outliers(data, percentile1, percentile2):
 
 def rw_averages(in_filename):
 
-    print('Entering ' + in_filename)
+    # print('Entering ' + in_filename)
     data = pd.read_csv(in_filename)
     averages = average_no_outliers(data, MIN_PERCENTILE, MAX_PERCENTILE)
 

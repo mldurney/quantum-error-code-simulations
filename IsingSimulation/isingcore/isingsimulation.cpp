@@ -64,11 +64,9 @@ void ising::manageSimulations(const std::string &inFilename, const double t,
     dvector correlationLengths =
         SimulatedLattice::getRealCorrelationLengths();
 
-    std::string oldDir = "hamiltonians";
-    std::string outMag = getOutFilename(inFilename, oldDir, "magnetizations");
-    std::string outBC = getOutFilename(inFilename, oldDir, "binder_cumulants");
-    std::string outCL =
-        getOutFilename(inFilename, oldDir, "correlation_lengths");
+    std::string outMag = getOutFilename(inFilename, "magnetizations");
+    std::string outBC = getOutFilename(inFilename, "binder_cumulants");
+    std::string outCL = getOutFilename(inFilename, "correlation_lengths");
 
     writeOutput(outMag, temperatures, magnetizations);
     writeOutput(outBC, temperatures, binderCumulants);
