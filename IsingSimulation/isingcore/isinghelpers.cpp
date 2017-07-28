@@ -118,6 +118,10 @@ std::string ising::getOutFilename(const std::string& inFilename,
 
 void ising::writeOutput(const std::string& filename, const dvector& temp,
                         const dvector& results) {
+	fs::path directory(filename);
+	directory.remove_filename();
+	fs::create_directory(directory);
+
     bool isNewFile = (std::ifstream(filename)) ? false : true;
     std::ofstream file(filename.c_str(),
                        std::ofstream::out | std::ofstream::app);

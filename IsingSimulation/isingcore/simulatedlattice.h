@@ -56,9 +56,11 @@ class SimulatedLattice {
     void addAvgMag4(double mag4);
     void addChi0(cdouble chi) { chi0.push_back(chi); }
     void addChiq(cdouble chi) { chiq.push_back(chi); }
-    double findAverage(dvector &v, double percentile1 = MIN_PERCENTILE,
+	double findAverage(dvector &v);
+	cdouble findAverage(cvector &v);
+    double findAverageNoOutliers(dvector &v, double percentile1 = MIN_PERCENTILE,
                        double percentile2 = MAX_PERCENTILE);
-    cdouble findAverage(cvector &v, double percentile1 = MIN_PERCENTILE,
+    cdouble findAverageNoOutliers(cvector &v, double percentile1 = MIN_PERCENTILE,
                         double percentile2 = MAX_PERCENTILE);
 
    private:
@@ -90,6 +92,7 @@ class SimulatedLattice {
     void runTrials();
     void runUpdates();
     void runUpdatesStable();
+	int reachStability();
 };
 }
 

@@ -154,94 +154,121 @@ void SimulatedLattice::runUpdates() {
 }
 
 void SimulatedLattice::runUpdatesStable() {
-    double runningMag, runningMag2, runningMag4;
-    std::map<int, imap> runningCorr;
+	double runningMag = 0;
+	double runningMag2 = 0;
+	double runningMag4 = 0;
+	std::map<int, imap> runningCorr;
 
-    bool continueUpdating = true;
-    unsigned int cycleUpdates;
-    unsigned int maxCycles = 10;
-    dvector runningMagBins;
-    unsigned int binsToCompare = 3;
+	unsigned int powerMax = 5;
+	unsigned int power = reachStability();
+	if (power > powerMax) {
+		power = powerMax;
+	}
+	unsigned int cycleUpdates = BASEUPDATES 
+			* static_cast<unsigned int>(std::pow(2, power));
 
-    unsigned int cycle;
-    for (cycle = 1; cycle < binsToCompare; ++cycle) {
-        runningMag = runningMag2 = runningMag4 = 0;
-        runningCorr.clear();
-        cycleUpdates = BASEUPDATES * static_cast<unsigned int>(std::pow(2, cycle));
+	auto distances = lattice->getDistances();
+	auto indices = lattice->getIndices();
 
-        for (unsigned int num1 = 0; num1 < cycleUpdates; ++num1) {
-            for (unsigned int num2 = 0; num2 < SKIP; ++num2) {
-                lattice->updateLattice();
-            }
+	for (unsigned int num1 = 0; num1 < cycleUpdates; ++num1) {
+		for (unsigned int num2 = 0; num2 < SKIP; ++num2) {
+			lattice->updateLattice();
+		}
 
-            runningMag += lattice->getMagnetism();
-        }
+		double magnetization = lattice->getMagnetism();
+		runningMag += magnetization;
+		runningMag2 += pow(magnetization, 2);
+		runningMag4 += pow(magnetization, 4);
 
-        runningMagBins.push_back(fabs(runningMag) / cycleUpdates);
-    }
+		imap spins = lattice->getSpins();
+		for (auto &i : indices) {
+			for (auto &j : indices) {
+				runningCorr[i][j] += spins[i] * spins[j];
+			}
+		}
+	}
 
-    auto distances = lattice->getDistances();
-    auto indices = lattice->getIndices();
-    double threshold = .05;
+	cdouble sumCorrK0 = 0;
+	cdouble sumCorrKq = 0;
+	for (auto &i : indices) {
+		for (auto &j : indices) {
+			runningCorr[i][j] /= (int)cycleUpdates;
+			sumCorrK0 += runningCorr[i][j];
+			sumCorrKq += cdouble(runningCorr[i][j]) *
+				std::exp(cdouble(0, q * distances[i][j]));
+		}
+	}
 
-    while (continueUpdating) {
-        runningMag = runningMag2 = runningMag4 = 0;
-        runningCorr.clear();
-        cycleUpdates = BASEUPDATES * static_cast<unsigned int>(std::pow(2, cycle));
+	addAvgMag(fabs(runningMag) / cycleUpdates);
+	addAvgMag2(fabs(runningMag2) / cycleUpdates);
+	addAvgMag4(fabs(runningMag4) / cycleUpdates);
+	addChi0(sumCorrK0 / cdouble(lattice->getNumIndices()));
+	addChiq(sumCorrKq / cdouble(lattice->getNumIndices()));
+}
 
-        for (unsigned int num1 = 0; num1 < cycleUpdates; ++num1) {
-            for (unsigned int num2 = 0; num2 < SKIP; ++num2) {
-                lattice->updateLattice();
-            }
+int SimulatedLattice::reachStability() {
+	unsigned int cycleUpdates;
+	unsigned int cycle;
+	unsigned int maxCycles = 10;
+	dvector runningMagBins;
+	unsigned int binsToCompare = 3;
+	bool continueUpdating = true;
 
-            double magnetization = lattice->getMagnetism();
-            runningMag += magnetization;
-            runningMag2 += pow(magnetization, 2);
-            runningMag4 += pow(magnetization, 4);
+	for (cycle = 1; cycle < binsToCompare; ++cycle) {
+		cycleUpdates = BASEUPDATES * static_cast<unsigned int>(std::pow(2, cycle));
+		double binMag = 0;
 
-            imap spins = lattice->getSpins();
-            for (auto &i : indices) {
-                for (auto &j : indices) {
-                    runningCorr[i][j] += spins[i] * spins[j];
-                }
-            }
-        }
+		for (unsigned int num1 = 0; num1 < cycleUpdates; ++num1) {
+			for (unsigned int num2 = 0; num2 < SKIP; ++num2) {
+				lattice->updateLattice();
+			}
 
-        double avgRunningMag = fabs(runningMag) / cycleUpdates;
-        runningMagBins.push_back(avgRunningMag);
+			binMag += lattice->getMagnetism();
+		}
 
-        continueUpdating = false;
-        for (int i = 1; i < static_cast<int>(binsToCompare); ++i) {
-            double change =
-                abs((avgRunningMag - runningMagBins.end()[-i]) / avgRunningMag);
+		runningMagBins.push_back(fabs(binMag) / cycleUpdates);
+	}
 
-            if (change >= threshold) {
-                continueUpdating = true;
-            }
-        }
+	while (continueUpdating) {
+		cycleUpdates = BASEUPDATES * static_cast<unsigned int>(std::pow(2, cycle));
+		dvector cycleMags;
 
-        ++cycle;
-        if (cycle > maxCycles) {
-            continueUpdating = false;
-        }
-    }
+		for (unsigned int num1 = 0; num1 < cycleUpdates; ++num1) {
+			for (unsigned int num2 = 0; num2 < SKIP; ++num2) {
+				lattice->updateLattice();
+			}
 
-    cdouble sumCorrK0 = 0;
-    cdouble sumCorrKq = 0;
-    for (auto &i : indices) {
-        for (auto &j : indices) {
-            runningCorr[i][j] /= (int)cycleUpdates;
-            sumCorrK0 += runningCorr[i][j];
-            sumCorrKq += cdouble(runningCorr[i][j]) *
-                         std::exp(cdouble(0, q * distances[i][j]));
-        }
-    }
+			double magnetization = lattice->getMagnetism();
+			cycleMags.push_back(magnetization);
+		}
 
-    addAvgMag(fabs(runningMag) / cycleUpdates);
-    addAvgMag2(fabs(runningMag2) / cycleUpdates);
-    addAvgMag4(fabs(runningMag4) / cycleUpdates);
-    addChi0(sumCorrK0 / cdouble(lattice->getNumIndices()));
-    addChiq(sumCorrKq / cdouble(lattice->getNumIndices()));
+		double mean = std::accumulate(cycleMags.begin(), cycleMags.end(), 0.0)
+			/ cycleUpdates;
+		double std = std::sqrt(std::accumulate(cycleMags.begin(), cycleMags.end(), 0.0,
+			[mean](double lhs, double rhs) {
+			return rhs + std::pow(lhs - mean, 2);
+		}) / cycleUpdates);
+
+		continueUpdating = false;
+		for (int i = 1; i < static_cast<int>(binsToCompare); ++i) {
+			double difference =
+				abs((mean - runningMagBins.end()[-i]) / mean);
+
+			if (difference >= std) {
+				continueUpdating = true;
+			}
+		}
+
+		if (cycle >= maxCycles) {
+			continueUpdating = false;
+		}
+
+		if (continueUpdating) {
+			++cycle;
+		}
+	}
+
+	return cycle;
 }
 
 void SimulatedLattice::addAvgMag(double mag) {
@@ -274,7 +301,26 @@ void SimulatedLattice::addAvgMag4(double mag4) {
     }
 }
 
-double SimulatedLattice::findAverage(dvector &v, double percentile1,
+double SimulatedLattice::findAverage(dvector &v) {
+	return std::accumulate(v.begin(), v.end(), 0.0) / v.size();
+}
+
+cdouble SimulatedLattice::findAverage(cvector &v) {
+	dvector vReal;
+	dvector vImag;
+
+	for (cdouble &c : v) {
+		vReal.push_back(c.real());
+		vImag.push_back(c.imag());
+	}
+
+	double avgReal = findAverage(vReal);
+	double avgImag = findAverage(vImag);
+
+	return cdouble(avgReal, avgImag);
+}
+
+double SimulatedLattice::findAverageNoOutliers(dvector &v, double percentile1,
                                      double percentile2) {
     if (percentile1 < 0 || percentile2 < 0 || percentile1 > 1 ||
         percentile2 > 1) {
@@ -314,7 +360,7 @@ double SimulatedLattice::findAverage(dvector &v, double percentile1,
            noOutliers.size();
 }
 
-cdouble SimulatedLattice::findAverage(cvector &v, double percentile1,
+cdouble SimulatedLattice::findAverageNoOutliers(cvector &v, double percentile1,
                                       double percentile2) {
     dvector vReal;
     dvector vImag;
@@ -324,8 +370,8 @@ cdouble SimulatedLattice::findAverage(cvector &v, double percentile1,
         vImag.push_back(c.imag());
     }
 
-    double avgReal = findAverage(vReal, percentile1, percentile2);
-    double avgImag = findAverage(vImag, percentile1, percentile2);
+    double avgReal = findAverageNoOutliers(vReal, percentile1, percentile2);
+    double avgImag = findAverageNoOutliers(vImag, percentile1, percentile2);
 
     return cdouble(avgReal, avgImag);
 }
