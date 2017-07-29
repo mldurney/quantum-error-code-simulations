@@ -155,9 +155,9 @@ def plot_results(filenames, directory, folder, mode):
     elif folder == 'binder_cumulants':
         title = 'U**4 v. T: ' + plotname
         ylabel = 'Binder Cumulant (U**4)'
-    elif folder == 'correlation_lengths':
+    elif folder == 'correlation_functions':
         title = 'E_m v. T: ' + plotname
-        ylabel = 'Correlation Lengths (E_m)'
+        ylabel = 'Correlation Function (E_m / L)'
     else:
         title = 'Data v. T: ' + plotname
         ylabel = 'Data'
@@ -172,7 +172,7 @@ def plot_results(filenames, directory, folder, mode):
 
     os.chdir(old_dir)
 
-# end plot_magnetization
+# end plot_results
 
 
 def main():

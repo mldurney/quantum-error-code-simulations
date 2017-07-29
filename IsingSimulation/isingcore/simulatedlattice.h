@@ -41,14 +41,14 @@ class SimulatedLattice {
     cdouble getChi0() { return findAverage(chi0); }
     cdouble getChiq() { return findAverage(chiq); }
     double getBinderCumulant();
-    cdouble getCorrelationLength();
+    cdouble getCorrelationFunction();
 
     static int getNumLattices() { return numLattices; }
     static dvector getTemperatures() { return temperatures; }
     static dvector getMagnetizations() { return magnetizations; }
     static dvector getBinderCumulants() { return binderCumulants; }
-    static cvector getCorrelationLengths() { return correlationLengths; }
-    static dvector getRealCorrelationLengths();
+    static cvector getCorrelationFunctions() { return correlationFunctions; }
+    static dvector getRealCorrelationFunctions();
 
    protected:
     void addAvgMag(double mag);
@@ -82,7 +82,7 @@ class SimulatedLattice {
     static dvector temperatures;
     static dvector magnetizations;
     static dvector binderCumulants;
-    static cvector correlationLengths;
+    static cvector correlationFunctions;
     static std::mutex data_mutex;
     static std::mutex file_mutex;
 

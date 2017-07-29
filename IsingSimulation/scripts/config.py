@@ -62,7 +62,7 @@ def find_exec_path(directory, filename):
 
 
 SHAPES = [RECTANGLE, SQUARE, TRIANGLE, STRIANGLE] = ['r', 's', 't', 'v']
-DIR_NAMES = ['magnetizations', 'binder_cumulants', 'correlation_lengths']
+DIR_NAMES = ['magnetizations', 'binder_cumulants', 'correlation_functions']
 ROOT_NAME = 'IsingSimulation'
 MAKE_NAME = 'Makefile'
 CSIM_NAME = 'IsingSimulation'

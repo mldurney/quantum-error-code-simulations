@@ -13,7 +13,7 @@ SimulatedLattice::SimulatedLattice(Lattice *latt, const std::string &filename,
     temperatures.push_back(-1);
     magnetizations.push_back(-1);
     binderCumulants.push_back(-1);
-    correlationLengths.push_back(-1);
+    correlationFunctions.push_back(-1);
 }
 
 void SimulatedLattice::initTempFiles(const std::string &filename) {
@@ -78,13 +78,13 @@ void SimulatedLattice::runLatticeSimulation() {
     auto currT = lattice->getTemp();
     auto currM = getAvgMag();
     auto currBC = getBinderCumulant();
-    auto currCL = getCorrelationLength();
+    auto currCL = getCorrelationFunction();
 
     std::lock_guard<std::mutex> guard(data_mutex);
     temperatures[indLattice] = currT;
     magnetizations[indLattice] = currM;
     binderCumulants[indLattice] = currBC;
-    correlationLengths[indLattice] = currCL;
+    correlationFunctions[indLattice] = currCL;
 }
 
 void SimulatedLattice::runPreupdates() {
@@ -380,13 +380,13 @@ double SimulatedLattice::getBinderCumulant() {
     return 1 - getAvgMag4() / (3 * pow(getAvgMag2(), 2));
 }
 
-cdouble SimulatedLattice::getCorrelationLength() {
-    return cdouble(.5 * asin(q)) * sqrt((getChi0() / getChiq()) - cdouble(1));
+cdouble SimulatedLattice::getCorrelationFunction() {
+    return cdouble(1 / (2 * lattice->getSize() * sin(q)) * sqrt((getChi0() / getChiq()) - cdouble(1)));
 }
 
-dvector SimulatedLattice::getRealCorrelationLengths() {
+dvector SimulatedLattice::getRealCorrelationFunctions() {
     dvector realLengths;
-    for (auto value : correlationLengths) {
+    for (auto value : correlationFunctions) {
         realLengths.push_back(value.real());
     }
     return realLengths;

@@ -6,7 +6,7 @@ int SimulatedLattice::numLattices = 0;
 dvector SimulatedLattice::temperatures;
 dvector SimulatedLattice::magnetizations;
 dvector SimulatedLattice::binderCumulants;
-cvector SimulatedLattice::correlationLengths;
+cvector SimulatedLattice::correlationFunctions;
 std::mutex SimulatedLattice::data_mutex;
 std::mutex SimulatedLattice::file_mutex;
 
@@ -60,15 +60,15 @@ void ising::manageSimulations(const std::string &inFilename, const double t,
     dvector temperatures = SimulatedLattice::getTemperatures();
     dvector magnetizations = SimulatedLattice::getMagnetizations();
     dvector binderCumulants = SimulatedLattice::getBinderCumulants();
-    dvector correlationLengths = SimulatedLattice::getRealCorrelationLengths();
+    dvector correlationFunctions = SimulatedLattice::getRealCorrelationFunctions();
 
     std::string outMag = getOutFilename(inFilename, "magnetizations");
     std::string outBC = getOutFilename(inFilename, "binder_cumulants");
-    std::string outCL = getOutFilename(inFilename, "correlation_lengths");
+    std::string outCL = getOutFilename(inFilename, "correlation_functions");
 
     writeOutput(outMag, temperatures, magnetizations);
     writeOutput(outBC, temperatures, binderCumulants);
-    writeOutput(outCL, temperatures, correlationLengths);
+    writeOutput(outCL, temperatures, correlationFunctions);
 }
 
 void ising::receiveInputCMD(int argc, char *argv[], std::string &filename,
