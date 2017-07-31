@@ -39,6 +39,8 @@ class Lattice {
         return indInteractions;
     }
     imap getSpins() const { return spins; }
+	std::map<int, imap> getXDisplacements() const { return xDisplacements; }
+	std::map<int, imap> getYDisplacements() const { return yDisplacements; }
     std::map<int, dmap> getDistances() const { return distances; }
 
     void updateLattice();
@@ -46,6 +48,8 @@ class Lattice {
     int getTotalEnergy() { return findTotalEnergy(); }
     double getMagnetism() { return findMagnetism(); }
 
+	virtual int findXDisplacement(int, int) { return 1; };
+	virtual int findYDisplacement(int, int) { return 1; };
     virtual double findDistance(int, int) { return 1; }
     void reinit() { initSpins(); }
     virtual void print(int cols = -1) const;
@@ -59,6 +63,8 @@ class Lattice {
     const ivectormap localTerms;
     const std::map<int, ivector2> indInteractions;
     imap spins;
+	std::map<int, imap> xDisplacements;
+	std::map<int, imap> yDisplacements;
     std::map<int, dmap> distances;
 
     virtual void checkShape() const {}
@@ -123,6 +129,8 @@ class RectangularLattice : public virtual Lattice {
     int getRows() const { return rows; }
     int getCols() const { return cols; }
     void print() const { Lattice::print(getCols()); }
+	int findXDisplacement(int i, int j);
+	int findYDisplacement(int i, int j);
     double findDistance(int i, int j);
 
    protected:
@@ -144,6 +152,12 @@ class RectangularLatticeFast : public RectangularLattice, public LatticeFast {
         : Lattice(h, t, m, init),
           RectangularLattice(h, t, m, init, r, c),
           LatticeFast(h, t, m, init){};
+	int findXDisplacement(int i, int j) {
+		return RectangularLattice::findXDisplacement(i, j);
+	}
+	int findYDisplacement(int i, int j) {
+		return RectangularLattice::findYDisplacement(i, j);
+	}
     double findDistance(int i, int j) {
         return RectangularLattice::findDistance(i, j);
     }
@@ -158,6 +172,12 @@ class SquareLattice : public RectangularLattice {
                   int s = -1);
     int getSide() const { return side; }
     void print() const { Lattice::print(getSide()); }
+	int findXDisplacement(int i, int j) {
+		return RectangularLattice::findXDisplacement(i, j);
+	}
+	int findYDisplacement(int i, int j) {
+		return RectangularLattice::findYDisplacement(i, j);
+	}
     double findDistance(int i, int j) {
         return RectangularLattice::findDistance(i, j);
     }
@@ -179,6 +199,12 @@ class SquareLatticeFast : public SquareLattice, public LatticeFast {
         : Lattice(h, t, m, init),
           SquareLattice(h, t, m, init, s),
           LatticeFast(h, t, m, init){};
+	int findXDisplacement(int i, int j) {
+		return SquareLattice::findXDisplacement(i, j);
+	}
+	int findYDisplacement(int i, int j) {
+		return SquareLattice::findYDisplacement(i, j);
+	}
     double findDistance(int i, int j) {
         return SquareLattice::findDistance(i, j);
     }
@@ -194,6 +220,8 @@ class TriangularLattice : public virtual Lattice {
     int getRows() const { return rows; }
     int getCols() const { return cols; }
     void print() const { Lattice::print(getCols()); }
+	int findXDisplacement(int i, int j);
+	int findYDisplacement(int i, int j);
     double findDistance(int i, int j);
 
    protected:
@@ -215,6 +243,12 @@ class TriangularLatticeFast : public TriangularLattice, public LatticeFast {
         : Lattice(h, t, m, init),
           TriangularLattice(h, t, m, init, r, c),
           LatticeFast(h, t, m, init){};
+	int findXDisplacement(int i, int j) {
+		return TriangularLattice::findXDisplacement(i, j);
+	}
+	int findYDisplacement(int i, int j) {
+		return TriangularLattice::findYDisplacement(i, j);
+	}
     double findDistance(int i, int j) {
         return TriangularLattice::findDistance(i, j);
     }
@@ -229,6 +263,12 @@ class STriangularLattice : public TriangularLattice {
                        int s = -1);
     int getSide() const { return side; }
     void print() const { Lattice::print(getSide()); }
+	int findXDisplacement(int i, int j) {
+		return TriangularLattice::findXDisplacement(i, j);
+	}
+	int findYDisplacement(int i, int j) {
+		return TriangularLattice::findYDisplacement(i, j);
+	}
     double findDistance(int i, int j) {
         return TriangularLattice::findDistance(i, j);
     }
@@ -250,6 +290,12 @@ class STriangularLatticeFast : public STriangularLattice, public LatticeFast {
         : Lattice(h, t, m, init),
           STriangularLattice(h, t, m, init, s),
           LatticeFast(h, t, m, init){};
+	int findXDisplacement(int i, int j) {
+		return STriangularLattice::findXDisplacement(i, j);
+	}
+	int findYDisplacement(int i, int j) {
+		return STriangularLattice::findYDisplacement(i, j);
+	}
     double findDistance(int i, int j) {
         return STriangularLattice::findDistance(i, j);
     }

@@ -114,7 +114,7 @@ void SimulatedLattice::runUpdates() {
     double runningMag4 = 0;
     std::map<int, imap> runningCorr;
 
-    auto distances = lattice->getDistances();
+    auto displacements = lattice->getXDisplacements();
     auto indices = lattice->getIndices();
 
     for (unsigned int num1 = 0; num1 < updates; ++num1) {
@@ -142,7 +142,7 @@ void SimulatedLattice::runUpdates() {
             runningCorr[i][j] /= (int)updates;
             sumCorrK0 += runningCorr[i][j];
             sumCorrKq += cdouble(runningCorr[i][j]) *
-                         std::exp(cdouble(0, q * distances[i][j]));
+                         std::exp(cdouble(0, q * displacements[i][j]));
         }
     }
 
@@ -167,7 +167,7 @@ void SimulatedLattice::runUpdatesStable() {
 	unsigned int cycleUpdates = BASEUPDATES 
 			* static_cast<unsigned int>(std::pow(2, power));
 
-	auto distances = lattice->getDistances();
+	auto displacements = lattice->getXDisplacements();
 	auto indices = lattice->getIndices();
 
 	for (unsigned int num1 = 0; num1 < cycleUpdates; ++num1) {
@@ -195,7 +195,7 @@ void SimulatedLattice::runUpdatesStable() {
 			runningCorr[i][j] /= (int)cycleUpdates;
 			sumCorrK0 += runningCorr[i][j];
 			sumCorrKq += cdouble(runningCorr[i][j]) *
-				std::exp(cdouble(0, q * distances[i][j]));
+				std::exp(cdouble(0, q * displacements[i][j]));
 		}
 	}
 

@@ -41,6 +41,8 @@ void Lattice::initSpins() {
 void Lattice::generateDistances() {
     for (auto i : indices) {
         for (auto j : indices) {
+			xDisplacements[i][j] = findXDisplacement(i, j);
+			yDisplacements[i][j] = findYDisplacement(i, j);
             distances[i][j] = findDistance(i, j);
         }
     }
@@ -276,6 +278,18 @@ void RectangularLattice::checkShape() const {
     }
 }
 
+int RectangularLattice::findXDisplacement(int i, int j) {
+	int iRow = i % getCols();
+	int jRow = j % getCols();
+	return iRow - jRow;
+}
+
+int RectangularLattice::findYDisplacement(int i, int j) {
+	int iCol = i / getCols();
+	int jCol = j / getCols();
+	return iCol - jCol;
+}
+
 double RectangularLattice::findDistance(int i, int j) {
     int iRow = i % getCols();
     int iCol = i / getCols();
@@ -365,6 +379,18 @@ void TriangularLattice::checkShape() const {
         std::cout << "Invalid shape parameter -- not a triangle ('t')!\n";
         shapeError();
     }
+}
+
+int TriangularLattice::findXDisplacement(int i, int j) {
+	int iRow = i % getCols();
+	int jRow = j % getCols();
+	return iRow - jRow;
+}
+
+int TriangularLattice::findYDisplacement(int i, int j) {
+	int iCol = i / getCols();
+	int jCol = j / getCols();
+	return iCol - jCol;
 }
 
 double TriangularLattice::findDistance(int i, int j) {
