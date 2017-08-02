@@ -30,7 +30,7 @@ class SimulatedLattice {
                      const unsigned int updates,
                      const unsigned int preupdates = PREUPDATES,
                      const unsigned int trials = 1);
-    ~SimulatedLattice() {}
+	virtual ~SimulatedLattice() = default;
     void runLatticeSimulation();
     unsigned int getIndLattice() const { return indLattice; }
     Lattice *getLattice() const { return lattice; }

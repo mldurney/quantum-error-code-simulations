@@ -52,6 +52,7 @@ class Lattice {
 	virtual int findYDisplacement(int, int) { return 1; };
     virtual double findDistance(int, int) { return 1; }
     void reinit() { initSpins(); }
+	void flipSpins();
     virtual void print(int cols = -1) const;
 
    protected:

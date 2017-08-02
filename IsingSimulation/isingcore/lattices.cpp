@@ -39,8 +39,8 @@ void Lattice::initSpins() {
 }
 
 void Lattice::generateDistances() {
-    for (auto i : indices) {
-        for (auto j : indices) {
+    for (auto& i : indices) {
+        for (auto& j : indices) {
 			xDisplacements[i][j] = findXDisplacement(i, j);
 			yDisplacements[i][j] = findYDisplacement(i, j);
             distances[i][j] = findDistance(i, j);
@@ -170,6 +170,12 @@ double Lattice::findMagnetism() {
 void Lattice::shapeError() const {
     std::cout << "Wrong lattice type. Aborting...\n\n";
     exit(EXIT_FAILURE);
+}
+
+void Lattice::flipSpins() {
+	for (auto &s : spins) {
+		s.second *= -1;
+	}
 }
 
 void Lattice::print(int cols) const {

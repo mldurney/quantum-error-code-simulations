@@ -386,7 +386,7 @@ cdouble SimulatedLattice::getCorrelationFunction() {
 
 dvector SimulatedLattice::getRealCorrelationFunctions() {
     dvector realLengths;
-    for (auto value : correlationFunctions) {
+    for (auto& value : correlationFunctions) {
         realLengths.push_back(value.real());
     }
     return realLengths;

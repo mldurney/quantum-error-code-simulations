@@ -34,11 +34,12 @@ def write_hamiltonian_dir(args):
                  + str(args['max_cols']) + '_' + str(args['min_temp']) + 'T-'
                  + str(args['change_temp']) + 'dTx' + str(args['num_temps'])
                  + '-' + str(args['updates']) + 'ux' + str(args['trials'])
-                 + '-' + args['mode'])
+                 + '-' + args['mode'] + str(args['neighbors']))
     main_dir = os.path.join(cf.ROOT_DIR, main_name)
 
     tests = list(itertools.product(args['range_rows'], args['range_cols'],
-                                   args['couplings'], args['disorders']))
+                                   args['couplings'], args['couplings2'],
+                                   args['disorders']))
 
     if args['shape'] in [cf.SQUARE, cf.STRIANGLE]:
         tests = [test for test in tests if test[0] == test[1]]
@@ -51,7 +52,7 @@ def write_hamiltonian_dir(args):
         str_rows = str(test[0])
         str_cols = str(test[1])
         str_coupling = str(test[2])
-        str_disorder = str(test[3])
+        str_disorder = str(test[4])
 
         hamiltonian_name = (args['shape'] + str_rows + 'x' + str_cols + '_'
                             + str_coupling + '-' + str_disorder + '.csv')
@@ -63,7 +64,7 @@ def write_hamiltonian_dir(args):
                           args['num_temps'], args['updates'], args['trials'],
                           args['mode']))
 
-        hamiltonian = get_hamiltonian(args['shape'], test)
+        hamiltonian = get_hamiltonian(args['shape'], args['neighbors'], test)
 
         gh.write_hamiltonian(hamiltonian_filename, hamiltonian, args['shape'],
                              str_rows, str_cols)
@@ -103,7 +104,7 @@ def receive_input():
     Intended for use when generate_input.py being ran directly
     '''
 
-    if len(sys.argv) == 14:
+    if len(sys.argv) in [15, 16]:
         args = get_cmdline_lattice()
     elif len(sys.argv) == 1:
         args = get_userinput_lattice()
@@ -121,21 +122,42 @@ def get_cmdline_lattice():
     Return input as dictionary args
     '''
 
-    args = {
-        'shape': sys.argv[1],
-        'min_rows': sys.argv[2],
-        'max_rows': sys.argv[3],
-        'min_cols': sys.argv[4],
-        'max_cols': sys.argv[5],
-        'min_temp': sys.argv[6],
-        'change_temp': sys.argv[7],
-        'num_temps': sys.argv[8],
-        'updates': sys.argv[9],
-        'trials': sys.argv[10],
-        'couplings': sys.argv[11],
-        'disorders': sys.argv[12],
-        'mode': sys.argv[13]
-    }
+    if len(sys.argv == 15):
+        args = {
+            'shape': sys.argv[1],
+            'neighbors': sys.argv[2],
+            'min_rows': sys.argv[3],
+            'max_rows': sys.argv[4],
+            'min_cols': sys.argv[5],
+            'max_cols': sys.argv[6],
+            'min_temp': sys.argv[7],
+            'change_temp': sys.argv[8],
+            'num_temps': sys.argv[9],
+            'updates': sys.argv[10],
+            'trials': sys.argv[11],
+            'couplings': sys.argv[12],
+            'couplings2': sys.argv[12],
+            'disorders': sys.argv[13],
+            'mode': sys.argv[14]
+        }
+    else:
+        args = {
+            'shape': sys.argv[1],
+            'neighbors': sys.argv[2],
+            'min_rows': sys.argv[3],
+            'max_rows': sys.argv[4],
+            'min_cols': sys.argv[5],
+            'max_cols': sys.argv[6],
+            'min_temp': sys.argv[7],
+            'change_temp': sys.argv[8],
+            'num_temps': sys.argv[9],
+            'updates': sys.argv[10],
+            'trials': sys.argv[11],
+            'couplings': sys.argv[12],
+            'couplings2': sys.argv[13],
+            'disorders': sys.argv[14],
+            'mode': sys.argv[15]
+        }
 
     args['range_rows'] = range(args['min_rows'], args['max_rows'] + 1)
     args['range_cols'] = range(args['min_cols'], args['max_cols'] + 1)
@@ -158,6 +180,7 @@ def get_userinput_lattice():
     while args['shape'] not in cf.SHAPES:
         args['shape'] = str(input('Invalid input. Enter s, r, t, or v: '))
 
+    args['neighbors'] = int(input('Furthest neighbor degree (1 or 2): '))
     args['min_rows'] = int(input('Min rows: '))
     args['max_rows'] = int(input('Max rows: '))
     row_skip = int(input('Rows to skip between simulations: '))
@@ -178,7 +201,13 @@ def get_userinput_lattice():
     args['updates'] = int(
         input('Number of updates per temperature per test: '))
     args['trials'] = int(input('Number of seperate trials per lattice: '))
-    couplings = input('List (delimited by space) of couplings between pairs: ')
+    couplings = input(
+        'List (delimited by space) of couplings between neighbor pairs: ')
+    if args['neighbors'] == 2:
+        couplings2 = input(
+            'List (delimited by space) of couplings between next-nearest pairs: ')
+    else:
+        couplings2 = '0'
     disorders = input('List of disorder percentages [0, 100]: ')
     args['mode'] = str(
         input('Update mode ("a" all, "p" psuedo, "r" random): '))
@@ -190,6 +219,7 @@ def get_userinput_lattice():
     args['num_temps'] = int((max_temp - args['min_temp'])
                             / args['change_temp']) + 1
     args['couplings'] = list(map(int, couplings.split()))
+    args['couplings2'] = list(map(int, couplings2.split()))
     args['disorders'] = list(map(int, disorders.split()))
 
     return args
@@ -208,6 +238,7 @@ def get_default_lattice():
 
     args = {
         'shape': 's',
+        'neighbors': 1,
         'min_rows': 10,
         'max_rows': 30,
         'min_temp': 1.1,
@@ -216,6 +247,7 @@ def get_default_lattice():
         'updates': 100,
         'trials': 100,
         'couplings': [1],
+        'couplings2': [0],
         'disorders': [0],
         'mode': 'r'
     }
@@ -230,7 +262,7 @@ def get_default_lattice():
 # end get_default_lattice
 
 
-def get_hamiltonian(shape, test):
+def get_hamiltonian(shape, neighbors, test):
     '''
     Call to generate appropriate hamiltonian based upon lattice shape
     and using parameters for coupling, disorder, rows, and columns as
@@ -238,15 +270,17 @@ def get_hamiltonian(shape, test):
     '''
 
     if shape == cf.SQUARE:
-        hamiltonian = gh.generate_square(test[2], test[3], test[0])
+        hamiltonian = gh.generate_square(
+            neighbors, test[2], test[4], test[0], test[3])
     elif shape == cf.RECTANGLE:
-        hamiltonian = gh.generate_rectangle(test[2], test[3], test[0],
-                                            test[1])
+        hamiltonian = gh.generate_rectangle(
+            neighbors, test[2], test[4], test[0], test[1], test[3])
     elif shape == cf.TRIANGLE:
-        hamiltonian = gh.generate_triangle(test[2], test[3], test[0],
-                                           test[1])
+        hamiltonian = gh.generate_triangle(
+            neighbors, test[2], test[4], test[0], test[1], test[3])
     else:
-        hamiltonian = gh.generate_striangle(test[2], test[3], test[0])
+        hamiltonian = gh.generate_striangle(
+            neighbors, test[2], test[4], test[0], test[3])
 
     return hamiltonian
 

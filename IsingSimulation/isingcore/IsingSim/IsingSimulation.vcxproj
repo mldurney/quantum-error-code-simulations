@@ -114,6 +114,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\hamiltonian.cpp" />
+    <ClCompile Include="..\ica.cpp" />
     <ClCompile Include="..\isinghelpers.cpp" />
     <ClCompile Include="..\isingsimulation.cpp" />
     <ClCompile Include="..\lattices.cpp" />
@@ -121,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\hamiltonian.h" />
+    <ClInclude Include="..\ica.h" />
     <ClInclude Include="..\isinghelpers.h" />
     <ClInclude Include="..\isingsimulation.h" />
     <ClInclude Include="..\lattices.h" />
