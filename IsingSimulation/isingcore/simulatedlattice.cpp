@@ -19,7 +19,7 @@ SimulatedLattice::SimulatedLattice(Lattice *latt, const std::string &filename,
 void SimulatedLattice::initTempFiles(const std::string &filename) {
     tempDirectory = fs::path(filename);
     std::ostringstream latticeName;
-    latticeName << lattice->getTemp() << tempDirectory.filename();
+    latticeName << lattice->getTemp() << tempDirectory.filename().string();
 
     tempDirectory.remove_filename();
     tempDirectory.replace_filename("temp/");
@@ -343,11 +343,14 @@ double SimulatedLattice::findAverageNoOutliers(dvector &v, double percentile1,
 
     double mean = std::accumulate(mid.begin(), mid.end(), 0.0) / mid.size();
     double std =
-        std::sqrt(std::accumulate(mid.begin(), mid.end(), 0.0,
+        std::sqrt(std::abs(std::accumulate(mid.begin(), mid.end(), 0.0,
                                   [mean](double lhs, double rhs) {
                                       return rhs + std::pow(lhs - mean, 2);
-                                  }) /
+                                  })) /
                   mid.size());
+
+	double minStd = 1e-6;
+	std = std::max(std, minStd);
 
     dvector noOutliers;
     for (auto &d : v) {
@@ -369,10 +372,9 @@ cdouble SimulatedLattice::findAverageNoOutliers(cvector &v, double percentile1,
         vReal.push_back(c.real());
         vImag.push_back(c.imag());
     }
-
+	
     double avgReal = findAverageNoOutliers(vReal, percentile1, percentile2);
     double avgImag = findAverageNoOutliers(vImag, percentile1, percentile2);
-
     return cdouble(avgReal, avgImag);
 }
 

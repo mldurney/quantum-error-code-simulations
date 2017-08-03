@@ -14,8 +14,8 @@ namespace ising {
 const unsigned int PREUPDATES = 500;
 const unsigned int BASEUPDATES = 5;
 const unsigned int SKIP = 10;
-const double MIN_PERCENTILE = .4;
-const double MAX_PERCENTILE = 1;
+const double MIN_PERCENTILE = .33;
+const double MAX_PERCENTILE = .67;
 
 #if defined(WIN32) || defined(_WIN32) || \
     defined(__WIN32) && !defined(__CYGWIN__)
@@ -30,16 +30,16 @@ class SimulatedLattice {
                      const unsigned int updates,
                      const unsigned int preupdates = PREUPDATES,
                      const unsigned int trials = 1);
-	virtual ~SimulatedLattice() = default;
+    virtual ~SimulatedLattice() = default;
     void runLatticeSimulation();
     unsigned int getIndLattice() const { return indLattice; }
     Lattice *getLattice() const { return lattice; }
     unsigned int getUpdates() const { return updates; }
-    double getAvgMag() { return findAverage(avgMag); }
-    double getAvgMag2() { return findAverage(avgMag2); }
-    double getAvgMag4() { return findAverage(avgMag4); }
-    cdouble getChi0() { return findAverage(chi0); }
-    cdouble getChiq() { return findAverage(chiq); }
+    double getAvgMag() { return findAverageNoOutliers(avgMag); }
+    double getAvgMag2() { return findAverageNoOutliers(avgMag2); }
+    double getAvgMag4() { return findAverageNoOutliers(avgMag4); }
+    cdouble getChi0() { return findAverageNoOutliers(chi0); }
+    cdouble getChiq() { return findAverageNoOutliers(chiq); }
     double getBinderCumulant();
     cdouble getCorrelationFunction();
 
@@ -56,12 +56,14 @@ class SimulatedLattice {
     void addAvgMag4(double mag4);
     void addChi0(cdouble chi) { chi0.push_back(chi); }
     void addChiq(cdouble chi) { chiq.push_back(chi); }
-	double findAverage(dvector &v);
-	cdouble findAverage(cvector &v);
-    double findAverageNoOutliers(dvector &v, double percentile1 = MIN_PERCENTILE,
-                       double percentile2 = MAX_PERCENTILE);
-    cdouble findAverageNoOutliers(cvector &v, double percentile1 = MIN_PERCENTILE,
-                        double percentile2 = MAX_PERCENTILE);
+    double findAverage(dvector &v);
+    cdouble findAverage(cvector &v);
+    double findAverageNoOutliers(dvector &v,
+                                 double percentile1 = MIN_PERCENTILE,
+                                 double percentile2 = MAX_PERCENTILE);
+    cdouble findAverageNoOutliers(cvector &v,
+                                  double percentile1 = MIN_PERCENTILE,
+                                  double percentile2 = MAX_PERCENTILE);
 
    private:
     unsigned int indLattice;
@@ -92,7 +94,7 @@ class SimulatedLattice {
     void runTrials();
     void runUpdates();
     void runUpdatesStable();
-	int reachStability();
+    int reachStability();
 };
 }
 

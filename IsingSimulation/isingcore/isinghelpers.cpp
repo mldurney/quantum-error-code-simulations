@@ -90,7 +90,7 @@ std::string ising::getOutFilename(const std::string& inFilename,
                                   const std::string& newDir) {
     fs::path outFilename(inFilename);
     std::ostringstream latticeName;
-    latticeName << outFilename.filename();
+    latticeName << outFilename.filename().string();
 
     outFilename.remove_filename();
     outFilename.replace_filename(newDir + "/");
@@ -104,7 +104,7 @@ std::string ising::getOutFilename(const std::string& inFilename,
                                   const std::string& newDir) {
     fs::path outFilename(inFilename);
     std::ostringstream latticeName;
-    latticeName << outFilename.filename();
+    latticeName << outFilename.filename().string();
 
     if (outFilename.string().find(oldDir) != std::string::npos) {
         outFilename.remove_filename();
