@@ -68,8 +68,10 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClCompile Include="lattices.cpp" />
+    <ClCompile Include="hamiltonian.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="hamiltonian.h" />
     <ClInclude Include="lattices.h" />
   </ItemGroup>
   <ItemDefinitionGroup />

@@ -1,10 +1,9 @@
 import os
 import sys
-import re
-import pandas as pd
-import config as cf
 from itertools import groupby
 from average_runs_dir import find_unaveraged_csv
+import pandas as pd
+import config as cf
 
 COLUMNS = ['chi0_re', 'chi0_im', 'chiq_re', 'chiq_im']
 

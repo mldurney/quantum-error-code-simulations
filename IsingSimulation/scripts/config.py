@@ -65,7 +65,7 @@ SHAPES = [RECTANGLE, SQUARE, TRIANGLE, STRIANGLE] = ['r', 's', 't', 'v']
 DIR_NAMES = ['magnetizations', 'binder_cumulants', 'correlation_functions']
 ROOT_NAME = 'IsingSimulation'
 MAKE_NAME = 'Makefile'
-CSIM_NAME = 'IsingSimulation'
+CSIM_NAME = 'IsingSimulation' if sys.platform in ['win32', 'cygwin'] else 'isingsimulation'
 SLASH = '\\' if sys.platform in ['win32', 'cygwin'] else '/'
 
 try:

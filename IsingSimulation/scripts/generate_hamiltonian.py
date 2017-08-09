@@ -30,20 +30,57 @@ def add_disorder(coupling, disorder):
 # end add_disorder
 
 
-def generate_square(neighbors, coupling, disorder, size, coupling2=0):
+def generate_rectangle(neighbors, coupling, disorder, rows, cols, coupling2=0,
+                       toric=False):
     '''
-    Generate list of interacting indices with their couplings for square
+    Generate list of interacting indices with their couplings for rectangular
     lattice
-    Return Hamiltonian for square lattice of with side length 'size' with same
+    Return Hamiltonian for rectangular lattice of size rows x cols with same
     coupling between all pairs
     '''
 
-    return generate_rectangle(neighbors, coupling, disorder, size, size, coupling2)
+    if toric:
+        return generate_rectangle_toric(neighbors, coupling, disorder, rows, cols,
+                                        coupling2)
 
-# end generate_square
+    hamiltonian = []
+
+    for index in range(rows * cols):
+        # Add interaction between index and right neighbor
+        hamiltonian.append([add_disorder(coupling, disorder),
+                            index, shift_index(index, rows, cols, 1, 0)])
+
+        # Add interaction between index and bottom neighbor
+        hamiltonian.append([add_disorder(coupling, disorder),
+                            index, shift_index(index, rows, cols, 0, 1)])
+
+        if neighbors == 2:
+            # Add interaction between index and second right neighbor
+            hamiltonian.append(
+                [add_disorder(coupling2, disorder), index, shift_index(index, rows, cols,
+                                                                       2, 0)])
+
+            # Add interaction between index and second bottom neighbor
+            hamiltonian.append(
+                [add_disorder(coupling2, disorder), index, shift_index(index, rows, cols,
+                                                                       0, 2)])
+
+            # Add interaction between index and top-right neighbor
+            hamiltonian.append(
+                [add_disorder(coupling2, disorder), index, shift_index(index, rows, cols,
+                                                                       1, -1)])
+
+            # Add interaction between index and bottom-right neighbor
+            hamiltonian.append(
+                [add_disorder(coupling2, disorder), index, shift_index(index, rows, cols,
+                                                                       1, 1)])
+
+    return hamiltonian
+
+# end generate_rectangle
 
 
-def generate_rectangle(neighbors, coupling, disorder, rows, cols, coupling2=0):
+def generate_rectangle_toric(neighbors, coupling, disorder, rows, cols, coupling2=0):
     '''
     Generate list of interacting indices with their couplings for rectangular
     lattice
@@ -52,43 +89,68 @@ def generate_rectangle(neighbors, coupling, disorder, rows, cols, coupling2=0):
     '''
 
     hamiltonian = []
+    rows *= 2
+    cols *= 2
 
     for index in range(rows * cols):
-        # Add interaction between index and right neighbor
-        right = (index // cols) * rows + (index + 1) % cols
-        hamiltonian.append([add_disorder(coupling, disorder), index, right])
+        # Generate interactions for even rows
+        if (index // cols) % 2 == 0:
+            # Generate interactions for valid (odd) indices
+            if index % 2 == 1:
+                # Add interaction between index and second right neighbor
+                hamiltonian.append(
+                    [add_disorder(coupling, disorder), index, shift_index(index, rows,
+                                                                          cols, 2, 0)])
 
-        # Add interaction between index and bottom neighbor
-        down = (index + rows) % (rows * cols)
-        hamiltonian.append([add_disorder(coupling, disorder), index, down])
+                # Add interaction between index and top-right neighbor
+                hamiltonian.append(
+                    [add_disorder(coupling, disorder), index, shift_index(index, rows,
+                                                                          cols, 1, -1)])
 
-        if neighbors == 2:
-            # Add interaction between index and second right neighbor
-            right2 = (right // cols) * rows + (right + 1) % cols
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, right2])
+                # Add interaction between index and bottom-right neighbor
+                hamiltonian.append(
+                    [add_disorder(coupling, disorder), index, shift_index(index, rows,
+                                                                          cols, 1, 1)])
 
-            # Add interaction between index and second bottom neighbor
-            down2 = (down + rows) % (rows * cols)
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, down2])
+        # Generate interactions for odd rows
+        else:
+            # Generate interactions for valid (even) indices
+            if index % 2 == 0:
+                # Add interaction between index and second bottom neighbor
+                hamiltonian.append(
+                    [add_disorder(coupling, disorder), index, shift_index(index, rows,
+                                                                          cols, 0, 2)])
 
-            # Add interaction between index and top-right neighbor
-            up_right = (right - rows) % (rows * cols)
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, up_right])
+                # Add interaction between index and bottom-right neighbor
+                hamiltonian.append(
+                    [add_disorder(coupling, disorder), index, shift_index(index, rows,
+                                                                          cols, 1, 1)])
 
-            # Add interaction between index and bottom-right neighbor
-            down_right = (right + rows) % (rows * cols)
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, down_right])
+                # Add interaction between index and bottom-left neighbor
+                hamiltonian.append(
+                    [add_disorder(coupling, disorder), index, shift_index(index, rows,
+                                                                          cols, -1, 1)])
 
     return hamiltonian
 
-# end generate_rectangle
+# end generate_rectangle_toric
 
 
-def generate_triangle(neighbors, coupling, disorder, rows, colsm, coupling2=0):
+def generate_square(neighbors, coupling, disorder, size, coupling2=0, toric=False):
+    '''
+    Generate list of interacting indices with their couplings for square
+    lattice
+    Return Hamiltonian for square lattice of with side length 'size' with same
+    coupling between all pairs
+    '''
+
+    return generate_rectangle(neighbors, coupling, disorder, size, size, coupling2, toric)
+
+# end generate_square
+
+
+def generate_triangle(neighbors, coupling, disorder, rows, cols, coupling2=0,
+                      toric=False):
     '''
     Generate list of interacting indices with their couplings for triangular
     lattice
@@ -96,59 +158,144 @@ def generate_triangle(neighbors, coupling, disorder, rows, colsm, coupling2=0):
     coupling between all pairs
     '''
 
+    if toric:
+        return generate_triangle_toric(neighbors, coupling, disorder, rows, cols,
+                                       coupling2)
+
     hamiltonian = []
 
     for index in range(rows * cols):
         # Add interaction between index and right neighbor
-        right = (index // cols) * rows + (index + 1) % cols
-        hamiltonian.append([add_disorder(coupling, disorder), index, right])
+        hamiltonian.append([add_disorder(coupling, disorder),
+                            index, shift_index(index, rows, cols, 1, 0)])
 
         # Add interaction between index and bottom neighbor
-        down = (index + rows) % (rows * cols)
-        hamiltonian.append([add_disorder(coupling, disorder), index, down])
+        hamiltonian.append([add_disorder(coupling, disorder),
+                            index, shift_index(index, rows, cols, 0, 1)])
 
         # Add interaction between index and bottom-right neighbor
-        down_right = (right + rows) % (rows * cols)
-        hamiltonian.append(
-            [add_disorder(coupling, disorder), index, down_right])
+        hamiltonian.append([add_disorder(coupling, disorder), index,
+                            shift_index(index, rows, cols, 1, 1)])
 
         if neighbors == 2:
             # Add interaction between index and second right neighbor
-            right2 = (right // cols) * rows + (right + 1) % cols
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, right2])
+            hamiltonian.append([add_disorder(coupling2, disorder), index,
+                                shift_index(index, rows, cols, 2, 0)])
 
             # Add interaction between index and second bottom neighbor
-            down2 = (down + rows) % (rows * cols)
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, down2])
+            hamiltonian.append([add_disorder(coupling2, disorder), index,
+                                shift_index(index, rows, cols, 0, 2)])
 
             # Add interaction between index and 1 down, 2 right neighbor
-            down_right2 = (right2 + rows) % (rows * cols)
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, down_right2])
+            hamiltonian.append([add_disorder(coupling2, disorder), index,
+                                shift_index(index, rows, cols, 2, 1)])
 
             # Add interaction between index and top-right neighbor
-            up_right = (right - rows) % (rows * cols)
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, up_right])
+            hamiltonian.append([add_disorder(coupling2, disorder), index,
+                                shift_index(index, rows, cols, 1, -1)])
 
             # Add interaction between index and 2 down, 1 right neighbor
-            down2_right = (down_right + rows) % (rows * cols)
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, down_right])
+            hamiltonian.append([add_disorder(coupling2, disorder), index,
+                                shift_index(index, rows, cols, 1, 2)])
 
             # Add interactino between index and 2 down, 2 right neighbor
-            down2_right2 = (down_right2 + rows) % (rows * cols)
-            hamiltonian.append(
-                [add_disorder(coupling2, disorder), index, down2_right2])
+            hamiltonian.append([add_disorder(coupling2, disorder), index,
+                                shift_index(index, rows, cols, 2, 2)])
 
     return hamiltonian
 
 # end generate_triangle
 
 
-def generate_striangle(neighbors, coupling, disorder, size, coupling2=0):
+def generate_triangle_toric(neighbors, coupling, disorder, rows, cols, coupling2=0):
+    '''
+    Generate list of interacting indices with their couplings for rectangular
+    lattice
+    Return Hamiltonian for rectangular lattice of size rows x cols with same
+    coupling between all pairs
+    '''
+
+    hamiltonian = []
+    rows *= 2
+    cols *= 2
+
+    for index in range(rows * cols):
+        # Generate interactions for even rows
+        if (index // cols) % 2 == 0:
+            # Generate interactions for valid (odd) indices
+            if index % 2 == 1:
+                # Add interaction between index and top neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 0, -1)])
+
+                # Add interaction between index and top-right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 1, -1)])
+
+                # Add interaction between index and second right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 2, 0)])
+
+                # Add interaction between index and 1 down, 2 right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 2, 1)])
+
+                # Add interaction between index and bottom-right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 1, 1)])
+
+        # Generate interactions for odd rows
+        else:
+            # Generate interactions for even indices
+            if index % 2 == 0:
+                # Add interaction between index and top-right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 1, -1)])
+
+                # Add interaction between index and right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 1, 0)])
+
+                # Add interaction between index and bottom-right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 1, 1)])
+
+                # Add interaction between index and 2 down, 1 right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 1, 2)])
+
+                # Add interaction between index and second bottom neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 0, 2)])
+
+            # Generate interactions for odd indices
+            else:
+                # Add interaction between index and right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 1, 0)])
+
+                # Add interaction between index and 1 down, 2 right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 2, 1)])
+
+                # Add interaction between index and 2 down, 2 right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 2, 2)])
+
+                # Add interaction between index and 2 down, 1 right neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 1, 2)])
+
+                # Add interaction between index and bottom neighbor
+                hamiltonian.append([add_disorder(coupling, disorder), index,
+                                    shift_index(index, rows, cols, 0, 1)])
+
+    return hamiltonian
+
+# end generate_triangle_toric
+
+
+def generate_striangle(neighbors, coupling, disorder, size, coupling2=0, toric=False):
     '''
     Generate list of interacting indices with their couplings for square
     triangular lattice
@@ -156,9 +303,28 @@ def generate_striangle(neighbors, coupling, disorder, size, coupling2=0):
     coupling between all pairs
     '''
 
-    return generate_triangle(neighbors, coupling, disorder, size, size, coupling)
+    return generate_triangle(neighbors, coupling, disorder, size, size, coupling2, toric)
 
 # end generate_striangle
+
+
+def shift_index(index, rows, cols, right_change, down_change):
+    '''
+    Using original index, the number of columns and of rows im the lattice,
+    and the shifts in index position moving to the right along a row and down
+    along a column (all integers), find new index position displaced from
+    original as specified
+    Return integer value of shifted index in lattice
+    '''
+
+    # Shift index right
+    index = (index // cols) * cols + (index + right_change) % cols
+    # Shift index down
+    index = (index + down_change * cols) % (rows * cols)
+
+    return index
+
+# end shift_index
 
 
 def write_hamiltonian(filename, hamiltonian, shape, rows, cols):
@@ -194,12 +360,12 @@ def receive_input():
 
     shape = str(input('Enter lattice shape ("s" - square, "r" - rectangle, ' +
                       '"t" - triangle): '))
+    while shape not in cf.SHAPES:
+        shape = str(input('Invalid input. Please enter "s", "r", or "t": '))
 
     neighbors = 2 if int(input('Enter 1 for nearest neighbor interactions, ' +
                                '2 for nearest and next nearest: ')) == 2 else 1
-
-    while shape not in cf.SHAPES:
-        shape = str(input('Invalid input. Please enter "s", "r", or "t": '))
+    toric = True if str(input('Toric code (y/n): ')).lower() == 'y' else False
 
     while True:
         try:
@@ -223,10 +389,10 @@ def receive_input():
             except ValueError:
                 print('Invalid input -- not an integer!')
 
-        hamiltonian = (generate_square(neighbors, coupling, disorder, rows, coupling2)
+        hamiltonian = (generate_square(neighbors, coupling, disorder, rows, coupling2, toric)
                        if shape == cf.SQUARE
                        else generate_striangle(neighbors, coupling, disorder, rows,
-                                               coupling2))
+                                               coupling2, toric))
 
     elif shape in [cf.RECTANGLE, cf.TRIANGLE]:
         while True:
@@ -238,12 +404,13 @@ def receive_input():
                 print('Invalid input -- not an integer!')
 
         hamiltonian = (generate_rectangle(neighbors, coupling, disorder, rows, cols,
-                                          coupling2)
+                                          coupling2, toric)
                        if shape == cf.RECTANGLE
                        else generate_triangle(neighbors, coupling, disorder, rows, cols,
-                                              coupling2))
+                                              coupling2, toric))
 
     return (hamiltonian, shape, rows, cols)
+
 # end receive_input
 
 

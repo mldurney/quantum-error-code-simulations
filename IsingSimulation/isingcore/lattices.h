@@ -34,6 +34,7 @@ class Lattice {
     const ivector2 getHFunction() const { return hFunction; }
     const ivector getIndices() const { return indices; }
     const int getNumIndices() const { return numIndices; }
+	const i2arraymap getLocations() const { return locations; }
     const ivectormap getLocalTerms() const { return localTerms; }
     const std::map<int, ivector2> getIndInteractions() const {
         return indInteractions;
@@ -61,6 +62,7 @@ class Lattice {
     const ivector indices;
     ivector randomizedIndices;
     const int numIndices;
+	const i2arraymap locations;
     const ivectormap localTerms;
     const std::map<int, ivector2> indInteractions;
     imap spins;

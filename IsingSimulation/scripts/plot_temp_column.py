@@ -67,7 +67,6 @@ def plot_temp_data(filename, directory):
     size = 5
     x_minor_locator = AutoMinorLocator(10)
     y_minor_locator = AutoMinorLocator(10)
-    colors = np.array([])
     c = cm.rainbow(np.linspace(0, 1, len(data[temp])))
 
     fig, ax = plt.subplots()
@@ -94,15 +93,13 @@ def plot_temp_data(filename, directory):
 def main():
 
     if len(sys.argv) == 2:
-        directory = os.path.join(os.getcwd(), sys.argv[1])
+        if not os.path.isdir(sys.argv[1]):
+            print('Directory does not exist! Need data directory')
+            print('Usage: ' + sys.argv[0] + ' data_dir')
+            sys.exit(1)
 
     else:
         print('Usage: ' + sys.argv[0] + ' data_dir mode')
-        sys.exit(1)
-
-    if not os.path.isdir(sys.argv[1]):
-        print('Directory does not exist! Need data directory')
-        print('Usage: ' + sys.argv[0] + ' data_dir')
         sys.exit(1)
 
     manage_plotting(sys.argv[1], 'temp_averages')

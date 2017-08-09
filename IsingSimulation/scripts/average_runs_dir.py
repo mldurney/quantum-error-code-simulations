@@ -4,6 +4,7 @@ import sys
 import config as cf
 from average_runs import rw_averages
 
+
 def find_unaveraged_csv(directory, folder):
 
     main_dir = os.getcwd()

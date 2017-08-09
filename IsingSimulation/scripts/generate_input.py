@@ -51,11 +51,23 @@ def write_hamiltonian_dir(args):
     for test in tests:
         str_rows = str(test[0])
         str_cols = str(test[1])
+        str_actual_rows = str(2 * test[0] if args['toric'] else test[0])
+        str_actual_cols = str(2 * test[1] if args['toric'] else test[1])
         str_coupling = str(test[2])
+        str_coupling2 = str(test[3])
         str_disorder = str(test[4])
 
-        hamiltonian_name = (args['shape'] + str_rows + 'x' + str_cols + '_'
-                            + str_coupling + '-' + str_disorder + '.csv')
+        if args['toric']:
+            hamiltonian_name = (args['shape'] + 'toric' + str_rows + 'x' + str_cols
+                                + '_' + str_coupling + '-' + str_disorder + '.csv')
+        elif test[3] == 0:
+            hamiltonian_name = (args['shape'] + str_rows + 'x' + str_cols + '_'
+                                + str_coupling + '-' + str_disorder + '.csv')
+        else:
+            hamiltonian_name = (args['shape'] + str_rows + 'x' + str_cols + '_'
+                                + str_coupling + '-' + str_coupling2 + '-'
+                                + str_disorder + '.csv')
+
         hamiltonian_filename = os.path.join(hamiltonian_dir, hamiltonian_name)
 
         tests_file.write('%s,%s,%f,%f,%d,%d,%d,%c\n' %
@@ -64,10 +76,11 @@ def write_hamiltonian_dir(args):
                           args['num_temps'], args['updates'], args['trials'],
                           args['mode']))
 
-        hamiltonian = get_hamiltonian(args['shape'], args['neighbors'], test)
+        hamiltonian = get_hamiltonian(
+            args['shape'], args['neighbors'], test, args['toric'])
 
         gh.write_hamiltonian(hamiltonian_filename, hamiltonian, args['shape'],
-                             str_rows, str_cols)
+                             str_actual_rows, str_actual_cols)
 
     tests_file.close()
 
@@ -104,7 +117,7 @@ def receive_input():
     Intended for use when generate_input.py being ran directly
     '''
 
-    if len(sys.argv) in [15, 16]:
+    if len(sys.argv) in [15, 16, 17]:
         args = get_cmdline_lattice()
     elif len(sys.argv) == 1:
         args = get_userinput_lattice()
@@ -138,7 +151,8 @@ def get_cmdline_lattice():
             'couplings': sys.argv[12],
             'couplings2': sys.argv[12],
             'disorders': sys.argv[13],
-            'mode': sys.argv[14]
+            'mode': sys.argv[14],
+            'toric': False
         }
     else:
         args = {
@@ -156,8 +170,12 @@ def get_cmdline_lattice():
             'couplings': sys.argv[12],
             'couplings2': sys.argv[13],
             'disorders': sys.argv[14],
-            'mode': sys.argv[15]
+            'mode': sys.argv[15],
+            'toric': False
         }
+
+    if len(sys.argv == 17):
+        args['toric'] = True
 
     args['range_rows'] = range(args['min_rows'], args['max_rows'] + 1)
     args['range_cols'] = range(args['min_cols'], args['max_cols'] + 1)
@@ -176,7 +194,6 @@ def get_userinput_lattice():
     args = {}
 
     args['shape'] = str(input('Shape of lattice (s, r, t, or v): '))
-
     while args['shape'] not in cf.SHAPES:
         args['shape'] = str(input('Invalid input. Enter s, r, t, or v: '))
 
@@ -211,6 +228,8 @@ def get_userinput_lattice():
     disorders = input('List of disorder percentages [0, 100]: ')
     args['mode'] = str(
         input('Update mode ("a" all, "p" psuedo, "r" random): '))
+    args['toric'] = True if str(
+        input('Toric code (y/n): ')).lower() == 'y' else False
 
     args['range_rows'] = range(args['min_rows'], args['max_rows'] + 1,
                                row_skip)
@@ -249,7 +268,8 @@ def get_default_lattice():
         'couplings': [1],
         'couplings2': [0],
         'disorders': [0],
-        'mode': 'r'
+        'mode': 'r',
+        'toric': False
     }
 
     args['min_cols'] = args['min_rows']
@@ -262,7 +282,7 @@ def get_default_lattice():
 # end get_default_lattice
 
 
-def get_hamiltonian(shape, neighbors, test):
+def get_hamiltonian(shape, neighbors, test, toric):
     '''
     Call to generate appropriate hamiltonian based upon lattice shape
     and using parameters for coupling, disorder, rows, and columns as
@@ -271,16 +291,16 @@ def get_hamiltonian(shape, neighbors, test):
 
     if shape == cf.SQUARE:
         hamiltonian = gh.generate_square(
-            neighbors, test[2], test[4], test[0], test[3])
+            neighbors, test[2], test[4], test[0], test[3], toric)
     elif shape == cf.RECTANGLE:
         hamiltonian = gh.generate_rectangle(
-            neighbors, test[2], test[4], test[0], test[1], test[3])
+            neighbors, test[2], test[4], test[0], test[1], test[3], toric)
     elif shape == cf.TRIANGLE:
         hamiltonian = gh.generate_triangle(
-            neighbors, test[2], test[4], test[0], test[1], test[3])
+            neighbors, test[2], test[4], test[0], test[1], test[3], toric)
     else:
         hamiltonian = gh.generate_striangle(
-            neighbors, test[2], test[4], test[0], test[3])
+            neighbors, test[2], test[4], test[0], test[3], toric)
 
     return hamiltonian
 

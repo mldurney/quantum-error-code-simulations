@@ -8,10 +8,13 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <array>
 
 typedef std::vector<int> ivector;
 typedef std::vector<ivector> ivector2;
 typedef std::map<int, ivector> ivectormap;
+typedef std::array<int, 2> i2array;
+typedef std::map<int, i2array> i2arraymap;
 
 namespace ising {
 ivector2 importHamiltonianVector(std::ifstream &file);
@@ -23,6 +26,7 @@ class Hamiltonian {
 
     const ivector2 getHamiltonian() const { return hamiltonian; }
     const ivector getIndices() const { return indices; }
+	const i2arraymap getLocations() const { return locations; }
     const int getNumIndices() const { return numIndices; }
     const ivectormap getLocalTerms() const { return localTerms; }
     const std::map<int, ivector2> getIndInteractions() const {
@@ -36,17 +40,20 @@ class Hamiltonian {
 
     void printHamiltonian() const;
     void printIndices() const;
+	void printLocations() const;
     void printLocalTerms() const;
     void printIndInteractions() const;
 
    private:
     void generateIndices();
+	void generateLocations();
     void generateLocalTerms();
     void generateIndInteractions();
     void findIsFast();
 
     ivector2 hamiltonian;
     ivector indices;
+	i2arraymap locations;
     int numIndices;
     ivectormap localTerms;
     std::map<int, ivector2> indInteractions;

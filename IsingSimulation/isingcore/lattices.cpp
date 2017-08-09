@@ -11,6 +11,7 @@ Lattice::Lattice(Hamiltonian h, double t, char m, bool init)
       hFunction(h.getHamiltonian()),
       indices(h.getIndices()),
       numIndices(h.getNumIndices()),
+	  locations(h.getLocations()),
       localTerms(h.getLocalTerms()),
       indInteractions(h.getIndInteractions()),
       shape(h.getShape()),
@@ -285,26 +286,19 @@ void RectangularLattice::checkShape() const {
 }
 
 int RectangularLattice::findXDisplacement(int i, int j) {
-	int iRow = i % getCols();
-	int jRow = j % getCols();
+	int iRow = locations.at(i).at(0);
+	int jRow = locations.at(j).at(0);
 	return iRow - jRow;
 }
 
 int RectangularLattice::findYDisplacement(int i, int j) {
-	int iCol = i / getCols();
-	int jCol = j / getCols();
+	int iCol = locations.at(i).at(1);
+	int jCol = locations.at(j).at(1);
 	return iCol - jCol;
 }
 
 double RectangularLattice::findDistance(int i, int j) {
-    int iRow = i % getCols();
-    int iCol = i / getCols();
-    int jRow = j % getCols();
-    int jCol = j / getCols();
-
-    int distRow = iRow - jRow;
-    int distCol = iCol - jCol;
-    return sqrt(pow(distRow, 2) + pow(distCol, 2));
+	return sqrt(pow(xDisplacements[i][j], 2) + pow(yDisplacements[i][j], 2));
 }
 
 void RectangularLattice::guessRowsCols() {
@@ -314,10 +308,11 @@ void RectangularLattice::guessRowsCols() {
         return;
     }
 
-    for (int guess = (int)sqrt(numIndices); guess > 0; --guess) {
-        if (numIndices % guess == 0) {
+	int maxIndex = indices.back() + 1;
+    for (int guess = (int)sqrt(maxIndex); guess > 0; --guess) {
+        if (maxIndex % guess == 0) {
             setRows(guess);
-            setCols(numIndices / guess);
+            setCols(maxIndex / guess);
             return;
         }
     }
@@ -349,10 +344,11 @@ void SquareLattice::checkShape() const {
 void SquareLattice::guessSide() {
     int guess = hamiltonian.getRows();
 
+	int maxIndex = indices.back() + 1;
     if (guess == -1) {
-        guess = (int)sqrt(numIndices);
+        guess = (int)sqrt(maxIndex);
 
-        if (guess * guess != numIndices) {
+        if (guess * guess != maxIndex) {
             std::cout << "Lattice is not a square (invalid number of indices)!";
             shapeError();
         }
@@ -388,26 +384,19 @@ void TriangularLattice::checkShape() const {
 }
 
 int TriangularLattice::findXDisplacement(int i, int j) {
-	int iRow = i % getCols();
-	int jRow = j % getCols();
-	return iRow - jRow;
+	int iCol = locations.at(i).at(0);
+	int jCol = locations.at(j).at(0);
+	return iCol - jCol;
 }
 
 int TriangularLattice::findYDisplacement(int i, int j) {
-	int iCol = i / getCols();
-	int jCol = j / getCols();
+	int iCol = locations.at(i).at(1);
+	int jCol = locations.at(j).at(1);
 	return iCol - jCol;
 }
 
 double TriangularLattice::findDistance(int i, int j) {
-    int iRow = i % getCols();
-    int iCol = i / getCols();
-    int jRow = j % getCols();
-    int jCol = j / getCols();
-
-    int distRow = iRow - jRow;
-    int distCol = iCol - jCol;
-    return sqrt(pow(distRow, 2) + pow(distCol, 2));
+    return sqrt(pow(xDisplacements[i][j], 2) + pow(yDisplacements[i][j], 2));
 }
 
 void TriangularLattice::guessRowsCols() {
@@ -417,10 +406,11 @@ void TriangularLattice::guessRowsCols() {
         return;
     }
 
-    for (int guess = (int)sqrt(numIndices); guess > 0; --guess) {
+	int maxIndex = indices.back() + 1;
+    for (int guess = (int)sqrt(maxIndex); guess > 0; --guess) {
         if (numIndices % guess == 0) {
             setRows(guess);
-            setCols(numIndices / guess);
+            setCols(maxIndex / guess);
             return;
         }
     }
@@ -454,10 +444,11 @@ void STriangularLattice::checkShape() const {
 void STriangularLattice::guessSide() {
     int guess = hamiltonian.getRows();
 
+	int maxIndex = indices.back() + 1;
     if (guess == -1) {
-        guess = (int)sqrt(numIndices);
+        guess = (int)sqrt(maxIndex);
 
-        if (guess * guess != numIndices) {
+        if (guess * guess != maxIndex) {
             std::cout << "Lattice is not a square triangle ";
             std::cout << "(invalid number of indices)!";
             shapeError();

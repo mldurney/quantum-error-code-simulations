@@ -32,6 +32,7 @@ ivector2 ising::importHamiltonianVector(std::ifstream& file) {
 Hamiltonian::Hamiltonian(ivector2 h, char s, int r, int c)
     : hamiltonian(h), shape(s), rows(r), cols(c) {
     generateIndices();
+    generateLocations();
     generateLocalTerms();
     generateIndInteractions();
     findIsFast();
@@ -53,6 +54,23 @@ void Hamiltonian::generateIndices() {
 
     sort(indices.begin(), indices.end());
     numIndices = (int)indices.size();
+}
+
+void Hamiltonian::generateLocations() {
+    if (rows == -1 || cols == -1) {
+        return;
+    }
+
+    for (auto& i : indices) {
+        int row = i / cols;
+        int col = i % cols;
+        locations[i] = {row, col};
+
+        if (row >= rows || col >= cols) {
+            locations.clear();
+            return;
+        }
+    }
 }
 
 void Hamiltonian::generateLocalTerms() {
@@ -149,6 +167,20 @@ void Hamiltonian::printIndices() const {
     }
 
     std::cout << std::endl << std::endl;
+}
+
+void Hamiltonian::printLocations() const {
+    i2arraymap::const_iterator it;
+
+    std::cout << "Printing locations:" << std::endl;
+
+    for (it = locations.begin(); it != locations.end(); ++it) {
+        std::cout << it->first << ":\t";
+        std::cout << it->second[0] << " " << it->second[1];
+        std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
 }
 
 void Hamiltonian::printLocalTerms() const {
