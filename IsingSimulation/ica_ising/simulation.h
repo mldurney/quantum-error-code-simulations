@@ -4,6 +4,9 @@
 #include "simulatedlattice.h"
 
 namespace ising {
+const double MIN_PERCENTILE = .33;
+const double MAX_PERCENTILE = .67;
+
 class Simulation {
    public:
    private:

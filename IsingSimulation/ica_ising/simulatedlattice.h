@@ -8,14 +8,12 @@
 
 namespace fs = std::experimental::filesystem;
 typedef std::complex<double> cdouble;
-typedef std::vector<cdouble> cvector;
+typedef std::vector<cdouble> cdvector;
 
 namespace ising {
 const unsigned int PREUPDATES = 500;
 const unsigned int BASEUPDATES = 5;
 const unsigned int SKIP = 10;
-const double MIN_PERCENTILE = .33;
-const double MAX_PERCENTILE = .67;
 
 class SimulatedLattice {
    public:
