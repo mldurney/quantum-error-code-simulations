@@ -110,39 +110,3 @@ class Simulation {
 }
 
 #endif /* SIMULATION_H_ */
-       /*
-       namespace ising {
-       const uint PREUPDATES = 500;
-       const uint BASEUPDATES = 5;
-       const uint SKIP = 10;
-       
-       class SimulatedLattice {
-          public:
-           uint getIndLattice() const { return indLattice; }
-           Lattice *getLattice() const { return lattice; }
-       
-          private:
-           uint indLattice;
-           Lattice *lattice;
-           fs::path tempDirectory;
-           fs::path tempData;
-           uint updates;
-           uint preupdates;
-           uint trials;
-           double q;
-           dvector avgMag;
-           dvector avgMag2;
-           dvector avgMag4;
-           cvector chi0;
-           cvector chiq;
-       
-           static int numLattices;
-           static dvector temperatures;
-           static dvector magnetizations;
-           static dvector binderCumulants;
-           static cvector correlationFunctions;
-           static std::mutex data_mutex;
-           static std::mutex file_mutex;
-       };
-       }
-       */

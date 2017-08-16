@@ -1,14 +1,15 @@
-#include "isingsimulation.h"
+#include "simulation.h"
 
 using namespace ising;
 
-int SimulatedLattice::numLattices = 0;
-dvector SimulatedLattice::temperatures;
-dvector SimulatedLattice::magnetizations;
-dvector SimulatedLattice::binderCumulants;
-cvector SimulatedLattice::correlationFunctions;
-std::mutex SimulatedLattice::data_mutex;
 std::mutex SimulatedLattice::file_mutex;
+std::mutex Simulation::file_mutex;
+std::mutex Simulation::trial_mutex;
+std::mutex Simulation::avgMag_mutex;
+std::mutex Simulation::avgMag2_mutex;
+std::mutex Simulation::avgMag4_mutex;
+std::mutex Simulation::chi0_mutex;
+std::mutex Simulation::chiq_mutex;
 
 int main(int argc, char *argv[]) {
     std::string inFilename;
@@ -60,7 +61,8 @@ void ising::manageSimulations(const std::string &inFilename, const double t,
     dvector temperatures = SimulatedLattice::getTemperatures();
     dvector magnetizations = SimulatedLattice::getMagnetizations();
     dvector binderCumulants = SimulatedLattice::getBinderCumulants();
-    dvector correlationFunctions = SimulatedLattice::getRealCorrelationFunctions();
+    dvector correlationFunctions =
+        SimulatedLattice::getRealCorrelationFunctions();
 
     std::string outMag = getOutFilename(inFilename, "magnetizations");
     std::string outBC = getOutFilename(inFilename, "binder_cumulants");
