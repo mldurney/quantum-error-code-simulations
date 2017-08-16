@@ -12,7 +12,7 @@ const int MAX_FILENAME_SIZE = 255;
 
 Hamiltonian readHamiltonian(std::ifstream& file, char& shape);
 Lattice* chooseLattice(char shape, const Hamiltonian& hamiltonian, double t,
-                       double dt, unsigned int n, char m);
+                       double dt, uint n, char m);
 std::string getOutFilename(const std::string& inFilename,
                            const std::string& newDir);
 std::string getOutFilename(const std::string& inFilename,

@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 
     double temperature;
     char mode;
-    unsigned int preupdates;
+    uint preupdates;
 
     if (argc == 4 || argc == 5) {
         temperature = atof(argv[2]);
@@ -60,13 +60,13 @@ std::string ising::receiveHamiltonianFile(int argc, char *argv[]) {
     return filename;
 }
 
-void ising::runReplica(Replica replica, unsigned int preupdates) {
+void ising::runReplica(Replica replica, uint preupdates) {
     char *input = new char[10];
 
     if (preupdates == 0) {
         runReplicaHelp();
     } else {
-        for (unsigned int i = 0; i < preupdates; i++) {
+        for (uint i = 0; i < preupdates; i++) {
             replica.update();
         }
 
@@ -85,7 +85,7 @@ void ising::runReplica(Replica replica, unsigned int preupdates) {
     while (true) {
         std::cin >> input;
 
-        unsigned int num;
+        uint num;
         switch (*input) {
             case 'p':
                 replica.print();
@@ -94,7 +94,7 @@ void ising::runReplica(Replica replica, unsigned int preupdates) {
             case 'u':
                 num = atoi(&input[1]);
 
-                for (unsigned int i = 0; i < num; i++) {
+                for (uint i = 0; i < num; i++) {
                     replica.update();
                 }
 
@@ -115,7 +115,7 @@ void ising::runReplica(Replica replica, unsigned int preupdates) {
             case 'a':
                 num = atoi(&input[1]);
 
-                for (unsigned int i = 0; i < num; i++) {
+                for (uint i = 0; i < num; i++) {
                     replica.update();
                 }
 

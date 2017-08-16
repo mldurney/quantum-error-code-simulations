@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 
     double t = 1;
     double dt = .1;
-    unsigned int n = 10;
+    uint n = 10;
     char m = 'p';
     int num = 5;
 
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Magnetization: " << replica.getMagnetization() << std::endl;
     std::cout << std::endl;
 
-    unsigned int updates = 1000;
+    uint updates = 1000;
     std::cout << "Printing lattice after " << updates
               << " updates:" << std::endl;
     for (unsigned i = 0; i < updates; ++i) {

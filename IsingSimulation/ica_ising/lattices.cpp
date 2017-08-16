@@ -15,20 +15,23 @@ Lattice::Lattice(Hamiltonian h, double t, double dt, int n, char m)
     generateDistances();
     gen = RandomGenerator();
 
-    for (unsigned int i = 0; i < prop.numT; ++i) {
+    for (uint i = 0; i < prop.numT; ++i) {
         replicavector replicas;
-        for (unsigned int j = 0; j < REPLICAS; ++j) {
+        for (uint j = 0; j < REPLICAS; ++j) {
             replicas.emplace_back(std::make_unique<Replica>(prop, i));
         }
         configs.push_back(std::move(replicas));
+        replicaIndices.push_back(i);
     }
+
+    std::sort(replicaIndices.begin(), replicaIndices.end());
 }
 
 void Lattice::mapsToSequences() {
     // Create map from original indices to new sequential locations
     auto origIndices = prop.hamiltonian.getIndices();
     std::map<int, int> indMap;
-    for (unsigned int i = 0; i < prop.numIndices; ++i) {
+    for (uint i = 0; i < prop.numIndices; ++i) {
         indMap[origIndices[i]] = i;
     }
 
@@ -82,7 +85,7 @@ void Lattice::generateDistances() {
     prop.yDisplacements.resize(prop.numIndices);
     prop.distances.resize(prop.numIndices);
 
-    for (unsigned int i = 0; i < prop.numIndices; ++i) {
+    for (uint i = 0; i < prop.numIndices; ++i) {
         prop.xDisplacements[i].resize(prop.numIndices);
         prop.yDisplacements[i].resize(prop.numIndices);
         prop.distances[i].resize(prop.numIndices);
@@ -97,7 +100,7 @@ void Lattice::generateDistances() {
     }
 }
 
-Replica Lattice::getReplicaCopy(unsigned int i, unsigned int j) {
+Replica Lattice::getReplicaCopy(uint i, uint j) {
     if (i >= configs.size() && j > REPLICAS) {
         std::cout << "INVALID CONFIGURATION/REPLICA INDICES! Exiting...\n\n";
         exit(EXIT_FAILURE);
@@ -115,19 +118,19 @@ void Lattice::monteCarloSweep() {
 }
 
 void Lattice::houdayerClusterMove() {
-    for (unsigned int i = 0; i < configs.size(); ++i) {
+    for (uint i = 0; i < configs.size(); ++i) {
         houdayerClusterMove(i);
     }
 }
 
-void Lattice::houdayerClusterMove(unsigned int index) {
+void Lattice::houdayerClusterMove(uint index) {
     auto spins0 = configs[index][0]->getSpins();
     auto spins1 = configs[index][1]->getSpins();
 
     bool done = false;
     while (!done) {
         ivector qIndices;
-        for (unsigned int i = 0; i < prop.numIndices; ++i) {
+        for (uint i = 0; i < prop.numIndices; ++i) {
             spins0[i] *= spins1[i];
             if (spins0[i] == 0) {
                 qIndices.push_back(i);
@@ -168,7 +171,7 @@ void Lattice::houdayerClusterMove(unsigned int index) {
 }
 
 void Lattice::parallelTemperingUpdate() {
-    for (unsigned int i = 0; i < prop.numT - 1; ++i) {
+    for (uint i = 0; i < prop.numT - 1; ++i) {
         double dEnergy = configs[i][0]->getTotalEnergy() -
                          configs[i + 1][0]->getTotalEnergy();
         double dBoltzmann = 1 / (KB * configs[i][0]->getTemperature()) -
@@ -176,14 +179,14 @@ void Lattice::parallelTemperingUpdate() {
         double probability = dEnergy * dBoltzmann;
 
         if (probability > 1 || probability > gen.randFloatCO()) {
-            for (unsigned int j = 0; j < REPLICAS; ++j) {
+            for (uint j = 0; j < REPLICAS; ++j) {
                 swapConfigs(i, i + 1);
             }
         }
     }
 }
 
-void Lattice::swapConfigs(unsigned int i, unsigned int j) {
+void Lattice::swapConfigs(uint i, uint j) {
     if (i == j || i >= configs.size() || j >= configs.size()) {
         std::cout << "INVALID CONFIGURATION INDEX! Exiting...\n\n";
         exit(EXIT_FAILURE);
@@ -192,7 +195,7 @@ void Lattice::swapConfigs(unsigned int i, unsigned int j) {
     auto t1 = configs[i][0]->getTemperature();
     auto t2 = configs[j][0]->getTemperature();
 
-    for (unsigned int k = 0; k < REPLICAS; ++k) {
+    for (uint k = 0; k < REPLICAS; ++k) {
         configs[i][k]->setTemperature(t2);
         configs[j][k]->setTemperature(t1);
         configs[i][k].swap(configs[j][k]);
@@ -208,7 +211,7 @@ void Lattice::HCA() {
 void Lattice::ICA() {
     monteCarloSweep();
 
-    for (unsigned int i = 0; i < configs.size(); ++i) {
+    for (uint i = 0; i < configs.size(); ++i) {
         double t = configs[i][0]->getTemperature();
         if (t < jTemperature) {
             houdayerClusterMove(i);

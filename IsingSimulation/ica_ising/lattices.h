@@ -10,7 +10,7 @@ typedef std::vector<std::unique_ptr<ising::Replica>> replicavector;
 typedef std::vector<replicavector> replicavector2;
 
 namespace ising {
-const unsigned int REPLICAS = 2;
+const uint REPLICAS = 2;
 
 class Lattice {
    public:
@@ -40,11 +40,12 @@ class Lattice {
 
     const LatticeProperties& getProperties() const { return prop; }
     const replicavector2& getConfigs() const { return configs; }
+    const ivector getReplicaIndices() const { return replicaIndices; }
     Replica getReplicaCopy(unsigned i, unsigned j = 0);
 
     void monteCarloSweep();
     void houdayerClusterMove();
-    void houdayerClusterMove(unsigned int index);
+    void houdayerClusterMove(uint index);
     void parallelTemperingUpdate();
     void HCA();
     void ICA();
@@ -72,10 +73,11 @@ class Lattice {
 
    private:
     replicavector2 configs;
+    ivector replicaIndices;
     double jTemperature;
 
     void mapsToSequences();
-    void swapConfigs(unsigned int i, unsigned int j);
+    void swapConfigs(uint i, uint j);
 };
 
 class RectangularLattice : public virtual Lattice {

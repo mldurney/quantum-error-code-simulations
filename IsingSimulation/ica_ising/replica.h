@@ -8,13 +8,14 @@
 namespace ising {
 class Replica {
    public:
-    Replica(const LatticeProperties& properties, unsigned int n);
+    Replica(const LatticeProperties& properties, uint n);
     ~Replica() {}
 
     cvector getSpins() const { return spins; }
     const LatticeProperties& getProperties() const { return prop; }
-    double getTemperature() { return t; }
-    void setTemperature(double newT);
+    uint getReplicaIndex() { return replicaIndex; }
+    double getTemperature() { return temperature; }
+    void setTemperature(double t);
     int getTotalEnergy() { return findTotalEnergy(); }
     double getMagnetization() { return findMagnetization(); }
 
@@ -36,10 +37,11 @@ class Replica {
     void initSpins();
 
     cvector spins;
-    ivector randomizedIndices;
     const LatticeProperties& prop;
+    uint replicaIndex;
+    double temperature;
+    ivector randomizedIndices;
     RandomGenerator gen;
-    double t;
 };
 }
 

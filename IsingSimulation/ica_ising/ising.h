@@ -5,7 +5,7 @@
 
 namespace ising {
 std::string receiveHamiltonianFile(int argc, char *argv[]);
-void runReplica(Replica replica, unsigned int preupdates = 0);
+void runReplica(Replica replica, uint preupdates = 0);
 void runReplicaHelp();
 }
 

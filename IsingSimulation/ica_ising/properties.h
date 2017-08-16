@@ -6,7 +6,7 @@
 
 namespace ising {
 struct LatticeProperties {
-    LatticeProperties(Hamiltonian h, double t, double dt, unsigned int n,
+    LatticeProperties(Hamiltonian h, double t, double dt, uint n,
                       char m)
         : hamiltonian(h),
           numIndices(h.getNumIndices()),
@@ -20,7 +20,7 @@ struct LatticeProperties {
     ~LatticeProperties() {}
 
     const Hamiltonian hamiltonian;
-    const unsigned int numIndices;
+    const uint numIndices;
     ivector indices;
     ivector2 hFunction;
     ivector2 localTerms;
@@ -34,10 +34,10 @@ struct LatticeProperties {
     const char shape;
     int rows;
     int cols;
-    unsigned int size;
+    uint size;
     const double minT;
     const double dT;
-    const unsigned int numT;
+    const uint numT;
     char mode;
 };
 }

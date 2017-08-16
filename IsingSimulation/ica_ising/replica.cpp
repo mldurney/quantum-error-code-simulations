@@ -2,9 +2,9 @@
 
 using namespace ising;
 
-Replica::Replica(const LatticeProperties& properties, unsigned int n)
-    : prop(properties) {
-    t = prop.minT + n * prop.dT;
+Replica::Replica(const LatticeProperties& properties, uint n)
+    : prop(properties), replicaIndex(n) {
+    temperature = prop.minT + replicaIndex * prop.dT;
     randomizedIndices = prop.indices;
     spins.resize(prop.numIndices);
     initSpins();
@@ -16,13 +16,13 @@ void Replica::initSpins() {
     }
 }
 
-void Replica::setTemperature(double newT) {
-    if (newT < prop.minT || newT > prop.minT + prop.numT * prop.dT) {
+void Replica::setTemperature(double t) {
+    if (t < prop.minT || t > prop.minT + prop.numT * prop.dT) {
         std::cout << "TEMPERATURE OUTSIDE VALID RANGE! Exiting...\n\n";
         exit(EXIT_FAILURE);
     }
 
-    t = newT;
+    temperature = t;
 }
 
 void Replica::update() {
@@ -43,7 +43,7 @@ void Replica::update() {
 }
 
 void Replica::updateAll() {
-    for (unsigned int i = 0; i < prop.numIndices; ++i) {
+    for (uint i = 0; i < prop.numIndices; ++i) {
         if (findProbability(i) > gen.randFloatCO()) {
             spins[i] *= -1;
         }
@@ -51,12 +51,12 @@ void Replica::updateAll() {
 }
 
 void Replica::updatePseudo() {
-    for (unsigned int i = 0; i < prop.numIndices; ++i) {
+    for (uint i = 0; i < prop.numIndices; ++i) {
         int j = gen.MWC() % prop.numIndices;
         std::swap(randomizedIndices[i], randomizedIndices[j]);
     }
 
-    for (unsigned int i = 0; i < prop.numIndices; ++i) {
+    for (uint i = 0; i < prop.numIndices; ++i) {
         int index = randomizedIndices[i];
         if (findProbability(index) > gen.randFloatCO()) {
             spins[index] *= -1;
@@ -67,7 +67,7 @@ void Replica::updatePseudo() {
 void Replica::updateRandom() {
     int index;
 
-    for (unsigned int i = 0; i < prop.numIndices; ++i) {
+    for (uint i = 0; i < prop.numIndices; ++i) {
         index = prop.indices[gen.MWC() % prop.numIndices];
 
         if (findProbability(index) > gen.randFloatCO()) {
@@ -89,7 +89,7 @@ double Replica::findProbability(int index) {
 int Replica::findTotalEnergy() {
     int energy = 0;
 
-    for (unsigned int i = 0; i < prop.numIndices; ++i) {
+    for (uint i = 0; i < prop.numIndices; ++i) {
         energy += findIndexEnergy(i);
     }
 
@@ -120,7 +120,7 @@ int Replica::findIndexEnergy(int index) {
 double Replica::findMagnetization() {
     double magnetism = 0;
 
-    for (unsigned int i = 0; i < prop.numIndices; ++i) {
+    for (uint i = 0; i < prop.numIndices; ++i) {
         magnetism += spins[i];
     }
 
@@ -134,13 +134,13 @@ void Replica::flipSpins() {
 }
 
 void Replica::print() const {
-    unsigned int side = prop.cols;
+    uint side = prop.cols;
     if (prop.cols == -1) {
         side = (int)sqrt(prop.numIndices);
     }
 
-    for (unsigned int i = 0; i < prop.numIndices;) {
-        for (unsigned int col = 0; col < side && i < prop.numIndices;
+    for (uint i = 0; i < prop.numIndices;) {
+        for (uint col = 0; col < side && i < prop.numIndices;
              ++col, ++i) {
             (spins.at(i) == 1) ? std::cout << "+ " : std::cout << "- ";
         }

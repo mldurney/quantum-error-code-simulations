@@ -17,7 +17,7 @@ class Hamiltonian {
     ~Hamiltonian() {}
 
     const ivector2 getHamiltonian() const { return hamiltonian; }
-    unsigned int getNumIndices() const { return numIndices; }
+    uint getNumIndices() const { return numIndices; }
     const ivector getIndices() const { return indices; }
     const i2arraymap getLocations() const { return locations; }
     const ivectormap getLocalTerms() const { return localTerms; }
@@ -42,7 +42,7 @@ class Hamiltonian {
     void generateIndInteractions();
 
     ivector2 hamiltonian;
-    unsigned int numIndices;
+    uint numIndices;
     ivector indices;
     i2arraymap locations;
     ivectormap localTerms;

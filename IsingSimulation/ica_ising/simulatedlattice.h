@@ -1,88 +1,65 @@
 #ifndef SIMULATEDLATTICE_H_
 #define SIMULATEDLATTICE_H_
 
-#include <complex>
 #include <experimental/filesystem>
 #include <mutex>
+#include <numeric>
 #include "lattices.h"
 
 namespace fs = std::experimental::filesystem;
-typedef std::complex<double> cdouble;
-typedef std::vector<cdouble> cdvector;
 
 namespace ising {
-const unsigned int PREUPDATES = 500;
-const unsigned int BASEUPDATES = 5;
-const unsigned int SKIP = 10;
+const uint PREUPDATES = 500;
+const uint BASEUPDATES = 5;
+const uint SKIP = 10;
 
 class SimulatedLattice {
    public:
-    SimulatedLattice(Lattice *lattice, const std::string &filename,
-                     const unsigned int updates,
-                     const unsigned int preupdates = PREUPDATES,
-                     const unsigned int trials = 1);
-    virtual ~SimulatedLattice() = default;
+    SimulatedLattice(Lattice* lattice, const std::string& filename,
+                     uint index, uint updates,
+                     uint preupdates = PREUPDATES);
+    ~SimulatedLattice() { delete lattice; }
     void runLatticeSimulation();
-    unsigned int getIndLattice() const { return indLattice; }
-    Lattice *getLattice() const { return lattice; }
-    unsigned int getUpdates() const { return updates; }
-    double getAvgMag() { return findAverageNoOutliers(avgMag); }
-    double getAvgMag2() { return findAverageNoOutliers(avgMag2); }
-    double getAvgMag4() { return findAverageNoOutliers(avgMag4); }
-    cdouble getChi0() { return findAverageNoOutliers(chi0); }
-    cdouble getChiq() { return findAverageNoOutliers(chiq); }
-    double getBinderCumulant();
-    cdouble getCorrelationFunction();
+    Lattice* getLattice() const { return lattice; }
+    uint getIndLattice() const { return indLattice; }
+    uint getUpdates() const { return updates; }
+    uint getPreupdates() const { return preupdates; }
 
-    static int getNumLattices() { return numLattices; }
-    static dvector getTemperatures() { return temperatures; }
-    static dvector getMagnetizations() { return magnetizations; }
-    static dvector getBinderCumulants() { return binderCumulants; }
-    static cvector getCorrelationFunctions() { return correlationFunctions; }
-    static dvector getRealCorrelationFunctions();
+    const dmap& getTemperatures() const { return temperatures; }
+    const dmap& getAvgMag() const { return avgMag; }
+    const dmap& getAvgMag2() const { return avgMag2; }
+    const dmap& getAvgMag4() const { return avgMag4; }
+    const cdmap& getChi0() const { return chi0; }
+    const cdmap& getChiq() const { return chiq; }
 
    protected:
-    void addAvgMag(double mag);
-    void addAvgMag2(double mag2);
-    void addAvgMag4(double mag4);
-    void addChi0(cdouble chi) { chi0.push_back(chi); }
-    void addChiq(cdouble chi) { chiq.push_back(chi); }
-    double findAverage(dvector &v);
-    cdouble findAverage(cvector &v);
-    double findAverageNoOutliers(dvector &v,
-                                 double percentile1 = MIN_PERCENTILE,
-                                 double percentile2 = MAX_PERCENTILE);
-    cdouble findAverageNoOutliers(cvector &v,
-                                  double percentile1 = MIN_PERCENTILE,
-                                  double percentile2 = MAX_PERCENTILE);
+    void addAvgMag(uint index, double mag);
+    void addAvgMag2(uint index, double mag2);
+    void addAvgMag4(uint index, double mag4);
+    void addChi0(uint index, cdouble chi) { chi0[index] = chi; }
+    void addChiq(uint index, cdouble chi) { chiq[index] = chi; }
 
    private:
-    unsigned int indLattice;
-    Lattice *lattice;
-    fs::path tempDirectory;
-    fs::path tempData;
-    unsigned int updates;
-    unsigned int preupdates;
-    unsigned int trials;
+    Lattice* lattice;
+    uint indLattice;
+    uint updates;
+    uint preupdates;
     double q;
-    dvector avgMag;
-    dvector avgMag2;
-    dvector avgMag4;
-    cvector chi0;
-    cvector chiq;
 
-    static int numLattices;
-    static dvector temperatures;
-    static dvector magnetizations;
-    static dvector binderCumulants;
-    static cvector correlationFunctions;
-    static std::mutex data_mutex;
+    dmap temperatures;
+    dmap avgMag;
+    dmap avgMag2;
+    dmap avgMag4;
+    cdmap chi0;
+    cdmap chiq;
+
+    fs::path tempDirectory;
+    fs::path tempFile;
     static std::mutex file_mutex;
 
-    void initTempFiles(const std::string &filename);
+    void initTempFile(const std::string& filename);
     void updateTempFile();
     void runPreupdates();
-    void runTrials();
     void runUpdates();
     void runUpdatesStable();
     int reachStability();

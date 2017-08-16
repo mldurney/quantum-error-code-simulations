@@ -37,6 +37,6 @@ hamiltonian.o : hamiltonian.cpp hamiltonian.h common.h randomgenerator.h
 	$(CXX) $(CXXFLAGS) -c hamiltonian.cpp
 
 clean :
-	rm -f testhamiltonian testreplica *.o *.gch *.exe
+	rm -f testhamiltonian testreplica ising *.o *.gch *.exe
 
 .PHONY : all clean

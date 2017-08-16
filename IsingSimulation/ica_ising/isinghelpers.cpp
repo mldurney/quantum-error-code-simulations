@@ -38,7 +38,7 @@ Hamiltonian ising::readHamiltonian(std::ifstream& file, char& shape) {
 }
 
 Lattice* ising::chooseLattice(char shape, const Hamiltonian& h, double t,
-                              double dt, unsigned int n, char m) {
+                              double dt, uint n, char m) {
     Lattice* lattice;
 
     switch (shape) {
