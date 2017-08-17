@@ -61,10 +61,13 @@ void Simulation::initTempDirectory() {
 }
 
 void Simulation::loadTempData() {
+    std::string name = fs::path(inFilename).filename().string();
     std::vector<fs::path> tempFiles;
+
     for (auto &p : fs::directory_iterator(tempDirectory)) {
-        if (p.path().extension() == ".csv" &&
-            isdigit(p.path().filename().c_str()[0])) {
+        fs::path file(p.path());
+        if (file.extension() == ".csv" && isdigit(file.filename().c_str()[0]) &&
+            file.string().find(name) != std::string::npos) {
             tempFiles.push_back(p);
         }
     }

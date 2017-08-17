@@ -10,8 +10,8 @@ typedef std::unique_ptr<ising::SimulatedLattice> latticeptr;
 typedef std::map<int, latticeptr> latticemap;
 
 namespace ising {
-const double MIN_PERCENTILE = .33;
-const double MAX_PERCENTILE = .67;
+const double MIN_PERCENTILE = .5;
+const double MAX_PERCENTILE = .9;
 
 class Simulation {
    public:
@@ -31,11 +31,11 @@ class Simulation {
     uint getTrials() const { return trials; }
     char getMode() const { return mode; }
 
-    double getAvgMag(uint n) { return findAverage(avgMag[n]); }
-    double getAvgMag2(uint n) { return findAverage(avgMag2[n]); }
-    double getAvgMag4(uint n) { return findAverage(avgMag4[n]); }
-    cdouble getChi0(uint n) { return findAverage(chi0[n]); }
-    cdouble getChiq(uint n) { return findAverage(chiq[n]); }
+    double getAvgMag(uint n) { return findAverageNoOutliers(avgMag[n]); }
+    double getAvgMag2(uint n) { return findAverageNoOutliers(avgMag2[n]); }
+    double getAvgMag4(uint n) { return findAverageNoOutliers(avgMag4[n]); }
+    cdouble getChi0(uint n) { return findAverageNoOutliers(chi0[n]); }
+    cdouble getChiq(uint n) { return findAverageNoOutliers(chiq[n]); }
 
     double getBinderCumulant(uint n);
     cdouble getCorrelationFunction(uint n);
