@@ -1,8 +1,0 @@
-#PBS -N ising_nextnearest
-#PBS -e ising_nextnearest.latest.err
-#PBS -o ising_nextnearest.latest.log
-#PBS -l nodes=1:ppn=16
-#PBS -l walltime=24:00:00
-#PBS -l mem=16gb
-cd $PBS_O_WORKDIR
-python scripts/run_simulation.py s10x10-25x25_0.5T-0.02dTx226-0ux100-p2/tests.csv

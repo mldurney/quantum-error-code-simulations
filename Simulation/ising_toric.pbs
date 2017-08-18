@@ -1,8 +1,0 @@
-#PBS -N ising_toric
-#PBS -e ising_toric.latest.err
-#PBS -o ising_toric.latest.log
-#PBS -l nodes=1:ppn=16
-#PBS -l walltime=24:00:00
-#PBS -l mem=16gb
-cd $PBS_O_WORKDIR
-python scripts/run_simulation.py torics10x10-30x30_0.8T-0.01dTx160-0ux100-p1/tests.csv
