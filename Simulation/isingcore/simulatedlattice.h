@@ -26,7 +26,7 @@ class SimulatedLattice {
     uint getUpdates() const { return updates; }
     uint getPreupdates() const { return preupdates; }
     uint getSize() const { return getLattice()->getSize(); }
-    double getQ() const { return q; }
+    ldouble getQ() const { return q; }
     char getStabilityMode() const { return stabilityMode; }
 
     const dmap& getTemperatures() const { return temperatures; }
@@ -37,12 +37,12 @@ class SimulatedLattice {
     const cdmap& getChiq() const { return chiq; }
 
    protected:
-    void setQ(double qNew) { q = qNew; }
+    void setQ(ldouble qNew) { q = qNew; }
     void setStabilityMode(char m);
 
-    void addAvgMag(uint index, double mag);
-    void addAvgMag2(uint index, double mag2);
-    void addAvgMag4(uint index, double mag4);
+    void addAvgMag(uint index, ldouble mag);
+    void addAvgMag2(uint index, ldouble mag2);
+    void addAvgMag4(uint index, ldouble mag4);
     void addChi0(uint index, cdouble chi) { chi0[index] = chi; }
     void addChiq(uint index, cdouble chi) { chiq[index] = chi; }
 
@@ -51,7 +51,7 @@ class SimulatedLattice {
     uint indLattice;
     uint updates;
     uint preupdates;
-    double q;
+    ldouble q;
     char stabilityMode = MAG;
 
     dmap temperatures;

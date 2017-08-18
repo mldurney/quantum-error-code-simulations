@@ -23,7 +23,7 @@ def run_trial(filename):
         args.insert(0, hamiltonian_path)
 
         command = [sim_path] + args
-        subprocess.call(command, stdout=FNULL, stderr=subprocess.STDOUT)
+        subprocess.call(command)  # , stdout=FNULL, stderr=subprocess.STDOUT
 
 # end run_trial
 

@@ -2,27 +2,31 @@
 #define COMMON_H_
 
 #include <array>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <complex>
 #include <map>
 #include <set>
 #include <vector>
 #include "randomgenerator.h"
 
+namespace mp = boost::multiprecision;
+
 // Typedefs
 typedef unsigned int uint;
-typedef std::complex<double> cdouble;
+typedef mp::number<mp::cpp_dec_float<100>> ldouble;
+typedef std::complex<ldouble> cdouble;
 typedef std::vector<char> cvector;
 typedef std::vector<cvector> cvector2;
 typedef std::vector<int> ivector;
 typedef std::vector<ivector> ivector2;
 typedef std::vector<ivector2> ivector3;
-typedef std::vector<double> dvector;
+typedef std::vector<ldouble> dvector;
 typedef std::vector<dvector> dvector2;
 typedef std::vector<cdouble> cdvector;
 typedef std::map<int, int> imap;
 typedef std::map<int, imap> imap2;
 typedef std::map<int, imap2> imap3;
-typedef std::map<int, double> dmap;
+typedef std::map<int, ldouble> dmap;
 typedef std::map<int, cdouble> cdmap;
 typedef std::map<int, ivector> ivectormap;
 typedef std::map<int, dvector> dvectormap;

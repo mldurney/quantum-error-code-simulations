@@ -89,7 +89,7 @@ void SimulatedLattice::runUpdates() {
 
         for (auto &replicas : configs) {
             uint index = replicas[0]->getReplicaIndex();
-            double magnetization = replicas[0]->getMagnetization();
+            ldouble magnetization = replicas[0]->getMagnetization();
             runningMag[index] += magnetization;
             runningMag2[index] += pow(magnetization, 2);
             runningMag4[index] += pow(magnetization, 4);
@@ -149,7 +149,7 @@ void SimulatedLattice::runUpdatesStable() {
 
         for (auto &replicas : configs) {
             uint index = replicas[0]->getReplicaIndex();
-            double magnetization = replicas[0]->getMagnetization();
+            ldouble magnetization = replicas[0]->getMagnetization();
             runningMag[index] += magnetization;
             runningMag2[index] += pow(magnetization, 2);
             runningMag4[index] += pow(magnetization, 4);
@@ -171,8 +171,7 @@ void SimulatedLattice::runUpdatesStable() {
                 runningCorr[index][i][j] /= cycleUpdates;
                 sumCorrK0[index] += runningCorr[index][i][j];
                 sumCorrKq[index] +=
-                    cdouble(runningCorr[index][i][j]) *
-                    std::exp(cdouble(0, q * displacements[i][j]));
+                    cdouble(runningCorr[index][i][j]) * cdouble(0, mp::exp(q * displacements[i][j]));
             }
         }
     }
@@ -242,7 +241,7 @@ uint SimulatedLattice::reachStabilityMag() {
             }
 
             for (auto &i : replicaIndices) {
-                double magnetization = configs[i][0]->getMagnetization();
+                ldouble magnetization = configs[i][0]->getMagnetization();
                 cycleMags[i].push_back(magnetization);
             }
         }
@@ -251,12 +250,12 @@ uint SimulatedLattice::reachStabilityMag() {
 
         for (auto &i : replicaIndices) {
             means[i] =
-                std::accumulate(cycleMags[i].begin(), cycleMags[i].end(), 0.0) /
+                std::accumulate(cycleMags[i].begin(), cycleMags[i].end(), ldouble(0)) /
                 cycleUpdates;
-            stds[i] = std::sqrt(
-                std::accumulate(cycleMags[i].begin(), cycleMags[i].end(), 0.0,
-                                [&](double lhs, double rhs) {
-                                    return rhs + std::pow(lhs - means[i], 2);
+            stds[i] = mp::sqrt(
+                std::accumulate(cycleMags[i].begin(), cycleMags[i].end(), ldouble(0),
+                                [&](ldouble lhs, ldouble rhs) {
+                                    return rhs + mp::pow(lhs - means[i], 2);
                                 }) /
                 cycleUpdates);
         }
@@ -269,7 +268,7 @@ uint SimulatedLattice::reachStabilityMag() {
             }
 
             for (int j = 1; j < static_cast<int>(binsToCompare); ++j) {
-                double difference =
+                ldouble difference =
                     abs((means[i] - bins.end()[-j][i]) / means[i]);
 
                 if (difference >= stds[i]) {
@@ -322,7 +321,7 @@ uint SimulatedLattice::reachStabilityChi0() {
         }
 
         for (auto &i : replicaIndices) {
-            double sumCorrK0 = 0;
+            ldouble sumCorrK0 = 0;
 
             for (auto &j : indices) {
                 for (auto &k : indices) {
@@ -347,7 +346,7 @@ uint SimulatedLattice::reachStabilityChi0() {
 
             for (auto &i : replicaIndices) {
                 auto spins = configs[i][0]->getSpins();
-                double sumCorrK0 = 0;
+                ldouble sumCorrK0 = 0;
 
                 for (auto &j : indices) {
                     for (auto &k : indices) {
@@ -363,12 +362,12 @@ uint SimulatedLattice::reachStabilityChi0() {
 
         for (auto &i : replicaIndices) {
             means[i] = std::accumulate(cycleChi0s[i].begin(),
-                                       cycleChi0s[i].end(), 0.0) /
+                                       cycleChi0s[i].end(), ldouble(0)) /
                        cycleUpdates;
-            stds[i] = std::sqrt(
-                std::accumulate(cycleChi0s[i].begin(), cycleChi0s[i].end(), 0.0,
-                                [&](double lhs, double rhs) {
-                                    return rhs + std::pow(lhs - means[i], 2);
+            stds[i] = mp::sqrt(
+                std::accumulate(cycleChi0s[i].begin(), cycleChi0s[i].end(), ldouble(0),
+                                [&](ldouble lhs, ldouble rhs) {
+                                    return rhs + mp::pow(lhs - means[i], 2);
                                 }) /
                 cycleUpdates);
         }
@@ -381,7 +380,7 @@ uint SimulatedLattice::reachStabilityChi0() {
             }
 
             for (int j = 1; j < static_cast<int>(binsToCompare); ++j) {
-                double difference =
+                ldouble difference =
                     abs((means[i] - bins.end()[-j][i]) / means[i]);
 
                 if (difference >= stds[i]) {
@@ -441,7 +440,7 @@ uint SimulatedLattice::reachStabilityEnergy() {
             }
 
             for (auto &i : replicaIndices) {
-                double energy = configs[i][0]->getTotalEnergy();
+                ldouble energy = configs[i][0]->getTotalEnergy();
                 cycleEnergies[i].push_back(energy);
             }
         }
@@ -450,13 +449,13 @@ uint SimulatedLattice::reachStabilityEnergy() {
 
         for (auto &i : replicaIndices) {
             means[i] = std::accumulate(cycleEnergies[i].begin(),
-                                       cycleEnergies[i].end(), 0.0) /
+                                       cycleEnergies[i].end(), ldouble(0)) /
                        cycleUpdates;
-            stds[i] = std::sqrt(
+            stds[i] = mp::sqrt(
                 std::accumulate(cycleEnergies[i].begin(),
-                                cycleEnergies[i].end(), 0.0,
-                                [&](double lhs, double rhs) {
-                                    return rhs + std::pow(lhs - means[i], 2);
+                                cycleEnergies[i].end(), ldouble(0),
+                                [&](ldouble lhs, ldouble rhs) {
+                                    return rhs + mp::pow(lhs - means[i], 2);
                                 }) /
                 cycleUpdates);
         }
@@ -469,7 +468,7 @@ uint SimulatedLattice::reachStabilityEnergy() {
             }
 
             for (int j = 1; j < static_cast<int>(binsToCompare); ++j) {
-                double difference =
+                ldouble difference =
                     abs((means[i] - bins.end()[-j][i]) / means[i]);
 
                 if (difference >= stds[i]) {
@@ -497,7 +496,7 @@ void SimulatedLattice::setStabilityMode(char m) {
     stabilityMode = m;
 }
 
-void SimulatedLattice::addAvgMag(uint index, double mag) {
+void SimulatedLattice::addAvgMag(uint index, ldouble mag) {
     if (mag >= 0 && mag <= 1) {
         avgMag[index] = mag;
     } else {
@@ -507,7 +506,7 @@ void SimulatedLattice::addAvgMag(uint index, double mag) {
     }
 }
 
-void SimulatedLattice::addAvgMag2(uint index, double mag2) {
+void SimulatedLattice::addAvgMag2(uint index, ldouble mag2) {
     if (mag2 >= 0 && mag2 <= 1) {
         avgMag2[index] = mag2;
     } else {
@@ -517,7 +516,7 @@ void SimulatedLattice::addAvgMag2(uint index, double mag2) {
     }
 }
 
-void SimulatedLattice::addAvgMag4(uint index, double mag4) {
+void SimulatedLattice::addAvgMag4(uint index, ldouble mag4) {
     if (mag4 >= 0 && mag4 <= 1) {
         avgMag4[index] = mag4;
     } else {

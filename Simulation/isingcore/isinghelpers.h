@@ -11,8 +11,8 @@ namespace ising {
 const int MAX_FILENAME_SIZE = 255;
 
 Hamiltonian readHamiltonian(std::ifstream& file, char& shape);
-Lattice* chooseLattice(char shape, const Hamiltonian& hamiltonian, double t,
-                       double dt, uint n, char m);
+Lattice* chooseLattice(char shape, const Hamiltonian& hamiltonian, ldouble t,
+                       ldouble dt, uint n, char m);
 std::string getOutFilename(const std::string& inFilename,
                            const std::string& newDir);
 std::string getOutFilename(const std::string& inFilename,

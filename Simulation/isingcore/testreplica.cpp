@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
 
     file.close();
 
-    double t = 1;
-    double dt = .1;
+    ldouble t = 1;
+    ldouble dt = .1;
     uint n = 10;
     char m = 'p';
     int num = 5;
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     assert(replica.getTemperature() == t + num * dt &&
            "Replica temperature incorrect!\n");
-    double newT = (replica.getTemperature() + t) / 2;
+    ldouble newT = (replica.getTemperature() + t) / 2;
     replica.setTemperature(newT);
     assert(replica.getTemperature() == newT &&
            "New replica temperature incorrect!\n");

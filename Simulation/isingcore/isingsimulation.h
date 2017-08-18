@@ -6,10 +6,10 @@
 
 namespace ising {
 void receiveSimulationInput(int argc, char *argv[], std::string &filename,
-                            double &t, double &dt, int &n, int &updates,
+                            ldouble &t, ldouble &dt, int &n, int &updates,
                             int &trials, char &mode);
-void manageSimulation(const std::string &inFilename, const double t,
-                      const double dt, const int n, const int updates,
+void manageSimulation(const std::string &inFilename, const ldouble t,
+                      const ldouble dt, const int n, const int updates,
                       const int trials, const char mode);
 }
 

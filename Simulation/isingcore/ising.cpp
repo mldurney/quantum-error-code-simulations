@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     file.close();
 
-    double temperature;
+    ldouble temperature;
     char mode;
     uint preupdates;
 

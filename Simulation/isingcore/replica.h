@@ -14,10 +14,10 @@ class Replica {
     cvector getSpins() const { return spins; }
     const LatticeProperties& getProperties() const { return prop; }
     uint getReplicaIndex() { return replicaIndex; }
-    double getTemperature() { return temperature; }
-    void setTemperature(double t);
+    ldouble getTemperature() { return temperature; }
+    void setTemperature(ldouble t);
     int getTotalEnergy() { return findTotalEnergy(); }
-    double getMagnetization() { return findMagnetization(); }
+    ldouble getMagnetization() { return findMagnetization(); }
 
     void update();
     void reinit() { initSpins(); }
@@ -29,17 +29,17 @@ class Replica {
     void updateAll();
     void updatePseudo();
     void updateRandom();
-    double findProbability(int index);
+    ldouble findProbability(int index);
     int findTotalEnergy();
     inline int findIndexEnergy(int index);
-    double findMagnetization();
+    ldouble findMagnetization();
 
     void initSpins();
 
     cvector spins;
     const LatticeProperties& prop;
     uint replicaIndex;
-    double temperature;
+    ldouble temperature;
     ivector randomizedIndices;
     RandomGenerator gen;
 };

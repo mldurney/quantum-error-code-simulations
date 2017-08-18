@@ -2,11 +2,11 @@
 
 using namespace ising;
 
-Simulation::Simulation(const std::string &filename, double t, double dt, uint n,
+Simulation::Simulation(const std::string &filename, ldouble t, ldouble dt, uint n,
                        uint updates, uint trials, char mode)
     : Simulation(filename, t, dt, n, updates, PREUPDATES, trials, mode) {}
 
-Simulation::Simulation(const std::string &filename, double t, double dt, uint n,
+Simulation::Simulation(const std::string &filename, ldouble t, ldouble dt, uint n,
                        uint updates, uint preupdates, uint trials, char mode)
     : inFilename(filename),
       minT(t),
@@ -21,7 +21,7 @@ Simulation::Simulation(const std::string &filename, double t, double dt, uint n,
     }
 
     for (unsigned i = 0; i < n; ++i) {
-        double currT = minT + dt * i;
+        ldouble currT = minT + dt * i;
         temperatures[temperatureToIndex(currT)] = currT;
     }
 
@@ -87,7 +87,7 @@ void Simulation::loadTempData() {
 
         std::ifstream file(p);
         std::string line;
-        double num;
+        ldouble num;
         uint unreadT = numT;
 
         while (isalpha(file.peek())) {
@@ -145,7 +145,7 @@ uint Simulation::getLeadingInt(const fs::path &filename) {
     return stoi(trialString);
 }
 
-uint Simulation::temperatureToIndex(double t) {
+uint Simulation::temperatureToIndex(ldouble t) {
     if (t < (minT - .5 * dT)) {
         std::cout << "INVALID TEMPERATURE -- below minimum. Exiting... ";
         exit(EXIT_FAILURE);
@@ -308,7 +308,7 @@ void Simulation::initRunTrial(uint trial) {
     lock.unlock();
 }
 
-void Simulation::addAvgMag(uint index, double mag) {
+void Simulation::addAvgMag(uint index, ldouble mag) {
     if (mag >= 0 && mag <= 1) {
         avgMag[index].push_back(mag);
     } else {
@@ -318,7 +318,7 @@ void Simulation::addAvgMag(uint index, double mag) {
     }
 }
 
-void Simulation::addAvgMag2(uint index, double mag2) {
+void Simulation::addAvgMag2(uint index, ldouble mag2) {
     if (mag2 >= 0 && mag2 <= 1) {
         avgMag2[index].push_back(mag2);
     } else {
@@ -328,7 +328,7 @@ void Simulation::addAvgMag2(uint index, double mag2) {
     }
 }
 
-void Simulation::addAvgMag4(uint index, double mag4) {
+void Simulation::addAvgMag4(uint index, ldouble mag4) {
     if (mag4 >= 0 && mag4 <= 1) {
         avgMag4[index].push_back(mag4);
     } else {
@@ -338,8 +338,8 @@ void Simulation::addAvgMag4(uint index, double mag4) {
     }
 }
 
-double Simulation::findAverage(dvector &v) {
-    return std::accumulate(v.begin(), v.end(), 0.0) / v.size();
+ldouble Simulation::findAverage(dvector &v) {
+    return std::accumulate(v.begin(), v.end(), ldouble(0)) / v.size();
 }
 
 cdouble Simulation::findAverage(cdvector &v) {
@@ -349,16 +349,17 @@ cdouble Simulation::findAverage(cdvector &v) {
     for (cdouble &c : v) {
         vReal.push_back(c.real());
         vImag.push_back(c.imag());
+        // std::cout << c << std::endl;
     }
 
-    double avgReal = findAverage(vReal);
-    double avgImag = findAverage(vImag);
+    ldouble avgReal = findAverage(vReal);
+    ldouble avgImag = findAverage(vImag);
 
     return cdouble(avgReal, avgImag);
 }
 
-double Simulation::findAverageNoOutliers(dvector &v, double percentile1,
-                                         double percentile2) {
+ldouble Simulation::findAverageNoOutliers(dvector &v, ldouble percentile1,
+                                          ldouble percentile2) {
     if (percentile1 < 0 || percentile2 < 0 || percentile1 > 1 ||
         percentile2 > 1) {
         std::cout << "\nInvalid percentile! Must be between 0.0 and 1.0\n\n";
@@ -366,42 +367,42 @@ double Simulation::findAverageNoOutliers(dvector &v, double percentile1,
     }
 
     dvector mid;
-    double minPercentile = std::min(percentile1, percentile2);
-    double maxPercentile = std::max(percentile1, percentile2);
+    ldouble minPercentile = mp::min(percentile1, percentile2);
+    ldouble maxPercentile = mp::max(percentile1, percentile2);
 
     std::sort(v.begin(), v.end());
 
     for (int i = static_cast<int>(v.size()) - 1; i >= 0; --i) {
-        double percentile = static_cast<double>(i) / v.size();
+        ldouble percentile = static_cast<double>(i) / v.size();
         if (percentile <= maxPercentile && percentile >= minPercentile) {
             mid.push_back(v[i]);
         }
     }
 
-    double mean = std::accumulate(mid.begin(), mid.end(), 0.0) / mid.size();
-    double std = std::sqrt(
-        std::abs(std::accumulate(mid.begin(), mid.end(), 0.0,
-                                 [mean](double lhs, double rhs) {
-                                     return rhs + std::pow(lhs - mean, 2);
+    ldouble mean = std::accumulate(mid.begin(), mid.end(), ldouble(0)) / mid.size();
+    ldouble std = mp::sqrt(
+        mp::abs(std::accumulate(mid.begin(), mid.end(), ldouble(0),
+                                 [mean](ldouble lhs, ldouble rhs) {
+                                     return rhs + mp::pow(lhs - mean, 2);
                                  })) /
         mid.size());
 
-    double minStd = 1e-6;
-    std = std::max(std, minStd);
+    ldouble minStd = 1e-6;
+    std = mp::max(std, minStd);
 
     dvector noOutliers;
     for (auto &d : v) {
-        if (std::abs(d - mean) <= std) {
+        if (mp::abs(d - mean) <= std) {
             noOutliers.push_back(d);
         }
     }
 
-    return std::accumulate(noOutliers.begin(), noOutliers.end(), 0.0) /
+    return std::accumulate(noOutliers.begin(), noOutliers.end(), ldouble(0)) /
            noOutliers.size();
 }
 
-cdouble Simulation::findAverageNoOutliers(cdvector &v, double percentile1,
-                                          double percentile2) {
+cdouble Simulation::findAverageNoOutliers(cdvector &v, ldouble percentile1,
+                                          ldouble percentile2) {
     dvector vReal;
     dvector vImag;
 
@@ -410,19 +411,19 @@ cdouble Simulation::findAverageNoOutliers(cdvector &v, double percentile1,
         vImag.push_back(c.imag());
     }
 
-    double avgReal = findAverageNoOutliers(vReal, percentile1, percentile2);
-    double avgImag = findAverageNoOutliers(vImag, percentile1, percentile2);
+    ldouble avgReal = findAverageNoOutliers(vReal, percentile1, percentile2);
+    ldouble avgImag = findAverageNoOutliers(vImag, percentile1, percentile2);
     return cdouble(avgReal, avgImag);
 }
 
-double Simulation::getBinderCumulant(uint n) {
+ldouble Simulation::getBinderCumulant(uint n) {
     return 1 - getAvgMag4(n) / (3 * pow(getAvgMag2(n), 2));
 }
 
 cdouble Simulation::getCorrelationFunction(uint n) {
-    return cdouble(
-        1 / (2 * personalLattice->getSize() * sin(personalLattice->getQ())) *
-        sqrt((getChi0(n) / getChiq(n)) - cdouble(1)));
+    return cdouble(1 / (2 * personalLattice->getSize() *
+                        sin(personalLattice->getQ()))) *
+           sqrt((getChi0(n) / getChiq(n)) - cdouble(1));
 }
 
 dmap Simulation::getRealCorrelationFunctions() {
