@@ -35,6 +35,9 @@ def write_hamiltonian_dir(args):
                  + str(args['change_temp']) + 'dTx' + str(args['num_temps'])
                  + '-' + str(args['updates']) + 'ux' + str(args['trials'])
                  + '-' + args['mode'] + str(args['neighbors']))
+    if args['toric']:
+        main_name = 'toric' + main_name
+
     main_dir = os.path.join(cf.ROOT_DIR, main_name)
 
     tests = list(itertools.product(args['range_rows'], args['range_cols'],

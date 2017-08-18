@@ -28,11 +28,11 @@ Simulation::Simulation(const std::string &filename, double t, double dt, uint n,
     checkInputFile();
     initTempDirectory();
     loadTempData();
-    initLattices();
+    initPersonalLattice();
 }
 
 void Simulation::runSimulation() {
-    runTrials();
+    initRunTrials();
 
     for (uint i = 0; i < numT; ++i) {
         magnetizations[i] = getAvgMag(i);
@@ -212,6 +212,61 @@ void Simulation::runTrials() {
 }
 
 void Simulation::runTrial(uint trial) {
+    lattices[trial]->runLatticeSimulation();
+
+    auto lAvgMag = lattices[trial]->getAvgMag();
+    auto lAvgMag2 = lattices[trial]->getAvgMag2();
+    auto lAvgMag4 = lattices[trial]->getAvgMag4();
+    auto lChi0 = lattices[trial]->getChi0();
+    auto lChiq = lattices[trial]->getChiq();
+
+    std::unique_lock<std::mutex> lock;
+
+    lock = std::unique_lock<std::mutex>(avgMag_mutex);
+    for (auto &mag : lAvgMag) {
+        addAvgMag(mag.first, mag.second);
+    }
+    lock.unlock();
+
+    lock = std::unique_lock<std::mutex>(avgMag2_mutex);
+    for (auto &mag : lAvgMag2) {
+        addAvgMag2(mag.first, mag.second);
+    }
+    lock.unlock();
+
+    lock = std::unique_lock<std::mutex>(avgMag4_mutex);
+    for (auto &mag : lAvgMag4) {
+        addAvgMag4(mag.first, mag.second);
+    }
+    lock.unlock();
+
+    lock = std::unique_lock<std::mutex>(chi0_mutex);
+    for (auto &x : lChi0) {
+        addChi0(x.first, x.second);
+    }
+    lock.unlock();
+
+    lock = std::unique_lock<std::mutex>(chiq_mutex);
+    for (auto &x : lChiq) {
+        addChiq(x.first, x.second);
+    }
+    lock.unlock();
+}
+
+void Simulation::initRunTrials() {
+    std::vector<std::function<void(void)>> runs;
+
+    while (!remainingTrials.empty()) {
+        auto &trial = remainingTrials.back();
+        remainingTrials.pop_back();
+        runs.push_back([&] { initRunTrial(trial); });
+    }
+
+    runInPool(runs.begin(), runs.end(), getMaxThreads());
+}
+
+void Simulation::initRunTrial(uint trial) {
+    addLattice(trial);
     lattices[trial]->runLatticeSimulation();
 
     auto lAvgMag = lattices[trial]->getAvgMag();

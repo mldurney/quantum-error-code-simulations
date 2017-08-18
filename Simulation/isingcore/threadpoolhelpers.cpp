@@ -19,5 +19,9 @@ unsigned int ising::getNumThreads(unsigned int remaining) {
         numThreads = remaining;
     }
 
+    if (numThreads > MAXTHREADS) {
+        numThreads = MAXTHREADS;
+    }
+
     return numThreads;
 }

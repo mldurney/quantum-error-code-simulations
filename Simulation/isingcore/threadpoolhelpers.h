@@ -5,6 +5,8 @@
 #include "threadpool.h"
 
 namespace ising {
+const uint MAXTHREADS = 32;
+
 template <typename Iter>
 void runInPool(Iter begin, Iter end, unsigned int threadCount) {
     ThreadPool pool(threadCount);

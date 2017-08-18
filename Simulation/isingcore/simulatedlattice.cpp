@@ -187,7 +187,20 @@ void SimulatedLattice::runUpdatesStable() {
     }
 }
 
-int SimulatedLattice::reachStability() {
+uint SimulatedLattice::reachStability() {
+    switch (stabilityMode) {
+        case MAG:
+            return reachStabilityMag();
+        case CHI0:
+            return reachStabilityChi0();
+        case ENERGY:
+            return reachStabilityEnergy();
+        default:
+            return reachStabilityMag();
+    }
+}
+
+uint SimulatedLattice::reachStabilityMag() {
     auto configs = lattice->getConfigs();
     auto replicaIndices = lattice->getReplicaIndices();
 
@@ -274,7 +287,7 @@ int SimulatedLattice::reachStability() {
     return cycle;
 }
 
-int SimulatedLattice::reachStabilityChi0() {
+uint SimulatedLattice::reachStabilityChi0() {
     auto configs = lattice->getConfigs();
     auto displacements = lattice->getXDisplacements();
     auto indices = lattice->getIndices();
@@ -384,6 +397,104 @@ int SimulatedLattice::reachStabilityChi0() {
     }
 
     return cycle;
+}
+
+uint SimulatedLattice::reachStabilityEnergy() {
+    auto configs = lattice->getConfigs();
+    auto replicaIndices = lattice->getReplicaIndices();
+
+    uint cycleUpdates;
+    uint cycle;
+    uint maxCycles = 10;
+    dmapvector bins;
+    uint binsToCompare = 3;
+    bool continueUpdating = true;
+
+    for (cycle = 1; cycle < binsToCompare; ++cycle) {
+        cycleUpdates = BASEUPDATES * static_cast<uint>(std::pow(2, cycle));
+        dmap energies;
+
+        for (uint num1 = 0; num1 < cycleUpdates; ++num1) {
+            for (uint num2 = 0; num2 < SKIP; ++num2) {
+                lattice->ICA();
+            }
+
+            for (auto &i : replicaIndices) {
+                energies[i] += configs[i][0]->getTotalEnergy();
+            }
+        }
+
+        for (auto &e : energies) {
+            e.second = fabs(e.second) / cycleUpdates;
+        }
+
+        bins.push_back(energies);
+    }
+
+    while (continueUpdating) {
+        cycleUpdates = BASEUPDATES * static_cast<uint>(std::pow(2, cycle));
+        dvectormap cycleEnergies;
+
+        for (uint num1 = 0; num1 < cycleUpdates; ++num1) {
+            for (uint num2 = 0; num2 < SKIP; ++num2) {
+                lattice->ICA();
+            }
+
+            for (auto &i : replicaIndices) {
+                double energy = configs[i][0]->getTotalEnergy();
+                cycleEnergies[i].push_back(energy);
+            }
+        }
+
+        dmap means, stds;
+
+        for (auto &i : replicaIndices) {
+            means[i] = std::accumulate(cycleEnergies[i].begin(),
+                                       cycleEnergies[i].end(), 0.0) /
+                       cycleUpdates;
+            stds[i] = std::sqrt(
+                std::accumulate(cycleEnergies[i].begin(),
+                                cycleEnergies[i].end(), 0.0,
+                                [&](double lhs, double rhs) {
+                                    return rhs + std::pow(lhs - means[i], 2);
+                                }) /
+                cycleUpdates);
+        }
+
+        continueUpdating = false;
+
+        for (auto &i : replicaIndices) {
+            if (cycle >= maxCycles || continueUpdating == true) {
+                break;
+            }
+
+            for (int j = 1; j < static_cast<int>(binsToCompare); ++j) {
+                double difference =
+                    abs((means[i] - bins.end()[-j][i]) / means[i]);
+
+                if (difference >= stds[i]) {
+                    continueUpdating = true;
+                }
+            }
+        }
+
+        if (continueUpdating) {
+            bins.push_back(means);
+            ++cycle;
+        }
+    }
+
+    return cycle;
+}
+
+void SimulatedLattice::setStabilityMode(char m) {
+    if (m != MAG && m != CHI0 && m != ENERGY) {
+        std::cout << "\nInvalid stability mode!";
+        std::cout << "Must be MAG ('m'), CHI ('x'), or ENERGY ('e')\n\n";
+        exit(EXIT_FAILURE);
+    }
+
+    stabilityMode = m;
 }
 
 void SimulatedLattice::addAvgMag(uint index, double mag) {

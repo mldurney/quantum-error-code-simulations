@@ -12,6 +12,7 @@ namespace ising {
 const uint PREUPDATES = 500;
 const uint BASEUPDATES = 5;
 const uint SKIP = 10;
+enum { MAG = 'm', CHI0 = 'x', ENERGY = 'e' };
 
 class SimulatedLattice {
    public:
@@ -26,6 +27,7 @@ class SimulatedLattice {
     uint getPreupdates() const { return preupdates; }
     uint getSize() const { return getLattice()->getSize(); }
     double getQ() const { return q; }
+    char getStabilityMode() const { return stabilityMode; }
 
     const dmap& getTemperatures() const { return temperatures; }
     const dmap& getAvgMag() const { return avgMag; }
@@ -36,6 +38,7 @@ class SimulatedLattice {
 
    protected:
     void setQ(double qNew) { q = qNew; }
+    void setStabilityMode(char m);
 
     void addAvgMag(uint index, double mag);
     void addAvgMag2(uint index, double mag2);
@@ -49,6 +52,7 @@ class SimulatedLattice {
     uint updates;
     uint preupdates;
     double q;
+    char stabilityMode = MAG;
 
     dmap temperatures;
     dmap avgMag;
@@ -66,8 +70,10 @@ class SimulatedLattice {
     void runPreupdates();
     void runUpdates();
     void runUpdatesStable();
-    int reachStability();
-    int reachStabilityChi0();
+    uint reachStability();
+    uint reachStabilityMag();
+    uint reachStabilityChi0();
+    uint reachStabilityEnergy();
 };
 }
 

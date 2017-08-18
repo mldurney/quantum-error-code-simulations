@@ -191,19 +191,19 @@ def main():
 
     else:
         print('Usage: ' + sys.argv[0] + ' data_dir mode')
-        print('Modes: s - single, c - same coupling, d - same disorder, a - all\n')
+        print('Modes: s - single, c - same coupling, d - same disorder, z - same size, a - all\n')
         sys.exit(1)
 
     if not os.path.isdir(sys.argv[1]):
         print('Directory does not exist! Need data directory')
         print('Usage: ' + sys.argv[0] + ' data_dir mode')
-        print('Modes: s - single, c - same coupling, d - same disorder, a - all\n')
+        print('Modes: s - single, c - same coupling, d - same disorder, z - same size, a - all\n')
         sys.exit(1)
 
     if not mode in MODES:
         print(mode + ' is not a valid operation mode!')
         print('Usage: ' + sys.argv[0] + ' data_dir mode')
-        print('Modes: s - single, c - same coupling, d - same disorder, a - all\n')
+        print('Modes: s - single, c - same coupling, d - same disorder, z - same size, a - all\n')
         sys.exit(1)
 
     if mode == ALL:
