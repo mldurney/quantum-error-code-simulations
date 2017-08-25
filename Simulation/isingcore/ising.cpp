@@ -17,9 +17,9 @@ int main(int argc, char *argv[]) {
 
     file.close();
 
-    ldouble temperature;
+    double temperature;
     char mode;
-    uint preupdates;
+    uint preupdates = 0;
 
     if (argc == 4 || argc == 5) {
         temperature = atof(argv[2]);

@@ -13,7 +13,7 @@ std::mutex Simulation::chiq_mutex;
 
 int main(int argc, char *argv[]) {
     std::string inFilename;
-    ldouble t, dt;
+    double t, dt;
     int n, updates, trials;
     char mode;
 
@@ -22,8 +22,8 @@ int main(int argc, char *argv[]) {
     manageSimulation(inFilename, t, dt, n, updates, trials, mode);
 }
 
-void ising::manageSimulation(const std::string &inFilename, const ldouble t,
-                             const ldouble dt, const int n, const int updates,
+void ising::manageSimulation(const std::string &inFilename, const double t,
+                             const double dt, const int n, const int updates,
                              const int trials, const char mode) {
     Simulation simulation(inFilename, t, dt, n, updates, trials, mode);
     simulation.runSimulation();
@@ -43,9 +43,9 @@ void ising::manageSimulation(const std::string &inFilename, const ldouble t,
 }
 
 void ising::receiveSimulationInput(int argc, char *argv[],
-                                   std::string &filename, ldouble &t,
-                                   ldouble &dt, int &n, int &updates,
-                                   int &trials, char &mode) {
+                                   std::string &filename, double &t, double &dt,
+                                   int &n, int &updates, int &trials,
+                                   char &mode) {
     if (argc == 1) {
         std::cout << "Enter Hamiltonian input file: ";
         std::cin >> filename;

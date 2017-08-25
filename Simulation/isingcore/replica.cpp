@@ -16,7 +16,7 @@ void Replica::initSpins() {
     }
 }
 
-void Replica::setTemperature(ldouble t) {
+void Replica::setTemperature(double t) {
     if (t < prop.minT || t > prop.minT + prop.numT * prop.dT) {
         std::cout << "TEMPERATURE OUTSIDE VALID RANGE! Exiting...\n\n";
         exit(EXIT_FAILURE);
@@ -76,7 +76,7 @@ void Replica::updateRandom() {
     }
 }
 
-ldouble Replica::findProbability(int index) {
+double Replica::findProbability(int index) {
     int initEnergy = findIndexEnergy(index);
 
     if (initEnergy < 0) {
@@ -117,8 +117,8 @@ int Replica::findIndexEnergy(int index) {
     return spins[index] * energy;
 }
 
-ldouble Replica::findMagnetization() {
-    ldouble magnetism = 0;
+double Replica::findMagnetization() {
+    double magnetism = 0;
 
     for (uint i = 0; i < prop.numIndices; ++i) {
         magnetism += spins[i];

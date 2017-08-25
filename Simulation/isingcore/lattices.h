@@ -14,19 +14,19 @@ const uint REPLICAS = 2;
 
 class Lattice {
    public:
-    Lattice(Hamiltonian h, ldouble t, ldouble dt, int n, char m = 'p');
+    Lattice(Hamiltonian h, double t, double dt, int n, char m = 'p');
     virtual ~Lattice() = default;
 
     std::string getType() const { return prop.type; }
     char getShape() const { return prop.shape; }
-    ldouble getMinTemperature() const { return prop.minT; }
-    ldouble getChangeTemperature() const { return prop.dT; }
-    int getNumTemperatures() const { return prop.numT; }
+    double getMinTemperature() const { return prop.minT; }
+    double getChangeTemperature() const { return prop.dT; }
+    double getNumTemperatures() const { return prop.numT; }
     char getMode() const { return prop.mode; }
     int getSize() const { return prop.size; }
     int getRows() const { return prop.rows; }
     int getCols() const { return prop.cols; }
-    ldouble getJTemperature() const { return jTemperature; }
+    double getJTemperature() const { return jTemperature; }
 
     const Hamiltonian& getHamiltonian() const { return prop.hamiltonian; }
     const ivector2& getHFunction() const { return prop.hFunction; }
@@ -52,10 +52,10 @@ class Lattice {
 
     virtual int findXDisplacement(int, int) { return 1; };
     virtual int findYDisplacement(int, int) { return 1; };
-    virtual ldouble findDistance(int, int) { return 1; }
+    virtual double findDistance(int, int) { return 1; }
     void switchMode(char m);
-    void setTemperature(ldouble t);
-    void setJTemperature(ldouble t) { jTemperature = t; }
+    void setTemperature(double t);
+    void setJTemperature(double t) { jTemperature = t; }
 
    protected:
     void setType(std::string t) { prop.type = t; }
@@ -74,7 +74,7 @@ class Lattice {
    private:
     replicavector2 configs;
     ivector replicaIndices;
-    ldouble jTemperature;
+    double jTemperature;
 
     void mapsToSequences();
     void swapConfigs(uint i, uint j);
@@ -82,11 +82,11 @@ class Lattice {
 
 class RectangularLattice : public virtual Lattice {
    public:
-    RectangularLattice(Hamiltonian h, ldouble t, ldouble dt, int n, char m,
+    RectangularLattice(Hamiltonian h, double t, double dt, int n, char m,
                        int r = -1, int c = -1);
     int findXDisplacement(int i, int j);
     int findYDisplacement(int i, int j);
-    ldouble findDistance(int i, int j);
+    double findDistance(int i, int j);
 
    protected:
     void checkShape() const;
@@ -97,7 +97,7 @@ class RectangularLattice : public virtual Lattice {
 
 class SquareLattice : public RectangularLattice {
    public:
-    SquareLattice(Hamiltonian h, ldouble t, ldouble dt, int n, char m = 'p',
+    SquareLattice(Hamiltonian h, double t, double dt, int n, char m = 'p',
                   int s = -1);
     int findXDisplacement(int i, int j) {
         return RectangularLattice::findXDisplacement(i, j);
@@ -105,7 +105,7 @@ class SquareLattice : public RectangularLattice {
     int findYDisplacement(int i, int j) {
         return RectangularLattice::findYDisplacement(i, j);
     }
-    ldouble findDistance(int i, int j) {
+    double findDistance(int i, int j) {
         return RectangularLattice::findDistance(i, j);
     }
 
@@ -118,11 +118,11 @@ class SquareLattice : public RectangularLattice {
 
 class TriangularLattice : public virtual Lattice {
    public:
-    TriangularLattice(Hamiltonian h, ldouble t, ldouble dt, int n, char m = 'p',
+    TriangularLattice(Hamiltonian h, double t, double dt, int n, char m = 'p',
                       int r = -1, int c = -1);
     int findXDisplacement(int i, int j);
     int findYDisplacement(int i, int j);
-    ldouble findDistance(int i, int j);
+    double findDistance(int i, int j);
 
    protected:
     void checkShape() const;
@@ -133,7 +133,7 @@ class TriangularLattice : public virtual Lattice {
 
 class STriangularLattice : public TriangularLattice {
    public:
-    STriangularLattice(Hamiltonian h, ldouble t, ldouble dt, int n, char m = 'p',
+    STriangularLattice(Hamiltonian h, double t, double dt, int n, char m = 'p',
                        int s = -1);
     int findXDisplacement(int i, int j) {
         return TriangularLattice::findXDisplacement(i, j);
@@ -141,7 +141,7 @@ class STriangularLattice : public TriangularLattice {
     int findYDisplacement(int i, int j) {
         return TriangularLattice::findYDisplacement(i, j);
     }
-    ldouble findDistance(int i, int j) {
+    double findDistance(int i, int j) {
         return TriangularLattice::findDistance(i, j);
     }
 

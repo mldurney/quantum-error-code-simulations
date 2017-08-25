@@ -1,5 +1,5 @@
 /**
-  * Copyright (c) 2012 Jakob Progsch, V�clav Zeman
+  * Copyright (c) 2012 Jakob Progsch, Vï¿½clav Zeman
   *
   * This software is provided 'as-is', without any express or implied
   * warranty. In no event will the authors be held liable for any damages

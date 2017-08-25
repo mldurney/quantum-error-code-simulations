@@ -6,7 +6,7 @@ using namespace ising;
 // Lattice //
 /////////////
 
-Lattice::Lattice(Hamiltonian h, ldouble t, ldouble dt, int n, char m)
+Lattice::Lattice(Hamiltonian h, double t, double dt, int n, char m)
     : prop(h, t, dt, n, m) {
     mapsToSequences();
     setType("default");
@@ -146,10 +146,10 @@ void Lattice::houdayerClusterMove(uint index) {
             ivector unbranched = cluster;
 
             while (!unbranched.empty()) {
-                int index = unbranched.back();
+                int ind = unbranched.back();
                 unbranched.pop_back();
 
-                for (auto& i : prop.localTerms[index]) {
+                for (auto& i : prop.localTerms[ind]) {
                     if (std::find(cluster.begin(), cluster.end(), i) ==
                             cluster.end() &&
                         std::binary_search(qIndices.begin(), qIndices.end(),
@@ -172,11 +172,11 @@ void Lattice::houdayerClusterMove(uint index) {
 
 void Lattice::parallelTemperingUpdate() {
     for (uint i = 0; i < prop.numT - 1; ++i) {
-        ldouble dEnergy = configs[i][0]->getTotalEnergy() -
-                          configs[i + 1][0]->getTotalEnergy();
-        ldouble dBoltzmann = 1 / (KB * configs[i][0]->getTemperature()) -
-                             1 / (KB * configs[i + 1][0]->getTemperature());
-        ldouble probability = dEnergy * dBoltzmann;
+        double dEnergy = configs[i][0]->getTotalEnergy() -
+                         configs[i + 1][0]->getTotalEnergy();
+        double dBoltzmann = 1 / (KB * configs[i][0]->getTemperature()) -
+                            1 / (KB * configs[i + 1][0]->getTemperature());
+        double probability = dEnergy * dBoltzmann;
 
         if (probability > 1 || probability > gen.randFloatCO()) {
             for (uint j = 0; j < REPLICAS; ++j) {
@@ -212,7 +212,7 @@ void Lattice::ICA() {
     monteCarloSweep();
 
     for (uint i = 0; i < configs.size(); ++i) {
-        ldouble t = configs[i][0]->getTemperature();
+        double t = configs[i][0]->getTemperature();
         if (t < jTemperature) {
             houdayerClusterMove(i);
         }
@@ -247,7 +247,7 @@ void Lattice::shapeError() const {
 // RectangularLattice //
 ////////////////////////
 
-RectangularLattice::RectangularLattice(Hamiltonian h, ldouble t, ldouble dt,
+RectangularLattice::RectangularLattice(Hamiltonian h, double t, double dt,
                                        int n, char m, int r, int c)
     : Lattice(h, t, dt, n, m) {
     setType("rectangle");
@@ -281,7 +281,7 @@ int RectangularLattice::findYDisplacement(int i, int j) {
     return iCol - jCol;
 }
 
-ldouble RectangularLattice::findDistance(int i, int j) {
+double RectangularLattice::findDistance(int i, int j) {
     return sqrt(pow(prop.xDisplacements[i][j], 2) +
                 pow(prop.yDisplacements[i][j], 2));
 }
@@ -306,7 +306,7 @@ void RectangularLattice::guessRowsCols() {
 // SquareLattice //
 ///////////////////
 
-SquareLattice::SquareLattice(Hamiltonian h, ldouble t, ldouble dt, int n, char m,
+SquareLattice::SquareLattice(Hamiltonian h, double t, double dt, int n, char m,
                              int s)
     : Lattice(h, t, dt, n, m), RectangularLattice(h, t, dt, n, m, s, s) {
     setType("square");
@@ -344,7 +344,7 @@ void SquareLattice::guessSide() {
 // TriangularLattice //
 ///////////////////////
 
-TriangularLattice::TriangularLattice(Hamiltonian h, ldouble t, ldouble dt, int n,
+TriangularLattice::TriangularLattice(Hamiltonian h, double t, double dt, int n,
                                      char m, int r, int c)
     : Lattice(h, t, dt, n, m) {
     setType("triangle");
@@ -378,7 +378,7 @@ int TriangularLattice::findYDisplacement(int i, int j) {
     return iCol - jCol;
 }
 
-ldouble TriangularLattice::findDistance(int i, int j) {
+double TriangularLattice::findDistance(int i, int j) {
     return sqrt(pow(prop.xDisplacements[i][j], 2) +
                 pow(prop.yDisplacements[i][j], 2));
 }
@@ -403,7 +403,7 @@ void TriangularLattice::guessRowsCols() {
 // STriangularLattice //
 ////////////////////////
 
-STriangularLattice::STriangularLattice(Hamiltonian h, ldouble t, ldouble dt,
+STriangularLattice::STriangularLattice(Hamiltonian h, double t, double dt,
                                        int n, char m, int s)
     : Lattice(h, t, dt, n, m), TriangularLattice(h, t, dt, n, m, s, s) {
     setType("square triangle");

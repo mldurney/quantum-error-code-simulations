@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     char shape = '\0';
     int rows = -1;
     int cols = -1;
-    char c = file.peek();
+    char c = (char)file.peek();
 
     if (isalpha(c)) {
         std::string line;
@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
 
     file.close();
 
-    ldouble t = 1;
-    ldouble dt = .1;
+    double t = 1;
+    double dt = .1;
     uint n = 10;
     char m = 'p';
     int num = 5;
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     assert(replica.getTemperature() == t + num * dt &&
            "Replica temperature incorrect!\n");
-    ldouble newT = (replica.getTemperature() + t) / 2;
+    double newT = (replica.getTemperature() + t) / 2;
     replica.setTemperature(newT);
     assert(replica.getTemperature() == newT &&
            "New replica temperature incorrect!\n");

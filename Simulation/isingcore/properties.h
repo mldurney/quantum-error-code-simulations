@@ -6,7 +6,7 @@
 
 namespace ising {
 struct LatticeProperties {
-    LatticeProperties(Hamiltonian h, ldouble t, ldouble dt, uint n, char m)
+    LatticeProperties(Hamiltonian h, double t, double dt, uint n, char m)
         : hamiltonian(h),
           numIndices(h.getNumIndices()),
           shape(h.getShape()),
@@ -34,8 +34,8 @@ struct LatticeProperties {
     int rows;
     int cols;
     uint size;
-    const ldouble minT;
-    const ldouble dT;
+    const double minT;
+    const double dT;
     const uint numT;
     char mode;
 };

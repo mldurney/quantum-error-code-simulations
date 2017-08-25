@@ -176,8 +176,8 @@ void Hamiltonian::printIndInteractions() const {
     for (auto &interaction : indInteractions) {
         std::cout << interaction.first << ":\t";
 
-        for (auto &indices : interaction.second) {
-            for (auto &i : indices) {
+        for (auto &ind : interaction.second) {
+            for (auto &i : ind) {
                 std::cout << i << " ";
             }
 

@@ -6,7 +6,7 @@ unsigned int ising::getMaxThreads() {
     unsigned int maxThreads = std::thread::hardware_concurrency();
 
     if (maxThreads != 0) {
-        return maxThreads;
+        return std::min(maxThreads, MAXTHREADS);
     } else {
         return 4;
     }

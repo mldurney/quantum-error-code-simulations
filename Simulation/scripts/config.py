@@ -71,6 +71,7 @@ SLASH = '\\' if sys.platform in ['win32', 'cygwin'] else '/'
 
 try:
     ROOT_DIR = find_parent_dir(ROOT_NAME)
+    DATA_DIR = os.path.join(ROOT_DIR, 'data')
     MAKE_DIR = os.path.dirname(find_exec_path(ROOT_DIR, MAKE_NAME))
 except ValueError as msg:
     print('ValueError: ' + str(msg))

@@ -8,8 +8,8 @@ namespace ising {
 class RandomGenerator {
    public:
     RandomGenerator() {
-        unsigned int zFactor = reinterpret_cast<intptr_t>(&zSeed);
-        unsigned int wFactor = reinterpret_cast<intptr_t>(&wSeed);
+        unsigned int zFactor = (unsigned int)reinterpret_cast<intptr_t>(&zSeed);
+        unsigned int wFactor = (unsigned int)reinterpret_cast<intptr_t>(&wSeed);
 
         srand((unsigned int)time(NULL) + (zFactor ^ wFactor) / zFactor);
         zSeed = rand() + (zFactor & rand());

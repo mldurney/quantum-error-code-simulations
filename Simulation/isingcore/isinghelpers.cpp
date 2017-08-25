@@ -37,8 +37,8 @@ Hamiltonian ising::readHamiltonian(std::ifstream& file, char& shape) {
     return Hamiltonian(importHamiltonianVector(file), shape, rows, cols);
 }
 
-Lattice* ising::chooseLattice(char shape, const Hamiltonian& h, ldouble t,
-                              ldouble dt, uint n, char m) {
+Lattice* ising::chooseLattice(char shape, const Hamiltonian& h, double t,
+                              double dt, uint n, char m) {
     Lattice* lattice;
 
     switch (shape) {

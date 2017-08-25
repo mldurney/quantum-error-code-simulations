@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     char shape = '\0';
     int rows = -1;
     int cols = -1;
-    char c = file.peek();
+    char c = (char)file.peek();
 
     if (isalpha(c)) {
         std::string line;
