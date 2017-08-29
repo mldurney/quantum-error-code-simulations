@@ -12,17 +12,19 @@ from matplotlib.ticker import AutoMinorLocator
 plt.switch_backend('agg')
 
 MODES = [SINGLE, COUPLING, DISORDER, SIZE, ALL] = ['s', 'c', 'd', 'z', 'a']
+YMAX = 0
+YMIN = 0
 
 
-def manage_plotting(directory, mode):
+def manage_plotting(directory, mode, clean):
 
     for folder in cf.DIR_NAMES:
         filenames = find_averaged_csv(directory, folder)
-        plot_directory = make_plot_directory(directory, folder, mode)
+        plot_directory = make_plot_directory(directory, folder, mode, clean)
         groups = find_filename_groups(filenames[:], mode)
 
         for group in groups:
-            plot_results(group, plot_directory, folder, mode)
+            plot_results(group, plot_directory, folder, mode, clean)
 
  # end manage_plotting
 
@@ -47,17 +49,20 @@ def find_averaged_csv(directory, folder):
 # end find_averaged_csv
 
 
-def make_plot_directory(directory, folder, mode):
+def make_plot_directory(directory, folder, mode, clean):
 
     if mode == SINGLE:
-        m = ''
+        ending = ''
     else:
-        m = '-' + mode
+        ending = '-' + mode
+
+    if clean:
+        ending += '_clean'
 
     main_dir = (os.path.dirname(directory)
                 if directory.endswith(folder) else directory)
 
-    plot_dir = os.path.join(main_dir, folder + '_plots' + m)
+    plot_dir = os.path.join(main_dir, folder + '_plots' + ending)
 
     if not os.path.exists(plot_dir):
         os.mkdir(plot_dir)
@@ -106,7 +111,7 @@ def find_filename_groups(filenames, mode):
 # end find_filenane_groups
 
 
-def plot_results(filenames, directory, folder, mode):
+def plot_results(filenames, directory, folder, mode, clean):
 
     old_dir = os.getcwd()
     os.chdir(directory)
@@ -126,6 +131,10 @@ def plot_results(filenames, directory, folder, mode):
         data = pd.read_csv(filename)
         temp, results = data.columns.tolist()
 
+        if clean:
+            mask = data[results] < data[results][0] * 1.1
+            data = data[mask]
+
         if mode == SINGLE:
             c = cm.rainbow(np.linspace(0, 1, len(data[temp])))
         else:
@@ -137,6 +146,20 @@ def plot_results(filenames, directory, folder, mode):
 
     ax.grid(color='.75', linestyle='-', linewidth=.5)
     ax.grid(which='minor', color='.01', linestyle='-', linewidth=.05)
+
+    results_min = min(data[results])
+    results_max = max(data[results])
+    YMIN = results_min - results_max * .1
+    YMAX = results_max * 1.1
+
+    curr_min, curr_max = ax.get_ylim()
+    if YMIN < curr_min:
+        YMIN = curr_min
+    if YMAX > curr_max:
+        YMAX = curr_max
+
+    ax.set_ylim([YMIN, YMAX])
+
     ax.xaxis.set_minor_locator(x_minor_locator)
     ax.yaxis.set_minor_locator(y_minor_locator)
 
@@ -177,42 +200,54 @@ def plot_results(filenames, directory, folder, mode):
 
 def main():
 
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
         directory = os.path.join(os.getcwd(), sys.argv[1])
         mode = sys.argv[2]
+        clean = True if sys.argv[3].lower() == 'y' else False
+
+    elif len(sys.argv) == 3:
+        directory = os.path.join(os.getcwd(), sys.argv[1])
+        if sys.argv[2].lower() == 'y':
+            mode = 's'
+            clean = True
+        else:
+            mode = sys.argv[2]
+            clean = False
 
     elif len(sys.argv) == 2:
         directory = os.path.join(os.getcwd(), sys.argv[1])
         mode = 's'
+        clean = False
 
     elif len(sys.argv) == 1:
         directory = os.getcwd()
         mode = 's'
+        clean = False
 
     else:
-        print('Usage: ' + sys.argv[0] + ' data_dir mode')
+        print('Usage: ' + sys.argv[0] + ' data_dir mode clean_data[y/n]')
         print('Modes: s - single, c - same coupling, d - same disorder, z - same size, a - all\n')
         sys.exit(1)
 
     if not os.path.isdir(sys.argv[1]):
         print('Directory does not exist! Need data directory')
-        print('Usage: ' + sys.argv[0] + ' data_dir mode')
+        print('Usage: ' + sys.argv[0] + ' data_dir mode clean_data[y/n]')
         print('Modes: s - single, c - same coupling, d - same disorder, z - same size, a - all\n')
         sys.exit(1)
 
     if not mode in MODES:
         print(mode + ' is not a valid operation mode!')
-        print('Usage: ' + sys.argv[0] + ' data_dir mode')
+        print('Usage: ' + sys.argv[0] + ' data_dir mode clean_data[y/n]')
         print('Modes: s - single, c - same coupling, d - same disorder, z - same size, a - all\n')
         sys.exit(1)
 
     if mode == ALL:
         for option in [SINGLE, COUPLING, DISORDER, SIZE]:
             mode = option
-            manage_plotting(directory, mode)
+            manage_plotting(directory, mode, clean)
 
     else:
-        manage_plotting(directory, mode)
+        manage_plotting(directory, mode, clean)
 
 # end main
 

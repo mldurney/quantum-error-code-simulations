@@ -1,9 +1,9 @@
 CXX		 = g++
-CXXFLAGS = -std=c++1z -Wall -Wextra -pedantic -pthread -Ofast
+CXXFLAGS = -std=c++1z -Wall -Wextra -pedantic -pthread -Ofast -static-libstdc++
 
 all : testhamiltonian testreplica ising isingsimulation
 
-debug: CXXFLAGS = -std=c++1z -Wall -Wextra -pedantic -pthread -g -ggdb -O0
+debug: CXXFLAGS = -std=c++1z -Wall -Wextra -pedantic -pthread -g -ggdb -O0 -static-libstdc++
 debug: testhamiltonian testreplica ising isingsimulation
 
 isingsimulation : isingsimulation.o simulation.o threadpoolhelpers.o simulatedlattice.o isinghelpers.o lattices.o replica.o hamiltonian.o
