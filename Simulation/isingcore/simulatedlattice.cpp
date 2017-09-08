@@ -70,7 +70,7 @@ void SimulatedLattice::runLatticeSimulation() {
 
 void SimulatedLattice::runPreupdates() {
     for (uint i = 0; i < preupdates; ++i) {
-        lattice->monteCarloSweep();
+        lattice->ICA();
     }
 }
 
@@ -84,7 +84,7 @@ void SimulatedLattice::runUpdates() {
 
     for (uint num1 = 0; num1 < updates; ++num1) {
         for (uint num2 = 0; num2 < SKIP; ++num2) {
-            lattice->monteCarloSweep();
+            lattice->ICA();
         }
 
         for (auto &replicas : configs) {
@@ -108,11 +108,21 @@ void SimulatedLattice::runUpdates() {
         for (auto &i : indices) {
             for (auto &j : indices) {
                 uint index = replicas[0]->getReplicaIndex();
-                runningCorr[index][i][j] /= (int)updates;
                 sumCorrK0[index] += runningCorr[index][i][j];
-                sumCorrKq[index] +=
-                    cdouble(runningCorr[index][i][j]) *
-                    std::exp(cdouble(0, q * displacements[i][j]));
+
+                if (lattice->getProperties().rows % 2 == 0 &&
+                    displacements[i][j] == lattice->getProperties().rows / 2) {
+                    sumCorrKq[index] +=
+                        ((cdouble(runningCorr[index][i][j]) *
+                          std::exp(cdouble(0, q * displacements[i][j]))) +
+                         (cdouble(runningCorr[index][i][j]) *
+                          std::exp(cdouble(0, q * -displacements[i][j])))) /
+                        cdouble(2);
+                } else {
+                    sumCorrKq[index] +=
+                        cdouble(runningCorr[index][i][j]) *
+                        std::exp(cdouble(0, q * displacements[i][j]));
+                }
             }
         }
     }
@@ -122,8 +132,8 @@ void SimulatedLattice::runUpdates() {
         addAvgMag(i, fabs(runningMag[i]) / updates);
         addAvgMag2(i, fabs(runningMag2[i]) / updates);
         addAvgMag4(i, fabs(runningMag4[i]) / updates);
-        addChi0(i, sumCorrK0[i] / cdouble(lattice->getNumIndices()));
-        addChiq(i, sumCorrKq[i] / cdouble(lattice->getNumIndices()));
+        addChi0(i, sumCorrK0[i] / cdouble(lattice->getNumIndices() * updates));
+        addChiq(i, sumCorrKq[i] / cdouble(lattice->getNumIndices() * updates));
     }
 }
 
@@ -144,7 +154,7 @@ void SimulatedLattice::runUpdatesStable() {
 
     for (uint num1 = 0; num1 < cycleUpdates; ++num1) {
         for (uint num2 = 0; num2 < SKIP; ++num2) {
-            lattice->monteCarloSweep();
+            lattice->ICA();
         }
 
         for (auto &replicas : configs) {
@@ -168,11 +178,21 @@ void SimulatedLattice::runUpdatesStable() {
         for (auto &i : indices) {
             for (auto &j : indices) {
                 uint index = replicas[0]->getReplicaIndex();
-                runningCorr[index][i][j] /= cycleUpdates;
                 sumCorrK0[index] += runningCorr[index][i][j];
-                sumCorrKq[index] +=
-                    cdouble(runningCorr[index][i][j]) *
-                    std::exp(cdouble(0, q * displacements[i][j]));
+
+                if (lattice->getProperties().rows % 2 == 0 &&
+                    displacements[i][j] == lattice->getProperties().rows / 2) {
+                    sumCorrKq[index] +=
+                        ((cdouble(runningCorr[index][i][j]) *
+                          std::exp(cdouble(0, q * displacements[i][j]))) +
+                         (cdouble(runningCorr[index][i][j]) *
+                          std::exp(cdouble(0, q * -displacements[i][j])))) /
+                        cdouble(2);
+                } else {
+                    sumCorrKq[index] +=
+                        cdouble(runningCorr[index][i][j]) *
+                        std::exp(cdouble(0, q * displacements[i][j]));
+                }
             }
         }
     }
@@ -182,8 +202,10 @@ void SimulatedLattice::runUpdatesStable() {
         addAvgMag(i, fabs(runningMag[i]) / cycleUpdates);
         addAvgMag2(i, fabs(runningMag2[i]) / cycleUpdates);
         addAvgMag4(i, fabs(runningMag4[i]) / cycleUpdates);
-        addChi0(i, sumCorrK0[i] / cdouble(lattice->getNumIndices()));
-        addChiq(i, sumCorrKq[i] / cdouble(lattice->getNumIndices()));
+        addChi0(
+            i, sumCorrK0[i] / cdouble(lattice->getNumIndices() * cycleUpdates));
+        addChiq(
+            i, sumCorrKq[i] / cdouble(lattice->getNumIndices() * cycleUpdates));
     }
 }
 
@@ -216,7 +238,7 @@ uint SimulatedLattice::reachStabilityMag() {
 
         for (uint num1 = 0; num1 < cycleUpdates; ++num1) {
             for (uint num2 = 0; num2 < SKIP; ++num2) {
-                lattice->monteCarloSweep();
+                lattice->ICA();
             }
 
             for (auto &i : replicaIndices) {
@@ -237,7 +259,7 @@ uint SimulatedLattice::reachStabilityMag() {
 
         for (uint num1 = 0; num1 < cycleUpdates; ++num1) {
             for (uint num2 = 0; num2 < SKIP; ++num2) {
-                lattice->monteCarloSweep();
+                lattice->ICA();
             }
 
             for (auto &i : replicaIndices) {
@@ -306,7 +328,7 @@ uint SimulatedLattice::reachStabilityChi0() {
 
         for (uint num1 = 0; num1 < cycleUpdates; ++num1) {
             for (uint num2 = 0; num2 < SKIP; ++num2) {
-                lattice->monteCarloSweep();
+                lattice->ICA();
             }
 
             for (auto &i : replicaIndices) {
@@ -340,7 +362,7 @@ uint SimulatedLattice::reachStabilityChi0() {
 
         for (uint num1 = 0; num1 < cycleUpdates; ++num1) {
             for (uint num2 = 0; num2 < SKIP; ++num2) {
-                lattice->monteCarloSweep();
+                lattice->ICA();
             }
 
             for (auto &i : replicaIndices) {
@@ -413,7 +435,7 @@ uint SimulatedLattice::reachStabilityEnergy() {
 
         for (uint num1 = 0; num1 < cycleUpdates; ++num1) {
             for (uint num2 = 0; num2 < SKIP; ++num2) {
-                lattice->monteCarloSweep();
+                lattice->ICA();
             }
 
             for (auto &i : replicaIndices) {
@@ -434,7 +456,7 @@ uint SimulatedLattice::reachStabilityEnergy() {
 
         for (uint num1 = 0; num1 < cycleUpdates; ++num1) {
             for (uint num2 = 0; num2 < SKIP; ++num2) {
-                lattice->monteCarloSweep();
+                lattice->ICA();
             }
 
             for (auto &i : replicaIndices) {

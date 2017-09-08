@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     assert(prop.rows == h.getRows() && "Rows incongruent!\n");
     assert(prop.cols == h.getCols() && "Cols incongruent!\n");
     assert(prop.numIndices == h.getNumIndices() &&
-           "Num of indices incongruent!\n");
+           "Number of indices incongruent!\n");
 
     auto h1 = prop.hamiltonian.getHamiltonian(), h2 = h.getHamiltonian();
     for (auto it1 = h1.begin(), it2 = h2.begin();

@@ -1,7 +1,7 @@
 CXX		 = g++
 CXXFLAGS = -std=c++1z -Wall -Wextra -pedantic -pthread -Ofast -static-libstdc++
 
-all : testhamiltonian testreplica ising isingsimulation
+all : testhamiltonian testreplica testsusceptibility ising isingsimulation
 
 debug: CXXFLAGS = -std=c++1z -Wall -Wextra -pedantic -pthread -g -ggdb -O0 -static-libstdc++
 debug: testhamiltonian testreplica ising isingsimulation
@@ -26,6 +26,12 @@ ising : ising.o isinghelpers.o lattices.o replica.o hamiltonian.o
 
 ising.o : ising.cpp ising.h isinghelpers.h lattices.h replica.h properties.h hamiltonian.h common.h randomgenerator.h
 	$(CXX) $(CXXFLAGS) -c ising.cpp -lstdc++fs
+
+testsusceptibility : testsusceptibility.o isinghelpers.o lattices.o replica.o hamiltonian.o
+	$(CXX) $(CXXFLAGS) testsusceptibility.o isinghelpers.o lattices.o replica.o hamiltonian.o -o testsusceptibility -lstdc++fs
+
+testsusceptibility.o : testsusceptibility.cpp isinghelpers.h lattices.h replica.h properties.h hamiltonian.h common.h randomgenerator.h
+	$(CXX) $(CXXFLAGS) -c testsusceptibility.cpp -lstdc++fs
 
 isinghelpers.o : isinghelpers.cpp isinghelpers.h lattices.h replica.h properties.h hamiltonian.h common.h randomgenerator.h
 	$(CXX) $(CXXFLAGS) -c isinghelpers.cpp -lstdc++fs

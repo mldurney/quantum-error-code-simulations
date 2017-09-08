@@ -101,7 +101,7 @@ def make_directories(main_dir):
 
     directories = []
 
-    for directory in ['hamiltonians']  # + cf.DIR_NAMES:
+    for directory in ['hamiltonians'] + cf.DIR_NAMES:
         directories.append(os.path.join(main_dir, directory))
 
     for directory in [main_dir] + directories:

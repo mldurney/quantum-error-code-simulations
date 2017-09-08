@@ -50,9 +50,9 @@ class Lattice {
     void HCA();
     void ICA();
 
-    virtual int findXDisplacement(int, int) { return 1; };
-    virtual int findYDisplacement(int, int) { return 1; };
-    virtual double findDistance(int, int) { return 1; }
+    virtual int findXDisplacement(int, int) { return 0; };
+    virtual int findYDisplacement(int, int) { return 0; };
+    virtual double findDistance(int, int) { return 0; }
     void switchMode(char m);
     void setTemperature(double t);
     void setJTemperature(double t) { jTemperature = t; }

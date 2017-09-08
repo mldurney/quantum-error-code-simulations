@@ -272,13 +272,29 @@ void RectangularLattice::checkShape() const {
 int RectangularLattice::findXDisplacement(int i, int j) {
     int iRow = prop.locations[i][0];
     int jRow = prop.locations[j][0];
-    return iRow - jRow;
+    int xDisplacement = iRow - jRow;
+
+    if (xDisplacement > prop.rows / 2) {
+        xDisplacement -= prop.rows;
+    } else if (xDisplacement <= (-prop.rows - 1) / 2) {
+        xDisplacement += prop.rows;
+    }
+
+    return xDisplacement;
 }
 
 int RectangularLattice::findYDisplacement(int i, int j) {
     int iCol = prop.locations[i][1];
     int jCol = prop.locations[j][1];
-    return iCol - jCol;
+    int yDisplacement = iCol - jCol;
+
+    if (yDisplacement > prop.cols / 2) {
+        yDisplacement -= prop.cols;
+    } else if (yDisplacement <= (-prop.cols - 1) / 2) {
+        yDisplacement += prop.cols;
+    }
+
+    return yDisplacement;
 }
 
 double RectangularLattice::findDistance(int i, int j) {
@@ -367,15 +383,31 @@ void TriangularLattice::checkShape() const {
 }
 
 int TriangularLattice::findXDisplacement(int i, int j) {
-    int iCol = prop.locations[i][0];
-    int jCol = prop.locations[j][0];
-    return iCol - jCol;
+    int iRow = prop.locations[i][0];
+    int jRow = prop.locations[j][0];
+    int xDisplacement = iRow - jRow;
+
+    if (xDisplacement > prop.rows / 2) {
+        xDisplacement -= prop.rows;
+    } else if (xDisplacement <= (-prop.rows - 1) / 2) {
+        xDisplacement += prop.rows;
+    }
+
+    return xDisplacement;
 }
 
 int TriangularLattice::findYDisplacement(int i, int j) {
     int iCol = prop.locations[i][1];
     int jCol = prop.locations[j][1];
-    return iCol - jCol;
+    int yDisplacement = iCol - jCol;
+
+    if (yDisplacement > prop.cols / 2) {
+        yDisplacement -= prop.cols;
+    } else if (yDisplacement <= (-prop.cols - 1) / 2) {
+        yDisplacement += prop.cols;
+    }
+
+    return yDisplacement;
 }
 
 double TriangularLattice::findDistance(int i, int j) {
