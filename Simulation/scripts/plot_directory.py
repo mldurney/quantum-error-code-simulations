@@ -2,6 +2,7 @@ import sys
 import glob
 import os
 import re
+import argparse
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,9 +15,10 @@ plt.switch_backend('agg')
 MODES = [SINGLE, COUPLING, DISORDER, SIZE, ALL] = ['s', 'c', 'd', 'z', 'a']
 YMAX = 0
 YMIN = 0
+DEFAULT = -1
 
 
-def manage_plotting(directory, mode, clean):
+def manage_plotting(directory, mode, clean, min_temperature, max_temperature):
 
     for folder in cf.DIR_NAMES:
         filenames = find_averaged_csv(directory, folder)
@@ -24,7 +26,8 @@ def manage_plotting(directory, mode, clean):
         groups = find_filename_groups(filenames[:], mode)
 
         for group in groups:
-            plot_results(group, plot_directory, folder, mode, clean)
+            plot_results(group, plot_directory, folder, mode,
+                         clean, min_temperature, max_temperature)
 
  # end manage_plotting
 
@@ -111,7 +114,7 @@ def find_filename_groups(filenames, mode):
 # end find_filenane_groups
 
 
-def plot_results(filenames, directory, folder, mode, clean):
+def plot_results(filenames, directory, folder, mode, clean, min_temperature, max_temperature):
 
     old_dir = os.getcwd()
     os.chdir(directory)
@@ -135,6 +138,10 @@ def plot_results(filenames, directory, folder, mode, clean):
             mask = data[results] < data[results][0] * 1.1
             data = data[mask]
 
+        if min_temperature is not DEFAULT and max_temperature is not DEFAULT:
+            data = data[data[temp] >= min_temperature]
+            data = data[data[temp] <= max_temperature]
+
         if mode == SINGLE:
             c = cm.rainbow(np.linspace(0, 1, len(data[temp])))
         else:
@@ -149,6 +156,7 @@ def plot_results(filenames, directory, folder, mode, clean):
 
     results_min = min(data[results])
     results_max = max(data[results])
+
     YMIN = results_min - results_max * .1
     YMAX = results_max * 1.1
 
@@ -200,54 +208,57 @@ def plot_results(filenames, directory, folder, mode, clean):
 
 def main():
 
-    if len(sys.argv) == 4:
-        directory = os.path.join(os.getcwd(), sys.argv[1])
-        mode = sys.argv[2]
-        clean = True if sys.argv[3].lower() == 'y' else False
+    parser = argparse.ArgumentParser(
+        description='Plot results against temperature for Ising simulation data')
 
-    elif len(sys.argv) == 3:
-        directory = os.path.join(os.getcwd(), sys.argv[1])
-        if sys.argv[2].lower() == 'y':
-            mode = 's'
-            clean = True
-        else:
-            mode = sys.argv[2]
-            clean = False
+    parser.add_argument('directory', metavar='dir', nargs='?', default=os.getcwd(
+    ), help='Main directory for specific simulation run')
+    parser.add_argument('-s', '--single', action='store_true',
+                        help='Plot all data separately')
+    parser.add_argument('-c', '--coupling', action='store_true',
+                        help='Plot data by like coupling')
+    parser.add_argument('-d', '--disorder', action='store_true',
+                        help='Plot data by like disorder')
+    parser.add_argument('-z', '--size', action='store_true',
+                        help='Plot data by like size')
+    parser.add_argument('-a', '--all', action='store_true',
+                        help='Plot data by all possible modes')
+    parser.add_argument('-x', '--clean', action='store_true',
+                        help='Remove extreme data points to reduce plot range')
+    parser.add_argument('-t', '--temperatures', metavar='T', nargs=2, type=float, default=[DEFAULT, DEFAULT],
+                        help='Set min and max [min max] temperature ranges')
 
-    elif len(sys.argv) == 2:
-        directory = os.path.join(os.getcwd(), sys.argv[1])
-        mode = 's'
-        clean = False
+    args = parser.parse_args()
+    mode = None
 
-    elif len(sys.argv) == 1:
-        directory = os.getcwd()
-        mode = 's'
-        clean = False
+    directory = os.path.join(os.getcwd(), args.directory)
+    clean = True if args.clean else False
+    (min_temperature, max_temperature) = args.temperatures
 
-    else:
-        print('Usage: ' + sys.argv[0] + ' data_dir mode clean_data[y/n]')
-        print('Modes: s - single, c - same coupling, d - same disorder, z - same size, a - all\n')
-        sys.exit(1)
-
-    if not os.path.isdir(sys.argv[1]):
-        print('Directory does not exist! Need data directory')
-        print('Usage: ' + sys.argv[0] + ' data_dir mode clean_data[y/n]')
-        print('Modes: s - single, c - same coupling, d - same disorder, z - same size, a - all\n')
-        sys.exit(1)
-
-    if not mode in MODES:
-        print(mode + ' is not a valid operation mode!')
-        print('Usage: ' + sys.argv[0] + ' data_dir mode clean_data[y/n]')
-        print('Modes: s - single, c - same coupling, d - same disorder, z - same size, a - all\n')
-        sys.exit(1)
-
-    if mode == ALL:
+    if args.single:
+        mode = SINGLE
+        manage_plotting(directory, mode, clean,
+                        min_temperature, max_temperature)
+    if args.coupling:
+        mode = COUPLING
+        manage_plotting(directory, mode, clean,
+                        min_temperature, max_temperature)
+    if args.disorder:
+        mode = DISORDER
+        manage_plotting(directory, mode, clean,
+                        min_temperature, max_temperature)
+    if args.size:
+        mode = SIZE
+        manage_plotting(directory, mode, clean,
+                        min_temperature, max_temperature)
+    if args.all:
         for option in [SINGLE, COUPLING, DISORDER, SIZE]:
             mode = option
-            manage_plotting(directory, mode, clean)
-
-    else:
-        manage_plotting(directory, mode, clean)
+            manage_plotting(directory, mode, clean,
+                            min_temperature, max_temperature)
+    if mode is None:
+        manage_plotting(directory, SINGLE, clean,
+                        min_temperature, max_temperature)
 
 # end main
 
