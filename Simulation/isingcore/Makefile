@@ -58,6 +58,6 @@ hamiltonian.o : hamiltonian.cpp hamiltonian.h common.h randomgenerator.h
 	$(CXX) $(CXXFLAGS) -c hamiltonian.cpp
 
 clean :
-	rm -f testhamiltonian testreplica ising isingsimulation *.o *.gch *.exe
+	rm -f testhamiltonian testreplica testsusceptibility ising isingsimulation *.o *.gch *.exe
 
 .PHONY : all clean
