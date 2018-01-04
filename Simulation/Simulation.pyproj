@@ -19,8 +19,6 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="scripts\average_runs.py" />
-    <Compile Include="scripts\average_runs_dir.py" />
     <Compile Include="scripts\config.py" />
     <Compile Include="scripts\generate_hamiltonian.py" />
     <Compile Include="scripts\generate_input.py" />
